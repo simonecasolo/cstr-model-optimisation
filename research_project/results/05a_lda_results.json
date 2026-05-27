@@ -1,0 +1,435 @@
+{
+  "method": "LDA (LOSO cross-validation)",
+  "threshold": 0.95,
+  "feature_configs": {
+    "physics (2)": [
+      "UA_eff_proxy",
+      "k0_eff_proxy"
+    ],
+    "minimal (6)": [
+      "k0_eff_proxy",
+      "UA_eff_proxy",
+      "C_mean",
+      "C_min",
+      "Qc_mean",
+      "C_final_mean"
+    ],
+    "full (29)": [
+      "C_mean",
+      "C_std",
+      "C_slope",
+      "C_min",
+      "C_max",
+      "T_mean",
+      "T_std",
+      "T_slope",
+      "T_min",
+      "T_max",
+      "Tc_mean",
+      "Tc_std",
+      "Tc_slope",
+      "Tc_min",
+      "Tc_max",
+      "Qc_mean",
+      "Qc_std",
+      "Qc_slope",
+      "Qc_min",
+      "Qc_max",
+      "C_final_mean",
+      "T_final_mean",
+      "Tc_final_mean",
+      "Qc_final_mean",
+      "int_abs_T_err",
+      "Qc_sat_low_frac",
+      "Qc_sat_high_frac",
+      "UA_eff_proxy",
+      "k0_eff_proxy"
+    ]
+  },
+  "results": {
+    "open_loop": {
+      "physics (2)": {
+        "accuracy": 1.0,
+        "macro_f1": 0.5,
+        "per_class_f1": {
+          "healthy": 1.0,
+          "fouling_dominant": 1.0,
+          "decay_dominant": 0.0,
+          "combined": 0.0
+        },
+        "confusion_matrix": [
+          [
+            50,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            50,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      },
+      "minimal (6)": {
+        "accuracy": 1.0,
+        "macro_f1": 0.5,
+        "per_class_f1": {
+          "healthy": 1.0,
+          "fouling_dominant": 1.0,
+          "decay_dominant": 0.0,
+          "combined": 0.0
+        },
+        "confusion_matrix": [
+          [
+            50,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            50,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      },
+      "full (29)": {
+        "accuracy": 1.0,
+        "macro_f1": 0.5,
+        "per_class_f1": {
+          "healthy": 1.0,
+          "fouling_dominant": 1.0,
+          "decay_dominant": 0.0,
+          "combined": 0.0
+        },
+        "confusion_matrix": [
+          [
+            50,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            50,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      }
+    },
+    "closed_loop": {
+      "physics (2)": {
+        "accuracy": 0.9933333333333333,
+        "macro_f1": 0.993420186866693,
+        "per_class_f1": {
+          "healthy": 0.9803921568627451,
+          "fouling_dominant": 0.9932885906040269,
+          "decay_dominant": 1.0,
+          "combined": 1.0
+        },
+        "confusion_matrix": [
+          [
+            50,
+            0,
+            0,
+            0
+          ],
+          [
+            2,
+            148,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            50,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            50
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      },
+      "minimal (6)": {
+        "accuracy": 0.9933333333333333,
+        "macro_f1": 0.9933333333333333,
+        "per_class_f1": {
+          "healthy": 0.98,
+          "fouling_dominant": 0.9933333333333333,
+          "decay_dominant": 1.0,
+          "combined": 1.0
+        },
+        "confusion_matrix": [
+          [
+            49,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            149,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            50,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            50
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      },
+      "full (29)": {
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class_f1": {
+          "healthy": 1.0,
+          "fouling_dominant": 1.0,
+          "decay_dominant": 1.0,
+          "combined": 1.0
+        },
+        "confusion_matrix": [
+          [
+            50,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            150,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            50,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            50
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      }
+    },
+    "combined": {
+      "physics (2)": {
+        "accuracy": 0.9475,
+        "macro_f1": 0.9623921011473394,
+        "per_class_f1": {
+          "healthy": 0.904977375565611,
+          "fouling_dominant": 0.9445910290237467,
+          "decay_dominant": 1.0,
+          "combined": 1.0
+        },
+        "confusion_matrix": [
+          [
+            100,
+            0,
+            0,
+            0
+          ],
+          [
+            21,
+            179,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            50,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            50
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      },
+      "minimal (6)": {
+        "accuracy": 0.965,
+        "macro_f1": 0.9744699474810348,
+        "per_class_f1": {
+          "healthy": 0.9339622641509434,
+          "fouling_dominant": 0.9639175257731958,
+          "decay_dominant": 1.0,
+          "combined": 1.0
+        },
+        "confusion_matrix": [
+          [
+            99,
+            1,
+            0,
+            0
+          ],
+          [
+            13,
+            187,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            50,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            50
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      },
+      "full (29)": {
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class_f1": {
+          "healthy": 1.0,
+          "fouling_dominant": 1.0,
+          "decay_dominant": 1.0,
+          "combined": 1.0
+        },
+        "confusion_matrix": [
+          [
+            100,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            50,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            50
+          ]
+        ],
+        "class_names": [
+          "healthy",
+          "fouling_dominant",
+          "decay_dominant",
+          "combined"
+        ]
+      }
+    }
+  }
+}

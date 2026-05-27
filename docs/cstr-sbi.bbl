@@ -1,0 +1,46 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Pilario and Cao(2018)]{pilario2018canonical}
+Karl Ezra~Salgado Pilario and Yi~Cao.
+\newblock Canonical variate dissimilarity analysis for process incipient fault
+  detection.
+\newblock \emph{IEEE Transactions on Industrial Informatics}, 14\penalty0
+  (12):\penalty0 5308--5315, 2018.
+\newblock URL
+  \url{https://dspace.lib.cranfield.ac.uk/bitstream/handle/1826/13055/Canonical_variate_dissimilarity_analysis-2018.pdf?sequence=4}.
+
+\bibitem[Tejero-Cantero et~al.(2020)Tejero-Cantero, Boelts, Deistler,
+  Lueckmann, Durkan, Gonçalves, Greenberg, and Macke]{tejero-cantero2020sbi}
+Alvaro Tejero-Cantero, Jan Boelts, Michael Deistler, Jan-Matthis Lueckmann,
+  Conor Durkan, Pedro~J. Gonçalves, David~S. Greenberg, and Jakob~H. Macke.
+\newblock sbi: A toolkit for simulation-based inference.
+\newblock \emph{Journal of Open Source Software}, 5\penalty0 (52):\penalty0
+  2505, 2020.
+\newblock \doi{10.21105/joss.02505}.
+\newblock URL \url{https://doi.org/10.21105/joss.02505}.
+
+\bibitem[Virtanen et~al.(2020)Virtanen, Gommers, Oliphant, Haberland, Reddy,
+  Cournapeau, Burovski, Peterson, Weckesser, Bright, {van der Walt}, Brett,
+  Wilson, Millman, Mayorov, Nelson, Jones, Kern, Larson, Carey, Polat, Feng,
+  Moore, {VanderPlas}, Laxalde, Perktold, Cimrman, Henriksen, Quintero, Harris,
+  Archibald, Ribeiro, Pedregosa, {van Mulbregt}, and {SciPy 1.0
+  Contributors}]{2020SciPy-NMeth}
+Pauli Virtanen, Ralf Gommers, Travis~E. Oliphant, Matt Haberland, Tyler Reddy,
+  David Cournapeau, Evgeni Burovski, Pearu Peterson, Warren Weckesser, Jonathan
+  Bright, St{\'e}fan~J. {van der Walt}, Matthew Brett, Joshua Wilson, K.~Jarrod
+  Millman, Nikolay Mayorov, Andrew R.~J. Nelson, Eric Jones, Robert Kern, Eric
+  Larson, C~J Carey, {\.I}lhan Polat, Yu~Feng, Eric~W. Moore, Jake
+  {VanderPlas}, Denis Laxalde, Josef Perktold, Robert Cimrman, Ian Henriksen,
+  E.~A. Quintero, Charles~R. Harris, Anne~M. Archibald, Ant{\^o}nio~H. Ribeiro,
+  Fabian Pedregosa, Paul {van Mulbregt}, and {SciPy 1.0 Contributors}.
+\newblock {{SciPy} 1.0: Fundamental Algorithms for Scientific Computing in
+  Python}.
+\newblock \emph{Nature Methods}, 17:\penalty0 261--272, 2020.
+\newblock \doi{10.1038/s41592-019-0686-2}.
+
+\end{thebibliography}

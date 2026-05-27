@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2021)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: cstr-sbi.aux
+The style file: plainnat.bst
+Database file #1: cstr-sbi.bib
+You've used 3 entries,
+            2773 wiz_defined-function locations,
+            620 strings with 6377 characters,
+and the built_in function-call counts, 3380 in all, are:
+= -- 254
+> -- 414
+< -- 1
++ -- 138
+- -- 135
+* -- 360
+:= -- 575
+add.period$ -- 13
+call.type$ -- 3
+change.case$ -- 54
+chr.to.int$ -- 3
+cite$ -- 6
+duplicate$ -- 62
+empty$ -- 121
+format.name$ -- 140
+if$ -- 645
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 3
+newline$ -- 27
+num.names$ -- 12
+pop$ -- 98
+preamble$ -- 1
+purify$ -- 51
+quote$ -- 0
+skip$ -- 84
+stack$ -- 0
+substring$ -- 74
+swap$ -- 3
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 33
+warning$ -- 0
+while$ -- 14
+width$ -- 0
+write$ -- 54

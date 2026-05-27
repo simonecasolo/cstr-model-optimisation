@@ -1,0 +1,90 @@
+{
+  "Sc0_open_healthy": {
+    "mode": "open_loop",
+    "alpha_true": 1.0,
+    "beta_true": 1.0,
+    "true_class": "healthy",
+    "alpha_post_mean": 0.9549210071563721,
+    "beta_post_mean": 0.876366376876831,
+    "alpha_cov90": 0.0,
+    "beta_cov90": 0.0,
+    "fault_class_acc": 0.0
+  },
+  "Sc1_closed_healthy": {
+    "mode": "closed_loop",
+    "alpha_true": 1.0,
+    "beta_true": 1.0,
+    "true_class": "healthy",
+    "alpha_post_mean": 0.9961338639259338,
+    "beta_post_mean": 0.9652767181396484,
+    "alpha_cov90": 0.86,
+    "beta_cov90": 0.58,
+    "fault_class_acc": 0.84
+  },
+  "Sc2_closed_fouling": {
+    "mode": "closed_loop",
+    "alpha_true": 1.0,
+    "beta_true": 0.7,
+    "true_class": "fouling_dominant",
+    "alpha_post_mean": 0.9433690905570984,
+    "beta_post_mean": 0.5443137288093567,
+    "alpha_cov90": 0.0,
+    "beta_cov90": 0.0,
+    "fault_class_acc": 0.06
+  },
+  "Sc3_closed_decay": {
+    "mode": "closed_loop",
+    "alpha_true": 0.7,
+    "beta_true": 1.0,
+    "true_class": "decay_dominant",
+    "alpha_post_mean": 0.6994893550872803,
+    "beta_post_mean": 0.9686598181724548,
+    "alpha_cov90": 1.0,
+    "beta_cov90": 0.62,
+    "fault_class_acc": 0.9
+  },
+  "Sc4_closed_combined": {
+    "mode": "closed_loop",
+    "alpha_true": 0.85,
+    "beta_true": 0.85,
+    "true_class": "combined",
+    "alpha_post_mean": 0.8380841016769409,
+    "beta_post_mean": 0.7910398244857788,
+    "alpha_cov90": 0.0,
+    "beta_cov90": 0.52,
+    "fault_class_acc": 1.0
+  },
+  "Sc5_closed_saturated": {
+    "mode": "closed_loop",
+    "alpha_true": 1.0,
+    "beta_true": 0.4,
+    "true_class": "fouling_dominant",
+    "alpha_post_mean": 1.1901987791061401,
+    "beta_post_mean": 0.25119006633758545,
+    "alpha_cov90": 0.02,
+    "beta_cov90": 0.12,
+    "fault_class_acc": 1.0
+  },
+  "Sc6_open_with_fault": {
+    "mode": "open_loop",
+    "alpha_true": 1.0,
+    "beta_true": 0.7,
+    "true_class": "fouling_dominant",
+    "alpha_post_mean": 1.0141232013702393,
+    "beta_post_mean": 0.8288506269454956,
+    "alpha_cov90": 0.08,
+    "beta_cov90": 0.0,
+    "fault_class_acc": 1.0
+  },
+  "Sc7_closed_drift": {
+    "mode": "closed_loop",
+    "alpha_true": 1.0,
+    "beta_true": 0.85,
+    "true_class": "fouling_dominant",
+    "alpha_post_mean": 0.9792812466621399,
+    "beta_post_mean": 0.7796014547348022,
+    "alpha_cov90": 0.0,
+    "beta_cov90": 0.38,
+    "fault_class_acc": 1.0
+  }
+}

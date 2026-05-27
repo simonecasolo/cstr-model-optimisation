@@ -1,0 +1,9 @@
+scenario,mode,alpha,beta,true_class,accuracy,F1_true_class
+Sc0,open_loop,1.0,1.0,healthy,0.88,0.9361702127659575
+Sc1,closed_loop,1.0,1.0,healthy,1.0,1.0
+Sc2,closed_loop,1.0,0.7,fouling_dominant,1.0,1.0
+Sc3,closed_loop,0.7,1.0,decay_dominant,1.0,1.0
+Sc4,closed_loop,0.85,0.85,combined,0.94,0.9690721649484536
+Sc5,closed_loop,1.0,0.4,fouling_dominant,1.0,1.0
+Sc6,open_loop,1.0,0.7,fouling_dominant,0.84,0.9130434782608696
+Sc7,closed_loop,1.0,0.85,fouling_dominant,0.96,0.9795918367346939

@@ -1,0 +1,11 @@
+subset,n_features,cv_accuracy
+full 29-D,29,1.0
+group:per_channel,20,1.0
+group:compact,12,1.0
+group:means_only,4,1.0
+top-10 MI,10,1.0
+top-15 MI,15,1.0
+group:final_window,4,0.9925
+group:physics,2,0.9825000000000002
+top-5 MI,5,0.925
+group:aggregates,3,0.44000000000000006

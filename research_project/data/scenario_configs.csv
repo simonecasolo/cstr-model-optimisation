@@ -1,0 +1,9 @@
+id,name,mode,alpha,beta,drift_T,description
+0,Sc0_open_healthy,open_loop,1.0,1.0,0.0,"Healthy reactor, open-loop (Qc fixed). Validation against spec Section 8."
+1,Sc1_closed_healthy,closed_loop,1.0,1.0,0.0,"Healthy reactor, closed-loop with PI control. Baseline."
+2,Sc2_closed_fouling,closed_loop,1.0,0.7,0.0,Jacket fouling (beta=0.7) -- primary fault scenario.
+3,Sc3_closed_decay,closed_loop,0.7,1.0,0.0,Catalyst decay (alpha=0.7).
+4,Sc4_closed_combined,closed_loop,0.85,0.85,0.0,Combined moderate fouling and decay.
+5,Sc5_closed_saturated,closed_loop,1.0,0.4,0.0,Severe fouling -- controller saturates at Qc_max.
+6,Sc6_open_with_fault,open_loop,1.0,0.7,0.0,Open-loop simulator applied to a fault -- the failure baseline (SBI trained on this is what the paper refutes).
+7,Sc7_closed_drift,closed_loop,1.0,0.85,2.0,Mild fouling plus +2 K sensor drift on T -- substudy of drift-vs-fouling identifiability.

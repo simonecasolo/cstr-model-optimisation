@@ -1,0 +1,9 @@
+scenario,mode,alpha_true,beta_true,alpha_mean,alpha_cov90,beta_mean,beta_cov90,fault_class,fault_prob
+Sc0_open_healthy,open_loop,1.0,1.0,0.9469338059425354,False,0.8916723728179932,False,healthy,0.8474
+Sc1_closed_healthy,closed_loop,1.0,1.0,0.9917206764221191,False,0.9880532026290894,True,healthy,0.998
+Sc2_closed_fouling,closed_loop,1.0,0.699999988079071,0.9511821269989014,False,0.6160989999771118,False,fouling_dominant,0.9986
+Sc3_closed_decay,closed_loop,0.699999988079071,1.0,0.7002981305122375,True,0.9930483102798462,True,decay_dominant,0.9978
+Sc4_closed_combined,closed_loop,0.8500000238418579,0.8500000238418579,0.838830292224884,False,0.7963268756866455,True,combined,0.9124
+Sc5_closed_saturated,closed_loop,1.0,0.4000000059604645,1.2179988622665405,False,0.1983732432126999,False,fouling_dominant,0.999
+Sc6_open_with_fault,open_loop,1.0,0.699999988079071,1.019014835357666,False,0.8199142813682556,False,fouling_dominant,0.7942
+Sc7_closed_drift,closed_loop,1.0,0.8500000238418579,0.9818893671035767,False,0.787875235080719,False,fouling_dominant,0.951
