@@ -355,6 +355,46 @@ def simulation_wrapper_sbi(
     return torch.tensor(np.stack(summaries), dtype=torch.float32)
 
 
+def simulation_wrapper_sbi_raw(
+    theta_torch,
+    inlet: jnp.ndarray = NOMINAL_INLET_CL,
+    ctrl: jnp.ndarray = NOMINAL_CTRL,
+    y0: jnp.ndarray = NOMINAL_Y0_CL,
+    t_window: float = 60.0,
+    dt: float = 0.01,
+    dt_out: float = 0.5,
+    seed: int = 0,
+):
+    """Like ``simulation_wrapper_sbi`` but returns raw flattened observations.
+
+    Returns
+    -------
+    ``torch.Tensor`` of shape ``(n_batch, n_timesteps * 4)`` — raw [C, T, Tc, Qc].
+    """
+    import torch
+    from cstr_sbi.physics import K0_NOMINAL, UA_NOMINAL
+    from cstr_sbi.simulator import apply_sensor_layer, DEFAULT_SENSOR_NOISE_PCT
+
+    theta_np = theta_torch.detach().cpu().numpy()
+    n_batch = theta_np.shape[0]
+
+    raw_obs = []
+    for i in range(n_batch):
+        alpha, beta = float(theta_np[i, 0]), float(theta_np[i, 1])
+        params = jnp.array([UA_NOMINAL, K0_NOMINAL, alpha, beta], dtype=jnp.float32)
+        proc_key, sens_key = jax.random.split(jax.random.PRNGKey(seed + i))
+        _, ys, qc = simulate_em_window(
+            params, inlet, ctrl, y0,
+            key=proc_key, t_window=t_window, dt=dt, dt_out=dt_out,
+        )
+        obs_packed = jnp.stack([ys[:, 0], ys[:, 1], ys[:, 2], qc], axis=1)
+        obs_packed = apply_sensor_layer(obs_packed, key=sens_key,
+                                        noise_pct=DEFAULT_SENSOR_NOISE_PCT)
+        raw_obs.append(np.asarray(obs_packed).reshape(-1))
+
+    return torch.tensor(np.stack(raw_obs), dtype=torch.float32)
+
+
 def train_sbi_posterior(
     prior,
     n_simulations: int = 10_000,
@@ -369,6 +409,8 @@ def train_sbi_posterior(
     inlet: jnp.ndarray = NOMINAL_INLET_CL,
     ctrl: jnp.ndarray = NOMINAL_CTRL,
     y0: jnp.ndarray = NOMINAL_Y0_CL,
+    embedding_net: "torch.nn.Module | None" = None,
+    use_raw_obs: bool = False,
 ):
     """Train an SNPE_C posterior with an NSF density estimator (M4).
 
@@ -382,6 +424,14 @@ def train_sbi_posterior(
         ``"nsf"`` (Neural Spline Flow, recommended) or ``"maf"``.
     save_to
         If given, pickle the trained posterior to this path.
+    embedding_net
+        Optional ``torch.nn.Module`` that maps raw observations to a learned
+        embedding. When provided, ``z_score_x="structured"`` is used.
+        See ``sbi.neural_nets.embedding_nets`` for built-in options.
+    use_raw_obs
+        If True, pass raw flattened ``(n_timesteps * 4,)`` observations to the
+        density estimator instead of 29-D summary statistics. Requires
+        ``embedding_net`` to be set.
 
     Returns
     -------
@@ -402,19 +452,27 @@ def train_sbi_posterior(
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
 
+    z_score_x = "structured" if embedding_net is not None else "independent"
     density_estimator_build_fun = posterior_nn(
         model=density_estimator,
         hidden_features=hidden_features,
         num_transforms=num_transforms,
+        embedding_net=embedding_net or torch.nn.Identity(),
+        z_score_x=z_score_x,
     )
-    inference_obj = SNPE(prior=prior, density_estimator=density_estimator_build_fun)
+    inference_obj = SNPE(
+        prior=prior,
+        density_estimator=density_estimator_build_fun,
+        show_progress_bars=False,
+    )
 
     _counter = [int(rng.integers(0, 2**31))]
+    sim_fn = simulation_wrapper_sbi_raw if use_raw_obs else simulation_wrapper_sbi
 
     def wrapper(theta: "torch.Tensor") -> "torch.Tensor":
         _counter[0] += 1
-        return simulation_wrapper_sbi(theta, inlet=inlet, ctrl=ctrl, y0=y0,
-                                      seed=_counter[0])
+        return sim_fn(theta, inlet=inlet, ctrl=ctrl, y0=y0,
+                      seed=_counter[0])
 
     t0 = time.perf_counter()
     theta, x = simulate_for_sbi(
@@ -425,13 +483,30 @@ def train_sbi_posterior(
         show_progress_bar=True,
     )
     inference_obj.append_simulations(theta, x)
-    density_estimator_trained = inference_obj.train(
-        training_batch_size=training_batch_size,
-        max_num_epochs=max_num_epochs,
-        show_train_summary=True,
-    )
+
+    import io, sys
+    _captured = io.StringIO()
+    _orig_stdout = sys.stdout
+    sys.stdout = _captured
+    try:
+        density_estimator_trained = inference_obj.train(
+            training_batch_size=training_batch_size,
+            max_num_epochs=max_num_epochs,
+            show_train_summary=False,
+        )
+    finally:
+        sys.stdout = _orig_stdout
+
     posterior = inference_obj.build_posterior(density_estimator_trained)
     wall_time_s = time.perf_counter() - t0
+
+    summary = getattr(inference_obj, "_summary", {})
+    n_epochs = summary.get("epochs_trained", ["?"])[-1]
+    best_val = summary.get("best_validation_loss", [None])[-1]
+    best_val_str = f"{best_val:.4f}" if best_val is not None else "?"
+    print(f"Training complete: {n_epochs} epochs, "
+          f"best val loss = {best_val_str}, "
+          f"wall time = {wall_time_s:.0f}s")
 
     metadata = {
         "n_simulations": n_simulations,

@@ -8,8 +8,8 @@ Parameter vector conventions (revised 2026-05-18)
 **Primary — 2-D (standard inference):**
     theta = [alpha, beta]
 
-    alpha [dimensionless] catalyst-activity factor  prior: Uniform[0.4, 1.0]
-    beta  [dimensionless] jacket-conductance factor prior: Uniform[0.4, 1.0]
+    alpha [dimensionless] catalyst-activity factor  prior: Uniform[0.4, 1.2]
+    beta  [dimensionless] jacket-conductance factor prior: Uniform[0.4, 1.2]
 
 UA and k0 are **fixed design constants** (UA_NOMINAL, K0_NOMINAL from
 ``physics.py``) and are NOT inferred. They enter the ODE as constants, not
@@ -39,12 +39,15 @@ from cstr_sbi.physics import K0_NOMINAL, UA_NOMINAL
 # Prior bounds (single source of truth)
 # ---------------------------------------------------------------------------
 
-# Primary inference parameters (both bounded [0.4, 1.0]).
+# Primary inference parameters (both bounded [0.4, 1.2]).
+# Upper bound extended to 1.2 to avoid neural density estimator boundary
+# effects at the nominal healthy state (α=β=1.0).  Values above 1.0 are
+# not physically meaningful — they serve as a numerical buffer only.
 ALPHA_LOW:  float = 0.40   # covers Sc5 severe-fouling / heavy decay
-ALPHA_HIGH: float = 1.00
+ALPHA_HIGH: float = 1.20
 
 BETA_LOW:   float = 0.40
-BETA_HIGH:  float = 1.00
+BETA_HIGH:  float = 1.20
 
 # Sensor-drift extension bounds (Sc7 / 4-D extended vector).
 DELTA_T_LOW:   float = -3.0    # K
