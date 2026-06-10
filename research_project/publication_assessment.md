@@ -65,17 +65,23 @@ Talts et al. 2018) was performed. The result is honest: mild miscalibration
 
 ## What's weak or missing
 
-### 1. No comparison with standard industrial baselines
+### ~~1. No comparison with standard industrial baselines~~ → RESOLVED (nb16)
 
-This is the biggest gap. The comparison is SBI vs NUTS (both Bayesian), but a
-reviewer in a process control journal will immediately ask: "How does this compare
-to an Extended Kalman Filter, an Unscented Kalman Filter, or a moving-horizon
-estimator?" These are the methods plants actually use. Without this comparison,
-the "53,000x speedup" claim is against the wrong baseline — nobody runs NUTS per
-window in practice.
+**Now done.** Notebook 16 implements both EKF (analytical Jacobian + matrix
+exponential discretisation) and UKF (sigma-point propagation, 13 points) for the
+augmented 6-D state [C, T, Tc, I, α, β]. Both are evaluated on the identical
+observations (50 replicates × 4 scenarios) and 30-day degradation stream (720
+windows) used for SBI. Key results:
 
-**Effort to fix: ~1 week.** Implement EKF/UKF for the same CSTR system and show
-the beta bias also appears (strengthening the structural argument).
+| Method | β bias (Sc2) | β MAE (tracking) | ms / window | Output |
+|--------|-------------|------------------|-------------|--------|
+| SBI | −0.149 | 0.033 | 16 | full posterior |
+| EKF | −0.093 | 0.065 | 30 | Gaussian (μ, Σ) |
+| UKF | −0.093 | 0.090 | 358 | Gaussian (μ, Σ) |
+| NUTS | −0.102 | 0.102 | 150,000 | full posterior |
+
+All four methods show β bias → structural confirmation. SBI has the lowest
+tracking MAE and fastest inference while providing full posterior uncertainty.
 
 ### 2. Synthetic data only
 
@@ -153,10 +159,10 @@ model, or compute the profile likelihood for beta to show the asymmetry directly
 
 In priority order:
 
-1. **Add an EKF/UKF baseline** (~1 week). Show the beta bias also appears with
-   classical state estimation. This transforms the evidence from "SBI has a
-   bias" to "the bias affects all methods," empirically confirming the
-   classical theory for this specific system.
+1. ~~**Add an EKF/UKF baseline**~~ → **DONE** (nb16). The β bias appears in all
+   four methods (SBI, NUTS, EKF, UKF), transforming the evidence from "SBI has a
+   bias" to "the bias affects all methods." This was the #1 priority and is now
+   the strongest empirical result in the paper.
 
 2. **Connect to the classical identifiability literature explicitly** (~days).
    The Fisher information result (I_bb 250-500x smaller than I_aa) should be
@@ -186,10 +192,13 @@ In priority order:
 
 The work is technically solid and well-documented. The strongest aspects are the
 **empirical methodology** (embedding-net ablation, SBC, multi-method confirmation
-of the bias) and the **practical demonstration** (real-time tracking with calibrated
-uncertainty). The identifiability finding is a careful quantification of a classical
-phenomenon — valuable as applied contribution but not a theoretical advance. Positioned
-honestly (applied SBI paper that quantifies a known identifiability limitation for a
-specific industrially relevant system), with an EKF baseline and proper literature
-context, this is publishable in a good process control journal. Without an EKF baseline,
-it reads as a thorough SBI application study — publishable but in a lower-impact venue.
+of the bias across 6 method/configuration combinations including EKF and UKF) and
+the **practical demonstration** (real-time tracking with calibrated uncertainty).
+The identifiability finding is a careful quantification of a classical phenomenon —
+valuable as applied contribution but not a theoretical advance. **With the EKF/UKF
+baseline now complete** (nb16), the paper has the industrial comparison that
+reviewers at process control journals require. The four-method β bias confirmation
+(SBI, NUTS, EKF, UKF all showing the same structural limitation) is the single
+strongest result. Positioned honestly, with proper literature context, this is
+publishable in a good process control journal (JPC, C&ChE) or in EAAI as an
+applied AI paper with strong engineering validation.

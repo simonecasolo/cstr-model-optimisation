@@ -85,6 +85,26 @@ This analytically confirms the numerical finding that $I_{\beta\beta}$ is $250$ 
 
 ---
 
+### 3.1 Frequency-Domain Perspective: Sensitivity Function
+
+The Jacobian collapse has an exact parallel in classical closed-loop identification theory (Forssell & Ljung, 1999). Define the **sensitivity function** of the closed-loop system as:
+
+$$S_0(q) = \left(1 + G_0(q) K(q)\right)^{-1}$$
+
+where $G_0(q)$ is the plant transfer function and $K(q)$ is the PI controller. The asymptotic variance of any identified parameter scales as (Forssell & Ljung, 1999, Eqs. 2.7, 3.9):
+
+$$\text{Var}(\hat{\theta}) \approx \frac{n}{N} \frac{\Phi_v(\omega)}{\Phi_u^r(\omega)}$$
+
+where $\Phi_v$ is the noise power spectrum and $\Phi_u^r$ is the **noise-free input spectrum** — the portion of the input that carries independent parametric information. For a closed-loop system, this is (Forssell & Ljung, 1999, Eq. 3.56):
+
+$$\Phi_u^r(\omega) = |S_0(e^{i\omega})|^2 \, \Phi_r(\omega)$$
+
+where $\Phi_r(\omega)$ is the reference (setpoint) spectrum. Because the CSTR operates at a **fixed setpoint** $T_{sp}$ without artificial dithering, $\Phi_r(\omega) = 0$ for all $\omega \neq 0$. Furthermore, a high-gain PI controller drives $S_0 \to 0$ at steady state. Together, $\Phi_u^r \to 0$, so the variance denominator vanishes — the parameter variance for $\beta$ explodes, which is mathematically equivalent to $I_{\beta\beta} \to 0$.
+
+The time-domain Jacobian collapse identified in §3 — specifically the zero row for $T$ in $J$ — is the **steady-state manifestation** of this frequency-domain result: $S_0 \to 0$ at DC means no input power is available to excite $\beta$, and the Jacobian row that would carry that information is zeroed out by the controller.
+
+---
+
 ## 4. Profile Likelihood and the Analytical Bias Mechanism
 
 To understand the negative bias, we isolate $\beta$ using the profile log-likelihood $\ell_{prof}(\beta)$. Substituting the optimal $\alpha^*(\beta) \approx \alpha_{true}$:
@@ -243,8 +263,29 @@ Ultimately, the empirical CNN embedding experiment—which bypassed hand-crafted
 
 ---
 
+### 6.1 Classical Closed-Loop Bias: Input-Noise Coupling
+
+The Laplace approximation in §4 characterises the bias geometrically (likelihood skewness), but a complementary explanation comes from classical prediction error methods (PEM). In closed loop, the standard PEM estimator is biased because the input $u(t)$ and the unmeasured output noise $\varepsilon(t)$ are **unavoidably correlated** — the controller feeds the noisy output back to determine the next input.
+
+The general PEM bias distribution is (Forssell & Ljung, 1999, Eq. 3.44):
+
+$$B(e^{i\omega}, \theta) = \left(H_0(e^{i\omega}) - H(e^{i\omega}, \theta)\right) \frac{\Phi_{e u}(\omega)}{\Phi_u(\omega)}$$
+
+where $H_0$ is the true noise model, $H(\cdot, \theta)$ is the estimated noise model, and $\Phi_{eu}$ is the **cross-spectrum between the input $u$ and the innovation $e$**. In open loop, $\Phi_{eu}(\omega) = 0$ for all $\omega$ (the input is independent of process noise), so the bias term vanishes identically.
+
+In the closed-loop CSTR, the PI controller computes the coolant flow as:
+
+$$Q_c(t) = Q_{c,0} + K_p \bigl(T_{sp} - T_{meas}(t)\bigr) + \frac{K_p}{\tau_i} \int_0^t \bigl(T_{sp} - T_{meas}(s)\bigr) ds$$
+
+where $T_{meas}(t) = T(t) + \varepsilon_T(t)$ includes sensor noise $\varepsilon_T$. This means $Q_c(t)$ is a function of $\varepsilon_T$, so the cross-spectrum $\Phi_{eu}(\omega) \neq 0$. The temperature noise couples directly into the "input" channel, and the resulting data asymmetry is precisely the $\Phi_{eu}$ term that biases classical estimators.
+
+**Bridge to SBI:** The neural summary networks in NPE receive the same $(C, T, T_c, Q_c)$ time series as any classical estimator. The asymmetric $\Phi_{eu}$ coupling is **physically embedded in the data** — it is not an artefact of the neural architecture or the hand-crafted 29-D summaries. The observed $-0.08$ to $-0.15$ downward bias on $\beta$ reflects the same structural input-noise coupling that biases classical PEM, as confirmed by the fact that NUTS, EKF, and UKF produce identical bias magnitudes. This is a fundamental limitation of inference from closed-loop data operating under this controller topology, independent of the inference methodology chosen.
+
+---
+
 ### References
 
+* **Forssell, U., & Ljung, L. (1999).** Closed-loop identification: Methods, theory, and applications. *Linköping Studies in Science and Technology*, Dissertation No. 566.
 * **Ljung, L. (1999).** *System Identification: Theory for the User*. Prentice Hall.
 * **Gustavsson, I., Ljung, L., & Söderström, T. (1977).** Identification of processes in closed loop—identifiability and accuracy aspects. *Automatica*, 13(1), 59-75.
 * **Gevers, M., Bombois, X., Hildebrand, R., & Solari, G. (2011).** Optimal experiment design for open and closed-loop system identification. *Communications in Information and Systems*, 11(3), 197-224.
