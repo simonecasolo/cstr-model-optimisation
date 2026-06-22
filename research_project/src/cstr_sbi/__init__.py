@@ -14,6 +14,7 @@ Package layout (see cstr_sbi_execution_plan.md):
 
 __version__ = "0.0.1"
 
-from cstr_sbi import physics  # re-export for convenience
+from cstr_sbi import physics   # propylene oxide system
+from cstr_sbi import luyben    # Luyben recycle plant extension
 
-__all__ = ["physics", "__version__"]
+__all__ = ["physics", "luyben", "__version__"]

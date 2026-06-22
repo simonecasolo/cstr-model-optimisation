@@ -51,7 +51,7 @@ Talts et al. 2018) was performed. The result is honest: mild miscalibration
   identifiability regardless of reaction order (1st, 2nd, Michaelis-Menten).
   A tighter controller makes it worse; MPC would be even worse than PI.
 
-### Appears new (modest novelty)
+### Appears new (modest novelty — propylene oxide system)
 
 - **The specific quantification** of the I_bb/I_aa ratio (250-500x) for a CSTR with
   competing α (catalyst activity) and β (fouling) parameters under PI temperature
@@ -62,6 +62,26 @@ Talts et al. 2018) was performed. The result is honest: mild miscalibration
 - **The connection to amortised SBI**: using neural posterior estimation to reveal and
   characterise the identifiability gap, then showing the method still achieves
   practical fault classification despite it.
+
+### New novelty unlocked by the Luyben extension
+
+- **Plant-wide fault localization under multi-loop feedback masking.** Eight degradation
+  parameters across four unit operations (CSTR, flash separator, recycle pump, purge
+  valve, feed preheater), each locally compensated by its own PI controller. No prior
+  SBI paper addresses multi-unit fault attribution under decentralized plant-wide control.
+- **Non-Gaussian posteriors as an inferential finding.** Under partial observability
+  (no concentration analyzers), α and η_sep are partially non-identifiable — the
+  posterior is banana-shaped in the (α, η_sep) plane. EKF, constrained to Gaussian
+  approximations, gives overconfident wrong intervals. SBI captures the full shape.
+  This shifts the contribution from "SBI is fast" to "SBI is *correct* where EKF is not."
+- **Snowball fault attribution.** A subtle catalyst decay (α ↓) triggers a cascade of
+  plant-wide symptoms (F_R ↑, pump stress, separator overload) that each local controller
+  compensates independently, masking the root cause. SBI traces the root cause correctly
+  from the joint posterior; classical symptom-by-unit diagnosis fails. This is the first
+  demonstration of SBI for Luyben snowball fault attribution.
+- **MCMC infeasibility at scale.** At 8-D, NUTS requires days of compute per observation
+  window. SBI is the only practical full-Bayesian method at this parameter dimensionality.
+  This is a qualitative, not just quantitative, advantage over MCMC.
 
 ## What's weak or missing
 
@@ -83,6 +103,11 @@ windows) used for SBI. Key results:
 All four methods show β bias → structural confirmation. SBI has the lowest
 tracking MAE and fastest inference while providing full posterior uncertainty.
 
+For the Luyben system: EKF with jax.jacobian (automatic differentiation) will be
+implemented on the 21-state augmented system [13 plant states + 8 parameters]. NUTS
+is not attempted (8-D inference, days per window). The comparison becomes SBI vs EKF,
+with MCMC infeasibility as an explicit finding.
+
 ### 2. Synthetic data only
 
 All observations come from the simulator. There's no sim-to-real gap, no model
@@ -90,17 +115,24 @@ mismatch, no measurement delays, no unmeasured disturbances. For a chemical
 engineering journal, this makes the "real-time fault diagnosis" framing aspirational
 rather than demonstrated.
 
-**Effort to fix: ~2 weeks.** Add model mismatch study (perturbed UA_nominal,
-different noise model) or partner with a lab for experimental data.
+**Plan:** Light model mismatch study included in the Luyben extension (nb38): ±5%
+perturbation on fixed parameters (V_r, ρ, k₀, UA_r) at test time. Reports posterior
+mean shift, coverage degradation, and classification F1 drop. This directly addresses
+the weakness without requiring experimental data.
 
-### 3. The system is trivially small
+### ~~3. The system is trivially small~~ → RESOLVED by Luyben extension
 
-Two parameters, one reactor, four measured channels. Real processes have dozens of
-correlated parameters, multiple units, and partial observability. The paper
-acknowledges this (L6) but doesn't test scalability at all.
+~~Two parameters, one reactor, four measured channels.~~
 
-**Effort to fix: ~2-3 weeks.** Extend to a 4-6 parameter system (e.g. add inlet
-flow perturbation, heat loss coefficient) or a two-reactor cascade.
+**Now addressed.** The Luyben recycle plant (project_luyben_extension.md) introduces:
+- 8 degradation parameters across 4 unit operations (4× the propylene oxide system)
+- 13 plant states + 5 controller states
+- 8 measured channels under partial observability (no concentration analyzers)
+- 5 decentralized PI control loops creating plant-wide fault masking
+- 12 fault scenarios including the snowball effect
+
+The two-system progression (propylene oxide → Luyben recycle plant) directly
+demonstrates scalability from a simple benchmark to an industrially realistic plant.
 
 ### 4. The fault classification is not really "unsupervised"
 
@@ -110,7 +142,10 @@ expert-chosen boundaries. The claim should be reframed as "label-free" — the S
 training uses no fault labels, but the classification rule is designed with domain
 knowledge.
 
-**Effort to fix: text only.** Reframe in the paper.
+**Effort to fix: text only.** Reframe in the paper. For the Luyben system, the
+hierarchical fault taxonomy (healthy / reactor-fault / separator-fault / recycle-fault /
+combined) will be described as "label-free domain-informed classification" from the
+outset.
 
 ### 5. SBC shows the posterior is miscalibrated
 
@@ -118,8 +153,11 @@ KS p < 0.05 for both parameters. The paper frames this as "mild" and the C2ST
 scores (0.52, 0.53) are near the 0.5 baseline, but it is a formal calibration
 failure. A Bayesian statistics reviewer would note this.
 
-**Effort to fix: none needed.** Report honestly (already done). The miscalibration
-is consistent with the structural beta bias rather than a training deficiency.
+**Effort to fix: none needed for propylene oxide.** Report honestly (already done).
+The miscalibration is consistent with the structural beta bias rather than a training
+deficiency. For the Luyben system: SBC will be run for each of the 8 parameters
+separately; the (α, η_sep) banana-shaped posterior is expected to show the largest
+miscalibration, and will be reported alongside the identifiability analysis.
 
 ### 6. Prior sensitivity not analyzed
 
@@ -128,7 +166,10 @@ collapsed from F1=0.91 to F1=0.08. This is extreme prior sensitivity for a resul
 claimed to be robust. No formal prior sensitivity study is included.
 
 **Effort to fix: ~2-3 days.** Run the pipeline with 2-3 different prior widths and
-report the sensitivity.
+report the sensitivity. This remains an open item for the propylene oxide section.
+For the Luyben system, prior bounds will be set conservatively from the outset
+([0.5, 1.2] for most parameters) with a brief sensitivity check before the full
+evaluation.
 
 ### 7. The beta bias mechanism is characterized but not fully explained
 
@@ -144,6 +185,8 @@ bias from a linearized model) would strengthen the theoretical contribution.
 
 **Effort to fix: ~1 week.** Derive the bias analytically for a simplified 2-state
 model, or compute the profile likelihood for beta to show the asymmetry directly.
+For the Luyben system, the 8×8 Fisher information matrix will be computed numerically
+(nb34) and the (α, η_sep) off-diagonal terms will explain the partial non-identifiability.
 
 ## Where this could be published
 
@@ -151,9 +194,13 @@ model, or compute the profile likelihood for beta to show the asymmetry directly
 |---|---|---|---|
 | Top ML | NeurIPS, ICML, AISTATS | Poor | No methodological novelty in SBI itself |
 | Top general | Nature Comms, PNAS | Poor | Too narrow, no real data |
-| **Good process control** | **Journal of Process Control, C&ChE** | **Best fit** | Needs EKF/UKF baseline, model mismatch |
+| **Good process control** | **C&ChE, Journal of Process Control** | **Best fit** | Model mismatch (partially addressed by nb38) |
 | Good Bayesian/stats | Bayesian Analysis, Stat & Computing | Moderate | Needs formal identifiability theory |
-| Applied ML | Eng. Applications of AI | Good | Could go as-is with minor additions |
+| Applied ML | Eng. Applications of AI | Good | Could go as-is after Luyben extension |
+
+With the Luyben extension complete, C&ChE becomes the primary target. The two-system
+progression (simple single-unit → complex plant-wide), snowball fault attribution, and
+EKF comparison on a 21-state augmented system are exactly what C&ChE reviewers expect.
 
 ## What would make it a strong paper
 
@@ -164,41 +211,46 @@ In priority order:
    bias" to "the bias affects all methods." This was the #1 priority and is now
    the strongest empirical result in the paper.
 
-2. **Connect to the classical identifiability literature explicitly** (~days).
+2. ~~**The system is trivially small**~~ → **ADDRESSED** (project_luyben_extension.md).
+   The Luyben recycle plant (8-D, plant-wide, snowball effect) replaces the planned
+   Van de Vusse extension as the complex case study. Timeline: 6-8 weeks.
+
+3. **Connect to the classical identifiability literature explicitly** (~days).
    The Fisher information result (I_bb 250-500x smaller than I_aa) should be
    presented with proper attribution to the closed-loop identification
    literature (Ljung 1977, Gevers et al. 2011) and positioned as a
-   system-specific quantification, not a discovery. Derive the physical
-   mechanism from the controlled heat balance to connect to structural
-   identifiability theory.
+   system-specific quantification, not a discovery.
 
-3. **Add model mismatch** (~1 week). Perturb simulator parameters (e.g. +/-5% on
-   UA_nominal, different noise model) and show the posterior is robust — or
-   honestly characterize when it breaks.
+4. **Add model mismatch** → **INCLUDED IN LUYBEN PLAN** (nb38, ~2-3 days). Perturb
+   simulator parameters (±5% on V_r, ρ, k₀, UA_r) and report posterior robustness.
 
-4. **Reframe the contribution.** The paper is not "we discover a fundamental
+5. **Reframe the contribution.** The paper is not "we discover a fundamental
    identifiability limitation" (that's known since 1977). The paper is:
 
-   > We quantify a classical closed-loop identifiability limitation (Ljung 1977;
-   > Gevers et al. 2011) for Bayesian fault diagnosis in a PI-controlled CSTR —
-   > showing that the Fisher information for the fouling parameter is 250-500×
-   > smaller than for catalyst activity — and demonstrate empirically that no
-   > choice of summary statistics (hand-crafted or learned) recovers the lost
-   > information, consistent with the Cramér-Rao bound. Despite this irreducible
-   > limitation, amortised SBI delivers real-time probabilistic fault
-   > classification with CL macro-F1 = 0.990 at 53,000× the speed of MCMC.
+   > We quantify classical closed-loop identifiability limitations for Bayesian fault
+   > diagnosis in feedback-controlled chemical processes — from a simple PI-controlled
+   > CSTR (2-D, I_bb 250-500× smaller than I_aa) to a plant-wide recycle process
+   > (8-D, 5 PI loops, Luyben snowball effect) — and demonstrate that amortised SBI
+   > is the only practical full-Bayesian method at plant scale, correctly recovering
+   > non-Gaussian posteriors where EKF gives overconfident Gaussian approximations.
 
 ## Bottom line
 
-The work is technically solid and well-documented. The strongest aspects are the
-**empirical methodology** (embedding-net ablation, SBC, multi-method confirmation
-of the bias across 6 method/configuration combinations including EKF and UKF) and
-the **practical demonstration** (real-time tracking with calibrated uncertainty).
-The identifiability finding is a careful quantification of a classical phenomenon —
-valuable as applied contribution but not a theoretical advance. **With the EKF/UKF
-baseline now complete** (nb16), the paper has the industrial comparison that
-reviewers at process control journals require. The four-method β bias confirmation
-(SBI, NUTS, EKF, UKF all showing the same structural limitation) is the single
-strongest result. Positioned honestly, with proper literature context, this is
-publishable in a good process control journal (JPC, C&ChE) or in EAAI as an
-applied AI paper with strong engineering validation.
+The propylene oxide work is technically solid and well-documented. **With the EKF/UKF
+baseline complete** (nb16), it is publishable in EAAI or JPC as a standalone paper.
+However, it remains vulnerable to the "trivially small system" critique at C&ChE.
+
+**The Luyben extension resolves this decisively.** The two-system paper — propylene
+oxide as a validated simple benchmark (Section 6) + Luyben recycle plant as the complex
+case study (Section 7) — makes three claims that together are novel and strong:
+
+1. The structural identifiability limitation (I_bb 250-500× I_aa) is empirically
+   irreducible (PO system, 4-method confirmation including EKF/UKF).
+2. At plant scale (8-D, 5 control loops), this limitation generalises and non-Gaussian
+   posteriors emerge (Luyben system, α-η_sep banana-shaped posterior).
+3. SBI is the only practical full-Bayesian method at 8-D: MCMC is infeasible, EKF
+   gives wrong coverage in non-Gaussian regimes, SBI correctly localizes the snowball
+   root cause.
+
+Positioned this way, the paper is a strong submission to **Computers & Chemical
+Engineering** with a realistic path to acceptance.
