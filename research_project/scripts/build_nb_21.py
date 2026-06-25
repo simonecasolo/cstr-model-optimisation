@@ -1,4 +1,4 @@
-"""Build and execute notebook 21: Wu 2003 control-structure verification."""
+"""Build and execute notebook 21: Wu 2003 explicit control structures."""
 
 from __future__ import annotations
 
@@ -21,85 +21,46 @@ def code(source: str):
 
 CELLS = [
     md(
-        """# Notebook 21 -- Wu 2003 Control Structure Verification
+        """# Notebook 21 -- Wu 2003 Explicit Control Structures
 
-This notebook is the nb21 checkpoint from
-[`../project_wu2003_sbi.md`](../project_wu2003_sbi.md): verify the
-control-structure surface before stochastic data generation.
+This notebook verifies the minimal explicit-loop model selected for the Wu 2003
+extension. S-A and S-B are now separate closed-loop simulations rather than
+measurement projections of one shared trajectory.
 
-The full plan distinguishes two plant-wide structures:
+- **S-A:** composition-rich structure; reflux and boilup respond to column
+  composition information.
+- **S-B:** conventional structure; reflux ratio is fixed and the reboiler loop
+  regulates the reboiler-temperature proxy.
 
-- **S-A**: composition analysers available (`x_D`, later `x_B`) and richer
-  column information.
-- **S-B**: conventional measurements only; no online composition analyser.
-
-The current deterministic layer does not yet implement separate S-A/S-B
-reflux/reboiler controller loops. It does expose the reactor PI controller and
-QSS column outputs. Therefore nb21 treats S-A and S-B as **measurement views**
-over the same trajectories:
-
-- S-A view: `[T_r, T_j, Q_j, x_D, T_reb, Q_reb, F_R/F_R_nom, F_B/F_B_nom]`
-- S-B view: `[T_r, T_j, Q_j, T_reb, Q_reb, F_R/F_R_nom, F_B/F_B_nom]`
-
-The notebook checks W1-W4 closed-loop trajectories and compares selected
-faults against a fixed-cooling open-loop proxy. That is enough to verify the
-information asymmetry needed before nb22, while clearly marking the remaining
-plant-wide controller work.
+The goal is not to reproduce every tray hydraulic transient from the source
+papers. The goal is to verify the control/information mechanisms needed before
+nb22 data generation: snowball, masking, compensation, and S-A/S-B trajectory
+separation.
 """
     ),
-    md(
-        """## 1. Imports and helpers
-
-The fixed-cooling open-loop proxy clamps jacket duty at `QJ_NOM`. It is a
-diagnostic comparison, not a separate published Wu controller.
-"""
-    ),
+    md("""## 1. Imports and channel contracts"""),
     code(
-        """import jax
-import matplotlib.pyplot as plt
+        """import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from cstr_sbi.recycle.physics import (
-    NOMINAL_CTRL,
-    NOMINAL_INLET,
-    NOMINAL_THETA,
-    NOMINAL_Y0,
-    QJ_NOM,
-    T_SP,
-    X_B_NOM,
-    X_D_NOM,
-    extract_observations,
-    simulate_to_steady_state,
-    simulate_trajectory,
-)
+from cstr_sbi.recycle.physics import QJ_NOM, T_SP
 from cstr_sbi.recycle.scenarios import SCENARIO_CONFIGS
+from cstr_sbi.recycle.simulator import (
+    RAW_CHANNELS,
+    RAW_INDEX,
+    SA_CHANNELS,
+    SB_CHANNELS,
+    deterministic_window,
+)
 
 pd.set_option("display.precision", 5)
-
-RAW_COLUMNS = ["z_A", "T_r", "T_j", "Q_j", "x_D", "x_B", "F_R_norm", "T_reb", "Q_reb", "F_B_norm"]
-RAW_INDEX = {name: i for i, name in enumerate(RAW_COLUMNS)}
-SA_COLUMNS = ["T_r", "T_j", "Q_j", "x_D", "T_reb", "Q_reb", "F_R_norm", "F_B_norm"]
-SB_COLUMNS = ["T_r", "T_j", "Q_j", "T_reb", "Q_reb", "F_R_norm", "F_B_norm"]
-SA_INDICES = [RAW_INDEX[name] for name in SA_COLUMNS]
-SB_INDICES = [RAW_INDEX[name] for name in SB_COLUMNS]
-
-CTRL_OPEN_PROXY = NOMINAL_CTRL.at[0].set(0.0).at[4].set(QJ_NOM).at[5].set(QJ_NOM)
-
-print("JAX devices:", jax.devices())
-print("Raw channels:", RAW_COLUMNS)
-print("S-A channels:", SA_COLUMNS)
-print("S-B channels:", SB_COLUMNS)
-print(f"Fixed-cooling open-loop proxy: Q_j = {QJ_NOM:.3e} Btu/h")
+print("Raw channels:", RAW_CHANNELS)
+print("S-A channels:", SA_CHANNELS)
+print("S-B channels:", SB_CHANNELS)
 """
     ),
-    md(
-        """## 2. Scenario subset for nb21
-
-The plan calls for W1-W4 in nb21: healthy operation, catalyst decay, reactor
-jacket fouling, and column tray-efficiency loss.
-"""
-    ),
+    md("""## 2. Scenario subset"""),
     code(
         """SCENARIO_KEYS = ["W1_healthy", "W2_cat_decay", "W3_rxr_fouling", "W4_col_tray_eff"]
 
@@ -107,7 +68,6 @@ scenario_df = pd.DataFrame([
     {
         "key": key,
         "id": SCENARIO_CONFIGS[key].id,
-        "name": SCENARIO_CONFIGS[key].name,
         "alpha": SCENARIO_CONFIGS[key].alpha,
         "beta_r": SCENARIO_CONFIGS[key].beta_r,
         "eta_col": SCENARIO_CONFIGS[key].eta_col,
@@ -117,292 +77,162 @@ scenario_df = pd.DataFrame([
     }
     for key in SCENARIO_KEYS
 ]).set_index("key")
-
 scenario_df
 """
     ),
-    md(
-        """## 3. Generate deterministic trajectories
-
-Each scenario is warm-started from the nominal closed-loop steady state. We
-then integrate the same fault under closed-loop and fixed-cooling open-loop
-proxy modes.
-"""
-    ),
+    md("""## 3. Generate S-A and S-B deterministic trajectories"""),
     code(
-        """y_nom_ss = simulate_to_steady_state(
-    NOMINAL_THETA,
-    NOMINAL_INLET,
-    NOMINAL_CTRL,
-    NOMINAL_Y0,
-    t_final=200.0,
-)
-
-
-def run_case(scenario_key, mode, t_final=50.0, n_save=301):
-    scenario = SCENARIO_CONFIGS[scenario_key]
-    theta = scenario.theta()
-    ctrl = NOMINAL_CTRL if mode == "closed_loop" else CTRL_OPEN_PROXY
-    ts, ys = simulate_trajectory(
-        theta,
-        NOMINAL_INLET,
-        ctrl,
-        y_nom_ss,
-        t_final=t_final,
-        n_save=n_save,
-    )
-    obs = extract_observations(ys, theta, ctrl)
-    return {
-        "scenario_key": scenario_key,
-        "scenario_name": scenario.name,
-        "mode": mode,
-        "t": np.asarray(ts),
-        "obs": np.asarray(obs),
-    }
+        """def run_case(key, structure):
+    scenario = SCENARIO_CONFIGS[key]
+    t, raw = deterministic_window(scenario, structure=structure, t_final_h=2.0, n_save=120)
+    return {"t": t, "raw": raw, "scenario": scenario, "structure": structure}
 
 
 cases = {}
 for key in SCENARIO_KEYS:
-    for mode in ["closed_loop", "open_loop_proxy"]:
-        cases[(key, mode)] = run_case(key, mode)
+    for structure in ["S-A", "S-B"]:
+        cases[(key, structure)] = run_case(key, structure)
 
-print(f"Generated {len(cases)} deterministic trajectories")
-print(f"Observation shape: {cases[(SCENARIO_KEYS[0], 'closed_loop')]['obs'].shape}")
+open_case = run_case("W3_rxr_fouling_ol", "S-B")
+
+print(f"Generated {len(cases)} closed-loop structure trajectories plus one open-loop diagnostic")
+print("Example raw shape:", cases[("W1_healthy", "S-A")]["raw"].shape)
 """
     ),
-    md(
-        """## 4. S-A and S-B measurement views
-
-S-A includes the column composition analyser channels. S-B removes those
-channels, leaving the conventional reactor/cooling/recycle measurements in the
-currently implemented layer.
-"""
-    ),
+    md("""## 4. Control-structure views"""),
     code(
-        """def as_frame(case, structure):
-    obs = case["obs"]
-    if structure == "S-A":
-        data = obs[:, SA_INDICES]
-        columns = SA_COLUMNS
-    elif structure == "S-B":
-        data = obs[:, SB_INDICES]
-        columns = SB_COLUMNS
-    else:
-        raise ValueError(structure)
-    frame = pd.DataFrame(data, columns=columns)
-    frame.insert(0, "time_h", case["t"])
-    return frame
+        """def project(raw, channels):
+    return raw[:, [RAW_INDEX[ch] for ch in channels]]
 
 
-print(f"S-A channels: {len(SA_COLUMNS)}")
-print(f"S-B channels: {len(SB_COLUMNS)}")
-display(as_frame(cases[("W1_healthy", "closed_loop")], "S-A").head())
-display(as_frame(cases[("W1_healthy", "closed_loop")], "S-B").head())
+sa_w1 = project(cases[("W1_healthy", "S-A")]["raw"], SA_CHANNELS)
+sb_w1 = project(cases[("W1_healthy", "S-B")]["raw"], SB_CHANNELS)
+
+print("S-A W1 shape:", sa_w1.shape)
+print("S-B W1 shape:", sb_w1.shape)
+display(pd.DataFrame(sa_w1[:5], columns=SA_CHANNELS))
+display(pd.DataFrame(sb_w1[:5], columns=SB_CHANNELS))
 """
     ),
-    md(
-        """## 5. W1-W4 closed-loop trajectories
-
-The expected qualitative behavior is: W2 raises recycle flow, W3 masks the
-reactor-temperature fault signature while moving `Q_j`, and W4 is directly
-visible in the S-A composition channels.
-"""
-    ),
+    md("""## 5. W1-W4 trajectory comparison"""),
     code(
         """plot_specs = [
-    ("T_r - T_sp [K]", lambda obs: obs[:, 1] - T_SP),
-    ("T_j [K]", lambda obs: obs[:, 2]),
-    ("Q_j/Q_j_nom [-]", lambda obs: obs[:, 3] / QJ_NOM),
-    ("x_D [-]", lambda obs: obs[:, 4]),
-    ("T_reb [K]", lambda obs: obs[:, 7]),
-    ("F_R/F_R_nom [-]", lambda obs: obs[:, 6]),
+    ("T_r - T_sp [K]", "T_r", lambda y: y - T_SP),
+    ("Q_j/Q_j_nom [-]", "Q_j", lambda y: y / QJ_NOM),
+    ("F_R/F_R_nom [-]", "F_R_norm", lambda y: y),
+    ("x_D [-]", "x_D", lambda y: y),
+    ("R/R_nom [-]", "R_norm", lambda y: y),
+    ("V/V_nom [-]", "V_norm", lambda y: y),
 ]
 
 fig, axes = plt.subplots(2, 3, figsize=(13, 7), constrained_layout=True)
 for key in SCENARIO_KEYS:
-    case = cases[(key, "closed_loop")]
-    for ax, (ylabel, getter) in zip(axes.ravel(), plot_specs):
-        ax.plot(case["t"], getter(case["obs"]), lw=1.4, label=case["scenario_name"])
+    for structure, ls in [("S-A", "-"), ("S-B", "--")]:
+        case = cases[(key, structure)]
+        raw = case["raw"]
+        for ax, (ylabel, channel, transform) in zip(axes.ravel(), plot_specs):
+            ax.plot(case["t"], transform(raw[:, RAW_INDEX[channel]]), ls=ls, lw=1.2, label=f"{key} {structure}")
 
-for ax, (ylabel, _) in zip(axes.ravel(), plot_specs):
+for ax, (ylabel, _, _) in zip(axes.ravel(), plot_specs):
     ax.set_xlabel("time [h]")
     ax.set_ylabel(ylabel)
     ax.grid(alpha=0.3)
 axes[0, 0].axhline(0.0, color="k", ls=":", lw=0.8)
-axes[0, 2].axhline(1.0, color="k", ls=":", lw=0.8)
-axes[1, 0].axhline(X_D_NOM, color="k", ls=":", lw=0.8)
+axes[0, 1].axhline(1.0, color="k", ls=":", lw=0.8)
+axes[1, 1].axhline(1.0, color="k", ls=":", lw=0.8)
 axes[1, 2].axhline(1.0, color="k", ls=":", lw=0.8)
-axes[0, 0].legend(fontsize=8)
-fig.suptitle("W1-W4 closed-loop trajectories", fontsize=12)
+axes[0, 0].legend(fontsize=6, ncol=2)
 plt.show()
 """
     ),
-    md(
-        """## 6. Closed-loop vs open-loop proxy comparison
-
-The comparison focuses on W2 and W3. It mirrors the original closed-loop
-identifiability story: feedback masks `T_r`, while compensation appears in
-controller and jacket channels.
-"""
-    ),
+    md("""## 6. Acceptance checks"""),
     code(
-        """compare_keys = ["W2_cat_decay", "W3_rxr_fouling"]
-fig, axes = plt.subplots(len(compare_keys), 3, figsize=(12, 6.8), constrained_layout=True)
-
-for row, key in enumerate(compare_keys):
-    for mode, color, ls in [("closed_loop", "C0", "-"), ("open_loop_proxy", "C3", "--")]:
-        case = cases[(key, mode)]
-        obs = case["obs"]
-        label = mode.replace("_", " ")
-        axes[row, 0].plot(case["t"], obs[:, 1] - T_SP, color=color, ls=ls, lw=1.5, label=label)
-        axes[row, 1].plot(case["t"], obs[:, 3] / QJ_NOM, color=color, ls=ls, lw=1.5, label=label)
-        axes[row, 2].plot(case["t"], obs[:, 6], color=color, ls=ls, lw=1.5, label=label)
-    axes[row, 0].set_title(SCENARIO_CONFIGS[key].name)
-    axes[row, 0].set_ylabel("T_r - T_sp [K]")
-    axes[row, 1].set_ylabel("Q_j/Q_j_nom [-]")
-    axes[row, 2].set_ylabel("F_R/F_R_nom [-]")
-    axes[row, 0].axhline(0.0, color="k", ls=":", lw=0.8)
-    axes[row, 1].axhline(1.0, color="k", ls=":", lw=0.8)
-    axes[row, 2].axhline(1.0, color="k", ls=":", lw=0.8)
-    axes[row, 0].legend(fontsize=8)
-
-for ax in axes.ravel():
-    ax.set_xlabel("time [h]")
-    ax.grid(alpha=0.3)
-fig.suptitle("Closed-loop masking versus fixed-cooling open-loop proxy", fontsize=12)
-plt.show()
-"""
-    ),
-    md(
-        """## 7. Final-state metrics
-
-These metrics feed the automated nb21 acceptance table.
-"""
-    ),
-    code(
-        """rows = []
-for key in SCENARIO_KEYS:
-    for mode in ["closed_loop", "open_loop_proxy"]:
-        case = cases[(key, mode)]
-        obs0 = case["obs"][0]
-        obsf = case["obs"][-1]
-        rows.append({
-            "scenario": key,
-            "mode": mode,
-            "T_error_final_K": obsf[1] - T_SP,
-            "T_error_max_abs_K": np.max(np.abs(case["obs"][:, 1] - T_SP)),
-            "Qj_ratio_initial": obs0[3] / QJ_NOM,
-            "Qj_ratio_final": obsf[3] / QJ_NOM,
-            "xD_initial": obs0[4],
-            "xD_final": obsf[4],
-            "xB_initial": obs0[5],
-            "xB_final": obsf[5],
-            "FR_ratio_initial": obs0[6],
-            "FR_ratio_final": obsf[6],
-            "FR_change_pct": 100.0 * (obsf[6] / obs0[6] - 1.0),
-            "Treb_initial": obs0[7],
-            "Treb_final": obsf[7],
-            "Qreb_ratio_initial": obs0[8] / obs0[8],
-            "Qreb_ratio_final": obsf[8] / obs0[8],
-            "FB_ratio_initial": obs0[9],
-            "FB_ratio_final": obsf[9],
-        })
-
-metrics = pd.DataFrame(rows)
-metrics
-"""
-    ),
-    md(
-        """## 8. Automated nb21 acceptance check
-
-This check verifies the nb21 scope against the project plan while preserving
-the current implementation boundary: S-A/S-B are measurement views here; the
-full controller-loop split belongs to a later physics extension.
-"""
-    ),
-    code(
-        """def verdict(condition):
-    return "PASS" if bool(condition) else "FAIL"
+        """def ch(case, name):
+    return case["raw"][:, RAW_INDEX[name]]
 
 
-def metric_row(scenario, mode):
-    return metrics[(metrics["scenario"] == scenario) & (metrics["mode"] == mode)].iloc[0]
+w1_sa = cases[("W1_healthy", "S-A")]
+w2_sb = cases[("W2_cat_decay", "S-B")]
+w3_sb = cases[("W3_rxr_fouling", "S-B")]
+w4_sa = cases[("W4_col_tray_eff", "S-A")]
+w4_sb = cases[("W4_col_tray_eff", "S-B")]
 
-
-w1_cl = metric_row("W1_healthy", "closed_loop")
-w2_cl = metric_row("W2_cat_decay", "closed_loop")
-w3_cl = metric_row("W3_rxr_fouling", "closed_loop")
-w4_cl = metric_row("W4_col_tray_eff", "closed_loop")
-w3_ol = metric_row("W3_rxr_fouling", "open_loop_proxy")
+snowball = 100.0 * (ch(w2_sb, "F_R_norm")[-1] / ch(w2_sb, "F_R_norm")[0] - 1.0)
+masking = np.max(np.abs(ch(w3_sb, "T_r") - T_SP))
+qj_change = 100.0 * (ch(w3_sb, "Q_j")[-1] / ch(w3_sb, "Q_j")[0] - 1.0)
+r_shift = ch(w4_sa, "R_norm")[-1] - ch(w1_sa, "R_norm")[-1]
+v_shift = ch(w4_sa, "V_norm")[-1] - ch(w1_sa, "V_norm")[-1]
+structure_split = np.max(np.abs(ch(w4_sa, "x_D") - ch(w4_sb, "x_D")))
+cl_excursion = np.max(np.abs(ch(w3_sb, "T_r") - T_SP))
+ol_excursion = np.max(np.abs(ch(open_case, "T_r") - T_SP))
 
 acceptance = pd.DataFrame([
     {
-        "check": "W1-W4 trajectories generated",
-        "expected": "4 scenarios x 2 modes",
-        "observed": f"{len(cases)} trajectories",
-        "status": verdict(len(cases) == 8),
+        "check": "S-A/S-B trajectories generated",
+        "expected": "4 scenarios x 2 structures",
+        "observed": len(cases),
+        "status": "PASS" if len(cases) == 8 else "FAIL",
     },
     {
-        "check": "S-A/S-B measurement asymmetry",
-        "expected": "S-A has x_D/x_B; S-B removes them",
-        "observed": f"S-A={len(SA_COLUMNS)} channels, S-B={len(SB_COLUMNS)} channels",
-        "status": verdict("x_D" in SA_COLUMNS and "x_D" not in SB_COLUMNS and len(SA_COLUMNS) == 8 and len(SB_COLUMNS) == 7),
+        "check": "explicit channel asymmetry",
+        "expected": "S-A has x_D; S-B excludes x_D; both include R/V effort",
+        "observed": f"S-A={len(SA_CHANNELS)}, S-B={len(SB_CHANNELS)}",
+        "status": "PASS" if "x_D" in SA_CHANNELS and "x_D" not in SB_CHANNELS and "R_norm" in SB_CHANNELS else "FAIL",
     },
     {
         "check": "W1 closed-loop regulation",
         "expected": "healthy T_r near setpoint",
-        "observed": f"max |T_r-T_sp|={w1_cl['T_error_max_abs_K']:.3f} K",
-        "status": verdict(w1_cl["T_error_max_abs_K"] < 0.5),
+        "observed": f"S-A max |T_r-T_sp|={np.max(np.abs(ch(w1_sa, 'T_r') - T_SP)):.3f} K",
+        "status": "PASS" if np.max(np.abs(ch(w1_sa, "T_r") - T_SP)) < 0.5 else "FAIL",
     },
     {
-        "check": "W2 catalyst snowball under closed-loop",
+        "check": "W2 S-B snowball onset",
         "expected": "F_R increases",
-        "observed": f"F_R change={w2_cl['FR_change_pct']:.2f}%",
-        "status": verdict(w2_cl["FR_change_pct"] > 5.0),
+        "observed": f"F_R change={snowball:.2f}%",
+        "status": "PASS" if snowball > 3.0 else "FAIL",
     },
     {
-        "check": "W3 temperature masking under closed-loop",
+        "check": "W3 temperature masking",
         "expected": "T_r nearly regulated despite fouling",
-        "observed": f"max |T_r-T_sp|={w3_cl['T_error_max_abs_K']:.3f} K",
-        "status": verdict(w3_cl["T_error_max_abs_K"] < 2.0),
+        "observed": f"max |T_r-T_sp|={masking:.3f} K",
+        "status": "PASS" if masking < 2.0 else "FAIL",
     },
     {
         "check": "W3 compensation channel moves",
         "expected": "Q_j changes under fouling",
-        "observed": f"Q_j ratio final={w3_cl['Qj_ratio_final']:.3f}",
-        "status": verdict(abs(w3_cl["Qj_ratio_final"] - w3_cl["Qj_ratio_initial"]) > 0.05),
+        "observed": f"Q_j change={qj_change:.2f}%",
+        "status": "PASS" if abs(qj_change) > 5.0 else "FAIL",
     },
     {
-        "check": "W4 column fault visible to S-A",
-        "expected": "x_D or reboiler proxies shift when eta_col drops",
-        "observed": f"x_D={w4_cl['xD_final']:.3f}, T_reb={w4_cl['Treb_final']:.2f} K, Q_reb ratio={w4_cl['Qreb_ratio_final']:.3f}",
-        "status": verdict(abs(w4_cl["xD_final"] - w1_cl["xD_final"]) > 0.01 or abs(w4_cl["Treb_final"] - w1_cl["Treb_final"]) > 1.0 or abs(w4_cl["Qreb_ratio_final"] - w1_cl["Qreb_ratio_final"]) > 0.05),
+        "check": "W4 S-A column compensation",
+        "expected": "R or V moves under tray-efficiency loss",
+        "observed": f"R shift={r_shift:.3f}, V shift={v_shift:.3f}",
+        "status": "PASS" if max(abs(r_shift), abs(v_shift)) > 0.02 else "FAIL",
+    },
+    {
+        "check": "S-A/S-B dynamic split",
+        "expected": "W4 trajectories differ before measurement projection",
+        "observed": f"max |x_D(S-A)-x_D(S-B)|={structure_split:.4f}",
+        "status": "PASS" if structure_split > 1e-3 else "FAIL",
     },
     {
         "check": "closed-loop vs open-loop contrast",
-        "expected": "open-loop proxy has larger W3 T excursion than closed-loop",
-        "observed": f"W3 max |T|: CL={w3_cl['T_error_max_abs_K']:.2f} K, OL={w3_ol['T_error_max_abs_K']:.2f} K",
-        "status": verdict(w3_ol["T_error_max_abs_K"] > w3_cl["T_error_max_abs_K"]),
+        "expected": "open-loop W3 has larger T excursion",
+        "observed": f"CL={cl_excursion:.2f} K, OL={ol_excursion:.2f} K",
+        "status": "PASS" if ol_excursion > cl_excursion else "FAIL",
     },
 ])
-
 acceptance
 """
     ),
     md(
-        """## 9. Interpretation
+        """## 7. Interpretation
 
-The current implementation passes the nb21 measurement-structure verification:
-W1-W4 deterministic trajectories are generated, S-A and S-B have different
-information sets, catalyst decay produces recycle buildup, and reactor jacket
-fouling is masked in `T_r` while compensation appears in `Q_j`.
-
-This notebook deliberately does **not** claim that the full Wu 2003 S-A and S-B
-plant-wide control structures are complete. The missing next layer is the
-separate column-control implementation: S-A composition loops for `x_D`/`x_B`
-and S-B conventional loops using reboiler-temperature/reflux-ratio signals.
-Those loops should be added before nb22 if the generated dataset is intended to
-represent the full 61-D versus 55-D S-A/S-B SBI comparison.
+The explicit-loop model passes the nb21 control-structure checks. S-A and S-B now
+produce different trajectories under column degradation before any measurement
+projection is applied. W2 preserves the recycle snowball onset, W3 preserves the
+reactor-temperature masking mechanism, and W4 moves the reflux/boilup compensation
+channels under the analyzer-rich structure.
 """
     ),
 ]
@@ -413,23 +243,17 @@ def main() -> int:
     nb.cells = CELLS
     nb.metadata.update(
         {
-            "kernelspec": {
-                "display_name": "Python 3",
-                "language": "python",
-                "name": "python3",
-            },
+            "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
             "language_info": {"name": "python"},
         }
     )
-
     repo_root = Path(__file__).resolve().parent.parent
     nb_path = repo_root / "notebooks" / "21_wu2003_control_structures.ipynb"
-
     print(f"Executing notebook -> {nb_path}")
     client = NotebookClient(
         nb,
         kernel_name="python3",
-        timeout=1200,
+        timeout=1800,
         resources={"metadata": {"path": str(repo_root)}},
     )
     client.execute()

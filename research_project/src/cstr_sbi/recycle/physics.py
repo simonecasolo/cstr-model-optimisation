@@ -143,6 +143,31 @@ TAU_I1: float = 0.1           # h,           integral time constant
 QJ_MIN: float = 0.0           # Btu/h
 QJ_MAX: float = 3.0e7         # Btu/h
 
+# Explicit Loop 2/3 control constants used by the control-structure model.
+# These preserve the QSS column approximation but make reflux and boilup true
+# manipulated variables so S-A and S-B generate different trajectories.
+STRUCTURE_SA: float = 0.0
+STRUCTURE_SB: float = 1.0
+L_NOM: float = 1100.0
+V_NOM: float = 1600.4
+RECYCLE_RATIO_NOM: float = F_R_NOM / F0_NOM
+
+KP_R_SA: float = 8.0
+TAU_I_R_SA: float = 0.08
+KP_R_SB: float = 0.0
+TAU_I_R_SB: float = 0.12
+R_MIN: float = 1.0
+R_MAX: float = 4.0
+TAU_R_ACT: float = 0.04
+
+KP_V_SA: float = 28.0
+TAU_I_V_SA: float = 0.08
+KP_V_SB: float = 0.055
+TAU_I_V_SB: float = 0.12
+V_NORM_MIN: float = 0.5
+V_NORM_MAX: float = 1.8
+TAU_V_ACT: float = 0.04
+
 
 # ---------------------------------------------------------------------------
 # Nominal JAX arrays
@@ -158,9 +183,35 @@ NOMINAL_INLET = jnp.array([F0_NOM, T_IN], dtype=jnp.float32)
 NOMINAL_CTRL = jnp.array([KP1, TAU_I1, T_SP, QJ_NOM, QJ_MIN, QJ_MAX],
                           dtype=jnp.float32)
 
+# Explicit controller vector:
+# [Loop 1: 0:6,
+#  mode,
+#  S-A Loop 2: Kp, tau_i, xD_sp,
+#  S-B Loop 2: Kp, tau_i, recycle_ratio_sp,
+#  reflux actuator: R0, R_min, R_max, tau_R,
+#  S-A Loop 3: Kp, tau_i, xB_sp,
+#  S-B Loop 3: Kp, tau_i, T_reb_sp,
+#  boilup actuator: V_norm0, V_min, V_max, tau_V]
+NOMINAL_CTRL_SA = jnp.array([
+    KP1, TAU_I1, T_SP, QJ_NOM, QJ_MIN, QJ_MAX,
+    STRUCTURE_SA,
+    KP_R_SA, TAU_I_R_SA, X_D_NOM,
+    KP_R_SB, TAU_I_R_SB, RECYCLE_RATIO_NOM,
+    REFLUX_RATIO, R_MIN, R_MAX, TAU_R_ACT,
+    KP_V_SA, TAU_I_V_SA, X_B_NOM,
+    KP_V_SB, TAU_I_V_SB, T_REB_NOM,
+    1.0, V_NORM_MIN, V_NORM_MAX, TAU_V_ACT,
+], dtype=jnp.float32)
+
+NOMINAL_CTRL_SB = NOMINAL_CTRL_SA.at[6].set(STRUCTURE_SB)
+
 # y0: warm-start near SS  [z_A, T_r, T_j, I_T]
 # At nominal SS: z_A ≈ 0.508, T_r ≈ T_SP, T_j ≈ T_J_NOM
 NOMINAL_Y0 = jnp.array([0.508, T_SP, T_J_NOM, 0.0], dtype=jnp.float32)
+NOMINAL_Y0_EXPLICIT = jnp.array(
+    [0.508, T_SP, T_J_NOM, 0.0, REFLUX_RATIO, 1.0, 0.0, 0.0],
+    dtype=jnp.float32,
+)
 
 # Parameter names for labeling
 PARAM_NAMES = ["alpha", "beta_r", "eta_col", "xi_reb", "z_A0_eff"]
@@ -334,6 +385,118 @@ def compute_qj(
     return jnp.clip(qj_unclamped, Qj_min, Qj_max)
 
 
+def column_qss_controlled(
+    z_F: jax.typing.ArrayLike,
+    eta_col: jax.typing.ArrayLike,
+    reflux_ratio: jax.typing.ArrayLike,
+    v_norm: jax.typing.ArrayLike,
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    """QSS column closure with explicit reflux and boilup actions.
+
+    The closure is anchored to Wu Table 1 and keeps the fast-column/QSS
+    approximation, but exposes the two column manipulated variables needed for
+    S-A/S-B control-structure simulations.  The sensitivities are monotone and
+    deliberately conservative; nb20/nb21 verify the signs and magnitudes.
+    """
+    z_F = jnp.clip(jnp.asarray(z_F, dtype=jnp.float32), 1e-5, 1.0 - 1e-5)
+    eta_col = jnp.asarray(eta_col, dtype=jnp.float32)
+    r_norm = jnp.clip(jnp.asarray(reflux_ratio, dtype=jnp.float32) / REFLUX_RATIO, 0.35, 2.5)
+    v_norm = jnp.clip(jnp.asarray(v_norm, dtype=jnp.float32), V_NORM_MIN, V_NORM_MAX)
+
+    col_severity = 1.0 - eta_col
+    d_frac = D_FRAC_NOM + RECYCLE_SENSITIVITY * (z_F - Z_F_RECYCLE_REF)
+    d_frac = d_frac - 0.02 * col_severity
+    d_frac = d_frac - 0.045 * (r_norm - 1.0) + 0.025 * (v_norm - 1.0)
+    d_frac = jnp.clip(d_frac, 0.05, 0.95)
+
+    x_B = X_B_NOM + 0.08 * col_severity
+    x_B = x_B - 0.012 * (r_norm - 1.0) - 0.030 * (v_norm - 1.0)
+    x_B = jnp.clip(x_B, 1e-5, 0.25)
+
+    x_D = (z_F - (1.0 - d_frac) * x_B) / d_frac
+    x_D = x_D + 0.006 * (r_norm - 1.0) + 0.002 * (v_norm - 1.0)
+    x_D = jnp.clip(x_D, z_F + 1e-4, 0.9998)
+
+    return x_D, x_B, d_frac
+
+
+def _controlled_column_metrics(
+    z_A: jax.typing.ArrayLike,
+    eta_col: jax.typing.ArrayLike,
+    xi_reb: jax.typing.ArrayLike,
+    reflux_ratio: jax.typing.ArrayLike,
+    v_norm: jax.typing.ArrayLike,
+) -> tuple[jnp.ndarray, ...]:
+    """Return column and reboiler outputs for explicit-loop simulations."""
+    x_D, x_B, d_frac = column_qss_controlled(z_A, eta_col, reflux_ratio, v_norm)
+    d_frac_safe = jnp.clip(d_frac, 0.01, 0.98)
+    F_total = NOMINAL_INLET[0] / (1.0 - d_frac_safe)
+    F_R = d_frac_safe * F_total
+    F_B = F_total - F_R
+    F_R_norm = F_R / F_R_NOM
+    F_B_norm = F_B / F_B_NOM
+
+    col_severity = 1.0 - eta_col
+    x_B_excess = x_B - X_B_NOM
+    throughput_ratio = F_total / F_TOT_NOM
+    T_reb = (
+        T_REB_NOM
+        + 90.0 * x_B_excess
+        + 8.0 * col_severity
+        + 3.0 * (F_R_norm - 1.0)
+        + 12.0 * (v_norm - 1.0)
+    )
+    Q_reb = QREB_NOM * throughput_ratio * v_norm
+    Q_reb = Q_reb * (1.0 + 2.0 * x_B_excess + 0.5 * col_severity)
+    Q_reb = Q_reb / jnp.clip(xi_reb, 0.2, 2.0)
+    return x_D, x_B, d_frac_safe, F_total, F_R, F_B, F_R_norm, F_B_norm, T_reb, Q_reb
+
+
+def compute_reflux_boilup(
+    x_D: jax.typing.ArrayLike,
+    x_B: jax.typing.ArrayLike,
+    F_R: jax.typing.ArrayLike,
+    T_reb: jax.typing.ArrayLike,
+    I_R: jax.typing.ArrayLike,
+    I_V: jax.typing.ArrayLike,
+    ctrl: jnp.ndarray,
+) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    """Return reflux/boilup commands and Loop 2/3 integration errors."""
+    mode = ctrl[6]
+    is_sa = mode < 0.5
+
+    KpR_sa, tauR_sa, xD_sp = ctrl[7], ctrl[8], ctrl[9]
+    KpR_sb, tauR_sb, rr_sp = ctrl[10], ctrl[11], ctrl[12]
+    R0, R_min, R_max = ctrl[13], ctrl[14], ctrl[15]
+
+    KpV_sa, tauV_sa, xB_sp = ctrl[17], ctrl[18], ctrl[19]
+    KpV_sb, tauV_sb, T_reb_sp = ctrl[20], ctrl[21], ctrl[22]
+    V0, V_min, V_max = ctrl[23], ctrl[24], ctrl[25]
+
+    recycle_ratio = F_R / F0_NOM
+    e_R_sa = xD_sp - x_D
+    e_R_sb = rr_sp - recycle_ratio
+    e_R = jnp.where(is_sa, e_R_sa, e_R_sb)
+    KpR = jnp.where(is_sa, KpR_sa, KpR_sb)
+    tauR = jnp.where(is_sa, tauR_sa, tauR_sb)
+    active_R = KpR > 1e-8
+    R_unclamped = jnp.where(active_R, R0 + KpR * e_R + I_R / tauR, R0)
+    R_cmd = jnp.clip(R_unclamped, R_min, R_max)
+    dI_R = jnp.where(active_R & (R_unclamped > R_min) & (R_unclamped < R_max), e_R, 0.0)
+
+    e_V_sa = x_B - xB_sp
+    e_V_sb = T_reb_sp - T_reb
+    e_V = jnp.where(is_sa, e_V_sa, e_V_sb)
+    KpV = jnp.where(is_sa, KpV_sa, KpV_sb)
+    tauV = jnp.where(is_sa, tauV_sa, tauV_sb)
+    active_V = KpV > 1e-8
+    V_unclamped = jnp.where(active_V, V0 + KpV * e_V + I_V / tauV, V0)
+    V_cmd = jnp.clip(V_unclamped, V_min, V_max)
+    dI_V = jnp.where(active_V & (V_unclamped > V_min) & (V_unclamped < V_max), e_V, 0.0)
+
+    return R_cmd, V_cmd, dI_R, dI_V, e_R, e_V
+
+
 # ---------------------------------------------------------------------------
 # 4-state ODE right-hand side
 # ---------------------------------------------------------------------------
@@ -425,6 +588,133 @@ def recycle_rhs(
     dT_j = (Q_transfer - Q_cooling_eff) / MJ_CPJ
 
     return jnp.array([dz_A, dT_r, dT_j, dI_T])
+
+
+def recycle_rhs_explicit(
+    t: float,
+    y: jnp.ndarray,
+    args: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
+) -> jnp.ndarray:
+    """Right-hand side with explicit reflux and reboiler control loops.
+
+    State: y = [z_A, T_r, T_j, I_T, R_state, V_norm_state, I_R, I_V]
+    Args:  (theta, inlet, ctrl) where ctrl is NOMINAL_CTRL_SA/SB-like.
+    """
+    theta, inlet, ctrl = args
+    alpha, beta_r, eta_col, xi_reb, z_A0_eff = (
+        theta[0], theta[1], theta[2], theta[3], theta[4],
+    )
+    F0, T_in = inlet[0], inlet[1]
+
+    z_A, T_r, T_j, I_T = y[0], y[1], y[2], y[3]
+    R_state = jnp.clip(y[4], ctrl[14], ctrl[15])
+    V_state = jnp.clip(y[5], ctrl[24], ctrl[25])
+    I_R, I_V = y[6], y[7]
+
+    z_A = jnp.clip(z_A, 1e-6, 1.0 - 1e-6)
+    T_r = jnp.maximum(T_r, 250.0)
+
+    (
+        x_D, x_B, _D_frac, F_total, F_R, _F_B,
+        _F_R_norm, _F_B_norm, T_reb, _Q_reb,
+    ) = _controlled_column_metrics(z_A, eta_col, xi_reb, R_state, V_state)
+
+    R_cmd, V_cmd, dI_R, dI_V, _e_R, _e_V = compute_reflux_boilup(
+        x_D, x_B, F_R, T_reb, I_R, I_V, ctrl,
+    )
+    dR_state = (R_cmd - R_state) / ctrl[16]
+    dV_state = (V_cmd - V_state) / ctrl[26]
+
+    z_A0 = jnp.clip(z_A0_eff, 0.01, 0.999)
+    z_A_in = (F0 * z_A0 + F_R * x_D) / F_total
+    z_A_in = jnp.clip(z_A_in, 1e-6, 1.0 - 1e-6)
+    T_in_mix = (F0 * T_in + F_R * T_r) / F_total
+
+    k_eff = alpha * K0 * jnp.exp(-EA / (R_GAS * T_r))
+    k_eff = jnp.maximum(k_eff, 0.0)
+
+    Kp1, tau_i1, T_sp_ctrl, Qj0, Qj_min, Qj_max = (
+        ctrl[0], ctrl[1], ctrl[2], ctrl[3], ctrl[4], ctrl[5],
+    )
+    qj_unclamped = Qj0 + Kp1 * (T_r - T_sp_ctrl) + I_T / tau_i1
+    Q_j = jnp.clip(qj_unclamped, Qj_min, Qj_max)
+    dI_T = jnp.where((qj_unclamped > Qj_min) & (qj_unclamped < Qj_max), T_r - T_sp_ctrl, 0.0)
+
+    UA_eff = beta_r * UA_NOM
+    Q_transfer = UA_eff * (T_r - T_j)
+    Q_cooling_eff = beta_r * Q_j
+
+    dz_A = (F_total / MR_NOM) * (z_A_in - z_A) - k_eff * z_A
+    dT_r = (
+        (F_total / MR_NOM) * (T_in_mix - T_r)
+        + (-DH_RXN) * k_eff * z_A / CP_MOLAR
+        - Q_transfer / (MR_NOM * CP_MOLAR)
+    )
+    dT_j = (Q_transfer - Q_cooling_eff) / MJ_CPJ
+
+    return jnp.array([dz_A, dT_r, dT_j, dI_T, dR_state, dV_state, dI_R, dI_V])
+
+
+def simulate_to_steady_state_explicit(
+    theta: jnp.ndarray,
+    inlet: jnp.ndarray,
+    ctrl: jnp.ndarray = NOMINAL_CTRL_SB,
+    y0: jnp.ndarray = NOMINAL_Y0_EXPLICIT,
+    t_final: float = 200.0,
+    rtol: float = 1e-6,
+    atol: float = 1e-8,
+    max_steps: int = 2_000_000,
+) -> jnp.ndarray:
+    """Integrate the explicit-loop model to steady state."""
+    term = diffrax.ODETerm(recycle_rhs_explicit)
+    solver = diffrax.Tsit5()
+    controller = diffrax.PIDController(rtol=rtol, atol=atol)
+    sol = diffrax.diffeqsolve(
+        term,
+        solver,
+        t0=0.0,
+        t1=t_final,
+        dt0=0.001,
+        y0=y0,
+        args=(theta, inlet, ctrl),
+        stepsize_controller=controller,
+        max_steps=max_steps,
+        throw=False,
+    )
+    return sol.ys[-1]
+
+
+def simulate_trajectory_explicit(
+    theta: jnp.ndarray,
+    inlet: jnp.ndarray,
+    ctrl: jnp.ndarray = NOMINAL_CTRL_SB,
+    y0: jnp.ndarray = NOMINAL_Y0_EXPLICIT,
+    t_final: float = 50.0,
+    n_save: int = 201,
+    dt0: float = 0.001,
+    rtol: float = 1e-6,
+    atol: float = 1e-8,
+    max_steps: int = 2_000_000,
+) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    """Integrate the explicit-loop model at fixed save times."""
+    term = diffrax.ODETerm(recycle_rhs_explicit)
+    solver = diffrax.Tsit5()
+    controller = diffrax.PIDController(rtol=rtol, atol=atol)
+    saveat = diffrax.SaveAt(ts=jnp.linspace(0.0, t_final, n_save))
+    sol = diffrax.diffeqsolve(
+        term,
+        solver,
+        t0=0.0,
+        t1=t_final,
+        dt0=dt0,
+        y0=y0,
+        args=(theta, inlet, ctrl),
+        stepsize_controller=controller,
+        saveat=saveat,
+        max_steps=max_steps,
+        throw=False,
+    )
+    return sol.ts, sol.ys
 
 
 # ---------------------------------------------------------------------------
@@ -570,6 +860,50 @@ def extract_observations(
     )
 
 
+def extract_observations_explicit(
+    ys: jnp.ndarray,
+    theta: jnp.ndarray,
+    ctrl: jnp.ndarray,
+) -> jnp.ndarray:
+    """Extract raw channels from explicit S-A/S-B control trajectories.
+
+    Returns (n_t, 12):
+    [z_A, T_r, T_j, Q_j, x_D, x_B, F_R_norm, T_reb, Q_reb,
+     F_B_norm, R_norm, V_norm]
+    """
+    eta_col = theta[2]
+    xi_reb = theta[3]
+
+    z_A = ys[:, 0]
+    T_r = ys[:, 1]
+    T_j = ys[:, 2]
+    I_T = ys[:, 3]
+    R_state = ys[:, 4]
+    V_state = ys[:, 5]
+
+    Q_j = jax.vmap(compute_qj, in_axes=(0, 0, None))(T_r, I_T, ctrl)
+
+    col_out = jax.vmap(lambda zf, rr, vv: _controlled_column_metrics(zf, eta_col, xi_reb, rr, vv))(
+        z_A, R_state, V_state,
+    )
+    x_D_arr = col_out[0]
+    x_B_arr = col_out[1]
+    F_R_norm = col_out[6]
+    F_B_norm = col_out[7]
+    T_reb = col_out[8]
+    Q_reb = col_out[9]
+    R_norm = R_state / REFLUX_RATIO
+    V_norm = V_state
+
+    return jnp.stack(
+        [
+            z_A, T_r, T_j, Q_j, x_D_arr, x_B_arr,
+            F_R_norm, T_reb, Q_reb, F_B_norm, R_norm, V_norm,
+        ],
+        axis=1,
+    )
+
+
 # ---------------------------------------------------------------------------
 # JIT / vmap variants
 # ---------------------------------------------------------------------------
@@ -580,4 +914,7 @@ simulate_to_ss_batch = jax.jit(
 )
 simulate_trajectory_jit = jax.jit(
     simulate_trajectory, static_argnames=("n_save",)
+)
+simulate_trajectory_explicit_jit = jax.jit(
+    simulate_trajectory_explicit, static_argnames=("n_save",)
 )

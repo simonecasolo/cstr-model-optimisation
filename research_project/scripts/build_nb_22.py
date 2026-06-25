@@ -32,10 +32,10 @@ Plan contract:
 
 - `23` scenarios = `16` closed-loop + `7` open-loop diagnostic counterparts
 - `30` replicates per scenario
-- `2` information structures: S-A and S-B
+- `2` explicit control structures: S-A and S-B
 - `2 h` observation window at `1 min` resolution = `120` time points
-- S-A: `8` channels, with `x_D`
-- S-B: `7` channels, without `x_D`
+- S-A: `10` channels, with `x_D`, reflux effort, and boilup effort
+- S-B: `9` channels, without `x_D`, with conventional controller effort
 
 The generated files are:
 
@@ -81,11 +81,10 @@ print("S-B channels:", SB_CHANNELS)
     md(
         """## 2. Generate the dataset
 
-The generator integrates one deterministic trajectory per scenario and then adds
-independent Gaussian sensor noise for each replicate. This is much faster than
-solving the ODE 1380 times and is sufficient for nb22 because the current
-stochastic layer is intended to represent measurement-window variation, not
-process-model uncertainty.
+The generator integrates one deterministic S-A trajectory and one deterministic
+S-B trajectory per scenario, then adds independent Gaussian sensor noise for each
+replicate. This keeps the stochastic layer focused on measurement-window
+variation while making the two structures genuine closed-loop simulations.
 """
     ),
     code(
@@ -226,9 +225,11 @@ These checks verify that the generated deterministic scenario windows contain
 the effects the paper needs:
 
 - **Snowball effect:** catalyst decay increases recycle flow.
+- **Compound loop response:** combined reactor/column degradation moves the
+    explicit boilup/reboiler compensation channel.
 - **Masking:** jacket fouling is mostly hidden in `T_r` under feedback.
 - **Compensation:** the controller output `Q_j` moves when jacket fouling occurs.
-- **Column degradation:** S-A/reboiler channels move under tray-efficiency loss.
+- **Column degradation:** S-A reflux/boilup compensation moves under tray-efficiency loss.
 - **Open-loop contrast:** open-loop diagnostic windows expose larger temperature
   excursions than closed-loop windows.
 """
@@ -240,34 +241,36 @@ effect_checks
     ),
     md("""## 7. Visual inspection: key effects"""),
     code(
-        """raw = dataset["deterministic_raw"]
+        """raw_sb = dataset["deterministic_raw_sb"]
+raw_sa = dataset["deterministic_raw_sa"]
 raw_idx = {name: i for i, name in enumerate(RAW_CHANNELS)}
 
-def series(scenario, channel):
+def series(raw, scenario, channel):
     return raw[scenario][:, raw_idx[channel]]
 
 t = dataset["t_h"]
 fig, axes = plt.subplots(2, 2, figsize=(11.5, 6.5), constrained_layout=True)
 
-axes[0, 0].plot(t, series("W1_healthy", "F_R_norm"), label="W1 healthy")
-axes[0, 0].plot(t, series("W2_cat_decay", "F_R_norm"), label="W2 catalyst decay")
+axes[0, 0].plot(t, series(raw_sb, "W1_healthy", "F_R_norm"), label="W1 S-B")
+axes[0, 0].plot(t, series(raw_sb, "W2_cat_decay", "F_R_norm"), label="W2 S-B catalyst decay")
 axes[0, 0].set_ylabel("F_R/F_R_nom [-]")
 axes[0, 0].set_title("Snowball: recycle buildup")
 
-axes[0, 1].plot(t, series("W3_rxr_fouling", "T_r") - series("W1_healthy", "T_r")[0], label="W3 closed-loop")
-axes[0, 1].plot(t, series("W3_rxr_fouling_ol", "T_r") - series("W1_healthy", "T_r")[0], label="W3 open-loop")
+axes[0, 1].plot(t, series(raw_sb, "W3_rxr_fouling", "T_r") - series(raw_sb, "W1_healthy", "T_r")[0], label="W3 S-B closed-loop")
+axes[0, 1].plot(t, series(raw_sb, "W3_rxr_fouling_ol", "T_r") - series(raw_sb, "W1_healthy", "T_r")[0], label="W3 S-B open-loop")
 axes[0, 1].set_ylabel("T_r - nominal T_r [K]")
 axes[0, 1].set_title("Masking: feedback suppresses T_r excursion")
 
-axes[1, 0].plot(t, series("W1_healthy", "Q_j") / series("W1_healthy", "Q_j")[0], label="W1 healthy")
-axes[1, 0].plot(t, series("W3_rxr_fouling", "Q_j") / series("W1_healthy", "Q_j")[0], label="W3 fouling")
+axes[1, 0].plot(t, series(raw_sb, "W1_healthy", "Q_j") / series(raw_sb, "W1_healthy", "Q_j")[0], label="W1 S-B")
+axes[1, 0].plot(t, series(raw_sb, "W3_rxr_fouling", "Q_j") / series(raw_sb, "W1_healthy", "Q_j")[0], label="W3 S-B fouling")
 axes[1, 0].set_ylabel("Q_j/Q_j_nom [-]")
 axes[1, 0].set_title("Compensation: controller output moves")
 
-axes[1, 1].plot(t, series("W1_healthy", "T_reb"), label="W1 healthy")
-axes[1, 1].plot(t, series("W4_col_tray_eff", "T_reb"), label="W4 tray efficiency loss")
-axes[1, 1].set_ylabel("T_reb proxy [K]")
-axes[1, 1].set_title("Column effect: reboiler proxy shifts")
+axes[1, 1].plot(t, series(raw_sa, "W1_healthy", "R_norm"), label="W1 S-A R")
+axes[1, 1].plot(t, series(raw_sa, "W4_col_tray_eff", "R_norm"), label="W4 S-A R")
+axes[1, 1].plot(t, series(raw_sa, "W4_col_tray_eff", "V_norm"), label="W4 S-A V")
+axes[1, 1].set_ylabel("normalized controller effort [-]")
+axes[1, 1].set_title("Column effect: explicit reflux/boilup compensation")
 
 for ax in axes.ravel():
     ax.set_xlabel("time [h]")
@@ -325,19 +328,19 @@ acceptance
         """## 10. Interpretation
 
 The generated nb22 dataset satisfies the current plan-level data contract:
-`23` scenarios, `30` replicates, `2` structures, and the planned `8`/`7` channel
-asymmetry between S-A and S-B.
+`23` scenarios, `30` replicates, `2` explicit control structures, and the planned
+channel asymmetry between S-A and S-B.
 
 The important physical effects are visible in the deterministic windows before
 sensor noise is added. That matters because downstream summary statistics and
 SBI training should learn from the intended process signatures rather than from
 accidental artefacts of the data generator.
 
-Remaining limitation before publication-grade data generation: the current
-S-A/S-B split is still an information-structure split over a shared plant model.
-Full Wu S-A/S-B controller dynamics would require explicit reflux-ratio and
-reboiler loops. The current dataset is suitable for nb23 summary-statistics
-prototyping and for checking whether the planned signatures are separable.
+The current implementation is the recommended minimal explicit-loop model: reactor
+and jacket dynamics are integrated, the column remains QSS, and S-A/S-B differ by
+their reflux/reboiler control policies as well as by measured channels. A full
+dynamic tray model remains a possible later validation extension, not a prerequisite
+for nb23 summary-statistics prototyping.
 """
     ),
 ]
