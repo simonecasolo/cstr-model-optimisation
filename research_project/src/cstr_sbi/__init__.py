@@ -16,5 +16,6 @@ __version__ = "0.0.1"
 
 from cstr_sbi import physics   # propylene oxide system
 from cstr_sbi import luyben    # Luyben recycle plant extension
+from cstr_sbi import recycle   # Wu 2003 CSTR-column-recycle extension
 
-__all__ = ["physics", "luyben", "__version__"]
+__all__ = ["physics", "luyben", "recycle", "__version__"]
