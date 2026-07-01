@@ -1,5 +1,5 @@
-results/*.npz filter=lfs diff=lfs merge=lfs -text
-results/**/*.npz filter=lfs diff=lfs merge=lfs -text
-data/*.npz filter=lfs diff=lfs merge=lfs -text
+results/*.npz -text
+results/**/*.npz -text
+data/*.npz -text
 
 *.ipynb -text

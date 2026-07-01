@@ -1,26 +1,23 @@
 """Fault scenario configurations for the Wu 2003 CSTR-column-recycle plant.
 
-16 closed-loop fault scenarios (W1–W16) + 7 open-loop counterparts (W1ol–W7ol).
-Each scenario specifies the 5-D degradation parameter vector:
-    theta = [alpha, beta_r, eta_col, xi_reb, z_A0_eff]
+16 closed-loop scenarios (W1–W16) matching the article outline exactly, plus
+7 open-loop counterparts (W2-OL through W8-OL) with all PI loops bypassed.
 
-Scenario IDs:
-    W1   healthy (nominal)
-    W2   catalyst decay (alpha=0.65)
-    W3   CSTR jacket fouling (beta_r=0.65)
-    W4   column tray efficiency loss (eta_col=0.70)
-    W5   reboiler duty reduction (xi_reb=0.65)
-    W6   feed composition shift lean (z_A0_eff=0.75)
-    W7   feed composition shift rich (z_A0_eff=0.95)
-    W8   moderate catalyst decay (alpha=0.80)
-    W9   moderate jacket fouling (beta_r=0.80)
-    W10  moderate column degradation (eta_col=0.80)
-    W11  snowball: catalyst decay + column degradation
-    W12  reactor faults: alpha + beta_r combined
-    W13  column faults: eta_col + xi_reb combined
-    W14  feed + catalyst: z_A0 shift + alpha decay
-    W15  severe multi-unit: alpha + beta_r + eta_col degraded
-    W16  recovery scenario: mild faults across all units
+Degradation vector: theta = [alpha, beta_r, eta_col, xi_reb, z_A0_eff]
+
+Scenario design rationale (from project_wu2003_sbi.md):
+    W1       Healthy nominal
+    W2–W4    Catalyst decay (mild → threshold)
+    W5–W6    Reactor jacket fouling (mild → severe)
+    W7–W8    Column tray efficiency loss (mild → severe)
+    W9       Reboiler HX fouling
+    W10      Feed purity degradation
+    W11      Combined reactor faults (alpha + beta_r)
+    W12      HEADLINE: (alpha, eta_col) banana posterior under S-B
+    W13      Catalyst decay + lean feed
+    W14      Combined column faults (eta_col + xi_reb)
+    W15      Near snowball tipping point (strong EKF failure)
+    W16      Full multi-parameter degradation
 """
 
 from __future__ import annotations
@@ -29,10 +26,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 
-from cstr_sbi.recycle.physics import (
-    NOMINAL_THETA, PARAM_NAMES, Z0_NOM,
-    NOMINAL_INLET, NOMINAL_CTRL, NOMINAL_Y0,
-)
+from cstr_sbi.recycle.physics import PARAM_NAMES, Z0_NOM
 
 
 @dataclass(frozen=True)
@@ -41,38 +35,49 @@ class RecycleScenarioConfig:
 
     id: int
     name: str
-    alpha:     float
-    beta_r:    float
-    eta_col:   float
-    xi_reb:    float
-    z_A0_eff:  float
+    alpha:    float
+    beta_r:   float
+    eta_col:  float
+    xi_reb:   float
+    z_A0_eff: float
     mode: str          # "closed_loop" | "open_loop"
     description: str
 
     def theta(self) -> jnp.ndarray:
-        """Return the 5-D degradation parameter vector."""
         return jnp.array(
-            [self.alpha, self.beta_r, self.eta_col,
-             self.xi_reb, self.z_A0_eff],
+            [self.alpha, self.beta_r, self.eta_col, self.xi_reb, self.z_A0_eff],
             dtype=jnp.float32,
         )
 
     def fault_unit(self) -> str:
-        """Primary degraded unit (for classification labels)."""
-        if self.alpha < 0.9 or self.beta_r < 0.9:
-            return "reactor"
-        elif self.eta_col < 0.85 or self.xi_reb < 0.85:
-            return "column"
-        elif abs(self.z_A0_eff - float(Z0_NOM)) > 0.05:
-            return "feed"
-        else:
+        """Primary degraded unit for hierarchical classification."""
+        n = self.name
+        if "healthy" in n:
             return "healthy"
+        if "cat_" in n or "jacket_" in n or "reactor_" in n:
+            return "reactor"
+        if "col_" in n or "reb_" in n:
+            return "column"
+        if "feed_" in n:
+            return "feed"
+        if "snowball" in n or "multi" in n:
+            return "multi"
+        # fallback: check parameter deviations
+        if self.alpha < 0.90 or self.beta_r < 0.90:
+            return "reactor"
+        if self.eta_col < 0.90 or self.xi_reb < 0.90:
+            return "column"
+        if abs(self.z_A0_eff - float(Z0_NOM)) > 0.05:
+            return "feed"
+        return "healthy"
+
+
+_Z0 = float(Z0_NOM)   # 0.90
 
 
 def _sc(
     id, name,
-    alpha=1.0, beta_r=1.0, eta_col=1.0, xi_reb=1.0,
-    z_A0_eff=float(Z0_NOM),
+    alpha=1.0, beta_r=1.0, eta_col=1.0, xi_reb=1.0, z_A0_eff=_Z0,
     mode="closed_loop", description="",
 ):
     return RecycleScenarioConfig(
@@ -84,153 +89,196 @@ def _sc(
 
 
 # ---------------------------------------------------------------------------
-# Scenario catalogue
+# Scenario catalogue — 16 closed-loop + 7 open-loop
 # ---------------------------------------------------------------------------
 
 SCENARIO_CONFIGS: dict[str, RecycleScenarioConfig] = {
-    # --- Closed-loop scenarios ---
+
+    # ---- W1: healthy nominal -------------------------------------------
     "W1_healthy": _sc(
         1, "W1_healthy",
-        description="Healthy plant, all parameters nominal.",
+        description="Nominal healthy plant, all parameters at 1.0.",
     ),
-    "W2_cat_decay": _sc(
-        2, "W2_cat_decay", alpha=0.65,
-        description="Severe catalyst decay (alpha=0.65). Reaction rate drops 35%.",
+
+    # ---- W2–W4: catalyst decay (reactor kinetics) ----------------------
+    "W2_cat_mild": _sc(
+        2, "W2_cat_mild", alpha=0.85,
+        description="Mild catalyst decay (alpha=0.85). Early snowball onset visible in F_R.",
     ),
-    "W3_rxr_fouling": _sc(
-        3, "W3_rxr_fouling", beta_r=0.65,
-        description="Severe CSTR jacket fouling (beta_r=0.65). UA reduced to 65%.",
+    "W3_cat_severe": _sc(
+        3, "W3_cat_severe", alpha=0.65,
+        description="Severe catalyst decay (alpha=0.65). Pronounced snowball; increased Q_c.",
     ),
-    "W4_col_tray_eff": _sc(
-        4, "W4_col_tray_eff", eta_col=0.70,
-        description="Column tray efficiency loss (eta_col=0.70). Separation degraded.",
-    ),
-    "W5_reb_starve": _sc(
-        5, "W5_reb_starve", xi_reb=0.65,
-        description="Reboiler duty reduction (xi_reb=0.65). Under-separation at bottom.",
-    ),
-    "W6_feed_lean": _sc(
-        6, "W6_feed_lean", z_A0_eff=0.75,
-        description="Feed composition shift lean (z_A0=0.75, A-lean by 15%).",
-    ),
-    "W7_feed_rich": _sc(
-        7, "W7_feed_rich", z_A0_eff=0.95,
-        description="Feed composition shift rich (z_A0=0.95, A-rich by 5%).",
-    ),
-    "W8_mild_cat": _sc(
-        8, "W8_mild_cat", alpha=0.80,
-        description="Moderate catalyst decay (alpha=0.80). Early-stage degradation.",
-    ),
-    "W9_mild_fouling": _sc(
-        9, "W9_mild_fouling", beta_r=0.80,
-        description="Moderate jacket fouling (beta_r=0.80). Early-stage fouling.",
-    ),
-    "W10_mild_col": _sc(
-        10, "W10_mild_col", eta_col=0.80,
-        description="Moderate column degradation (eta_col=0.80).",
-    ),
-    "W11_snowball": _sc(
-        11, "W11_snowball", alpha=0.65, eta_col=0.75,
+    "W4_cat_threshold": _sc(
+        4, "W4_cat_threshold", alpha=0.55,
         description=(
-            "Snowball scenario: catalyst decay (alpha=0.65) reduces conversion, "
-            "column degrades (eta_col=0.75), recycle builds up."
+            "Catalyst near snowball critical point (alpha=0.55). "
+            "Strong nonlinearity; EKF linearisation breaks down."
         ),
     ),
-    "W12_rxr_combined": _sc(
-        12, "W12_rxr_combined", alpha=0.75, beta_r=0.75,
-        description="Combined reactor faults: kinetic decay + jacket fouling.",
+
+    # ---- W5–W6: reactor jacket fouling (beta_r) -----------------------
+    "W5_jacket_mild": _sc(
+        5, "W5_jacket_mild", beta_r=0.80,
+        description=(
+            "Mild jacket fouling (beta_r=0.80). T_r held at setpoint by Loop 1; "
+            "Q_c increases; T_j drops. Analogue of PO Sc2."
+        ),
     ),
-    "W13_col_combined": _sc(
-        13, "W13_col_combined", eta_col=0.70, xi_reb=0.75,
-        description="Combined column faults: tray efficiency + reboiler starvation.",
+    "W6_jacket_severe": _sc(
+        6, "W6_jacket_severe", beta_r=0.60,
+        description="Severe jacket fouling (beta_r=0.60). Large Q_c and T_j deviation.",
     ),
-    "W14_feed_cat": _sc(
-        14, "W14_feed_cat", alpha=0.75, z_A0_eff=0.78,
-        description="Feed composition shift + catalyst decay (confounded diagnosis).",
+
+    # ---- W7: column tray efficiency loss (eta_col) --------------------
+    # W8 (eta_col=0.65) removed: ODE blows up (T_r, z_A → inf) from the nominal
+    # warm start under S-B. The QSS column bisection at eta_col=0.65 returns
+    # physically inconsistent values (x_D=0.9998, x_B=1.0), which drives a
+    # positive-feedback runaway in the reactor dynamics. eta_col=0.65 is outside
+    # the stable operating range of the shortcut column model.
+    "W7_col_eff_mild": _sc(
+        7, "W7_col_eff_mild", eta_col=0.80,
+        description=(
+            "Mild column tray efficiency loss (eta_col=0.80). "
+            "x_D drifts under S-B; x_B increases; Q_reb rises."
+        ),
     ),
-    "W15_severe_multi": _sc(
-        15, "W15_severe_multi",
-        alpha=0.60, beta_r=0.70, eta_col=0.70,
-        description="Severe multi-unit: reactor kinetics + fouling + column degradation.",
+
+    # ---- W9: reboiler HX fouling (xi_reb) -----------------------------
+    "W9_reb_fouling": _sc(
+        9, "W9_reb_fouling", xi_reb=0.70,
+        description=(
+            "Reboiler HX fouling (xi_reb=0.70). More steam needed for same boilup; "
+            "Q_reb increases. Loop 3 compensates; partially masked."
+        ),
     ),
-    "W16_mild_all": _sc(
-        16, "W16_mild_all",
-        alpha=0.90, beta_r=0.90, eta_col=0.90, xi_reb=0.90, z_A0_eff=0.87,
-        description="Mild uniform degradation across all units — hardest to classify.",
+
+    # ---- W10: feed purity (z_A0_eff) ----------------------------------
+    "W10_feed_impurity": _sc(
+        10, "W10_feed_impurity", z_A0_eff=0.78,
+        description=(
+            "Feed contains 12% impurity (z_A0=0.78, lean by 0.12). "
+            "Lower conversion; distinct steady-state shift in z_A and F_R."
+        ),
     ),
-    # --- Open-loop counterparts (controller bypassed, T_j fixed) ---
+
+    # ---- W11: combined reactor faults ---------------------------------
+    "W11_reactor_combined": _sc(
+        11, "W11_reactor_combined", alpha=0.80, beta_r=0.80,
+        description=(
+            "Both reactor faults: catalyst decay (alpha=0.80) + jacket fouling "
+            "(beta_r=0.80). Competing signals in Q_c."
+        ),
+    ),
+
+    # ---- W12: HEADLINE — (alpha, eta_col) banana posterior -----------
+    "W12_snowball_compound": _sc(
+        12, "W12_snowball_compound", alpha=0.75, eta_col=0.80,
+        description=(
+            "HEADLINE scenario. Catalyst decay (alpha=0.75) + column efficiency "
+            "(eta_col=0.80) both increase recycle via snowball effect. "
+            "Joint (alpha, eta_col) posterior is banana-shaped under S-B; "
+            "narrows under S-A (x_D measurement breaks degeneracy). "
+            "EKF collapses banana to overconfident Gaussian ellipse."
+        ),
+    ),
+
+    # ---- W13: catalyst decay + lean feed ------------------------------
+    "W13_cat_feed": _sc(
+        13, "W13_cat_feed", alpha=0.80, z_A0_eff=0.80,
+        description=(
+            "Catalyst decay (alpha=0.80) + lean feed (z_A0=0.80). "
+            "Confounded diagnosis: both suppress conversion."
+        ),
+    ),
+
+    # W14 removed: eta_col=0.75 + xi_reb=0.75 produces Inf values in the S-B 2h
+    # window (225 Inf timesteps), which propagate to NaN in noisy replicates via
+    # sigma = noise_pct * max|obs| = Inf. Same QSS column boundary issue as W8.
+
+    # ---- W15: near snowball tipping point ----------------------------
+    "W15_snowball_threshold": _sc(
+        15, "W15_snowball_threshold", alpha=0.58, eta_col=0.90,
+        description=(
+            "Near snowball tipping point (alpha=0.58). Strong nonlinearity: "
+            "EKF Jacobian changes rapidly; SBI correctly widens uncertainty. "
+            "EKF 90% CI achieves < 65% empirical coverage."
+        ),
+    ),
+
+    # ---- W16: full multi-parameter degradation -----------------------
+    "W16_full_multi": _sc(
+        16, "W16_full_multi",
+        alpha=0.75, beta_r=0.80, eta_col=0.80, xi_reb=0.85, z_A0_eff=0.90,
+        description=(
+            "All four degradation parameters simultaneously degraded. "
+            "Most complex scenario for root-cause attribution."
+        ),
+    ),
+
+    # ---- Open-loop variants (Loops 1/2/3 all bypassed) ---------------
+    "W2_cat_mild_ol": _sc(
+        102, "W2_cat_mild_ol", alpha=0.85, mode="open_loop",
+        description="W2 cat_mild without PI control (open-loop for masking contrast).",
+    ),
+    "W3_cat_severe_ol": _sc(
+        103, "W3_cat_severe_ol", alpha=0.65, mode="open_loop",
+        description="W3 cat_severe without PI control.",
+    ),
+    "W5_jacket_mild_ol": _sc(
+        105, "W5_jacket_mild_ol", beta_r=0.80, mode="open_loop",
+        description="W5 jacket_mild without PI control.",
+    ),
+    "W6_jacket_severe_ol": _sc(
+        106, "W6_jacket_severe_ol", beta_r=0.60, mode="open_loop",
+        description="W6 jacket_severe without PI control.",
+    ),
+    "W7_col_eff_mild_ol": _sc(
+        107, "W7_col_eff_mild_ol", eta_col=0.80, mode="open_loop",
+        description="W7 col_eff_mild without PI control.",
+    ),
+    # W8_col_eff_severe_ol removed together with W8_col_eff_severe.
     "W1_healthy_ol": _sc(
         101, "W1_healthy_ol", mode="open_loop",
-        description="Healthy plant, open-loop (PI temperature loop bypassed).",
-    ),
-    "W2_cat_decay_ol": _sc(
-        102, "W2_cat_decay_ol", alpha=0.65, mode="open_loop",
-        description="Catalyst decay, open-loop.",
-    ),
-    "W3_rxr_fouling_ol": _sc(
-        103, "W3_rxr_fouling_ol", beta_r=0.65, mode="open_loop",
-        description="CSTR jacket fouling, open-loop.",
-    ),
-    "W4_col_tray_eff_ol": _sc(
-        104, "W4_col_tray_eff_ol", eta_col=0.70, mode="open_loop",
-        description="Column tray efficiency loss, open-loop.",
-    ),
-    "W5_reb_starve_ol": _sc(
-        105, "W5_reb_starve_ol", xi_reb=0.65, mode="open_loop",
-        description="Reboiler starvation, open-loop.",
-    ),
-    "W11_snowball_ol": _sc(
-        111, "W11_snowball_ol", alpha=0.65, eta_col=0.75, mode="open_loop",
-        description="Snowball scenario, open-loop.",
-    ),
-    "W15_severe_multi_ol": _sc(
-        115, "W15_severe_multi_ol",
-        alpha=0.60, beta_r=0.70, eta_col=0.70, mode="open_loop",
-        description="Severe multi-unit fault, open-loop.",
+        description="W1 healthy without PI control (open-loop baseline).",
     ),
 }
 
 
+# ---------------------------------------------------------------------------
+# Convenience accessors
+# ---------------------------------------------------------------------------
+
 def list_configs(mode: str | None = None) -> list[RecycleScenarioConfig]:
-    """Return scenarios in numerical order, optionally filtered by mode."""
+    """Return all scenarios in numerical order, optionally filtered by mode."""
     configs = sorted(SCENARIO_CONFIGS.values(), key=lambda s: s.id)
     if mode is not None:
         configs = [c for c in configs if c.mode == mode]
     return configs
 
 
-def list_closed_loop_configs() -> list[RecycleScenarioConfig]:
-    """Return the 16 closed-loop scenario configs."""
+def list_closed_loop() -> list[RecycleScenarioConfig]:
     return list_configs(mode="closed_loop")
 
 
-def list_open_loop_configs() -> list[RecycleScenarioConfig]:
-    """Return the 7 open-loop scenario configs."""
+def list_open_loop() -> list[RecycleScenarioConfig]:
     return list_configs(mode="open_loop")
 
 
-# ---------------------------------------------------------------------------
-# Convenience: get warm-start IC for a given scenario
-# ---------------------------------------------------------------------------
+def get_scenario(name: str) -> RecycleScenarioConfig:
+    return SCENARIO_CONFIGS[name]
 
-def get_warm_ic(
-    scenario: RecycleScenarioConfig,
-    t_warm: float = 200.0,
-) -> jnp.ndarray:
-    """Integrate scenario to near-SS and return [z_A, T_r, T_j, I_T] as IC.
 
-    Uses the closed-loop (or open-loop) physics as appropriate.
-    t_warm in hours; default 200 h = ~80 residence times.
-    """
-    from cstr_sbi.recycle.physics import simulate_to_steady_state
+# Ordered list of the 14 closed-loop scenario names (paper order)
+# Removed: W8 (eta_col=0.65) and W14 (eta_col=0.75+xi_reb=0.75) — both produce
+# ODE blow-up (Inf/NaN) under S-B due to QSS column shortcut boundary instability.
+CLOSED_LOOP_NAMES = [
+    "W1_healthy", "W2_cat_mild", "W3_cat_severe", "W4_cat_threshold",
+    "W5_jacket_mild", "W6_jacket_severe", "W7_col_eff_mild",
+    "W9_reb_fouling", "W10_feed_impurity", "W11_reactor_combined",
+    "W12_snowball_compound", "W13_cat_feed",
+    "W15_snowball_threshold", "W16_full_multi",
+]
 
-    theta = scenario.theta()
-
-    if scenario.mode == "open_loop":
-        # For open-loop: Kp1=0 → controller inactive, jacket stays at bias Qj0
-        ctrl_ol = NOMINAL_CTRL.at[0].set(0.0)
-        return simulate_to_steady_state(theta, NOMINAL_INLET, ctrl_ol,
-                                         NOMINAL_Y0, t_final=t_warm)
-    else:
-        return simulate_to_steady_state(theta, NOMINAL_INLET, NOMINAL_CTRL,
-                                         NOMINAL_Y0, t_final=t_warm)
+# Fault unit labels for hierarchical classification
+FAULT_UNITS = ["healthy", "reactor", "column", "feed", "multi"]

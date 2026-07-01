@@ -35,7 +35,7 @@ import diffrax
 # Reaction A + B -> C, exothermic, bimolecular, irreversible
 K0_R: float = 1.0e10          # L/(mol·min), pre-exponential factor
 E_A_R: float = 69_000.0       # J/mol, activation energy
-H_R_R: float = -41_800.0      # J/mol, heat of reaction (exothermic)
+H_R_R: float = -250_000.0     # J/mol, heat of reaction (exothermic)
 R_GAS: float = 8.314           # J/(mol·K)
 
 # Reactor fluid
@@ -91,8 +91,8 @@ DELTA_T_PREHEAT: float = 10.0  # K, nominal preheat rise (kappa=1 -> T_IN + DELT
 TSP_R: float = 360.0           # K
 KP1: float = 200.0             # J/(min·K·(J/min)) = dimensionless scaling factor
 TAU_I1: float = 15.0           # min
-QC0_R: float = 600.0           # J/min, nominal cooling duty
-QC_MIN_R: float = 0.0
+QC0_R: float = 600.0           # J/min, nominal jacket duty (positive = cooling)
+QC_MIN_R: float = -3000.0      # negative = steam heating (jacket can heat and cool)
 QC_MAX_R: float = 6000.0
 
 # Loop 2: Separator temperature (T_s -> Q_s)
@@ -155,7 +155,7 @@ NOMINAL_CTRL_ALL = jnp.stack(
 #: 13-D warm initial condition (near nominal steady state)
 #  [Ca, Cb, T_r, Tc, n_L, x_A, x_B, T_s, I_T, I_Ts, I_L, I_R, I_P]
 NOMINAL_Y0 = jnp.array(
-    [0.10, 0.10, TSP_R, 310.0, N_L_NOM, 0.40, 0.30, TSP_S, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.30, 0.30, TSP_R, 355.0, N_L_NOM, 0.35, 0.30, TSP_S, 0.0, 0.0, 0.0, 0.0, 0.0],
     dtype=jnp.float32,
 )
 
@@ -277,9 +277,6 @@ def luyben_rhs(
 
     # Total reactor feed
     F_in = F_A0_eff + F_B0_eff + F_R
-    # Mixed inlet concentrations
-    CA_mix = (F_A0_eff * CA_in + F_R * x_A * (n_L / jnp.maximum(n_L, 1e-6))) / jnp.maximum(F_in, 1e-6)
-    CB_mix = (F_B0_eff * CB_in + F_R * x_B * (n_L / jnp.maximum(n_L, 1e-6))) / jnp.maximum(F_in, 1e-6)
     # Effective inlet concentrations (recycle dilutes inlet streams)
     Ca_feed = (F_A0_eff * CA_in + F_R * jnp.clip(x_A, 0.0, 1.0)) / jnp.maximum(F_in, 1e-6)
     Cb_feed = (F_B0_eff * CB_in + F_R * jnp.clip(x_B, 0.0, 1.0)) / jnp.maximum(F_in, 1e-6)
@@ -301,7 +298,9 @@ def luyben_rhs(
         + (-H_R_R) * rate / (RHO_R * CP_R)
         - UA_r_eff * (T_r - Tc) / (RHO_R * CP_R * V_R)
     )
-    dTc = (Qc / (RHO_C * CP_C * V_C_R)) * (T_ci - Tc) + UA_r_eff * (T_r - Tc) / (RHO_C * CP_C * V_C_R)
+    # Jacket energy balance: Qc is heat extracted (J/min). Positive = cooling, negative = heating.
+    # Dimensionally correct: [J/(min*K)*K - J/min] / [J/K] = K/min
+    dTc = (UA_r_eff * (T_r - Tc) - Qc) / (RHO_C * CP_C * V_C_R)
 
     # ----- Flash separator -----
     # Reactor outlet feeds separator; composition approximately equal to reactor outlet
@@ -408,7 +407,7 @@ def luyben_open_loop_rhs(
         + (-H_R_R) * rate / (RHO_R * CP_R)
         - UA_r_eff * (T_r - Tc) / (RHO_R * CP_R * V_R)
     )
-    dTc = (Qc / (RHO_C * CP_C * V_C_R)) * (T_ci - Tc) + UA_r_eff * (T_r - Tc) / (RHO_C * CP_C * V_C_R)
+    dTc = (UA_r_eff * (T_r - Tc) - Qc) / (RHO_C * CP_C * V_C_R)
 
     y_A, y_B, y_C = _vle_equilibrium(x_A, x_B, eta_sep)
     V_frac = _vapour_fraction(Ca / jnp.maximum(Ca + Cb + 0.1, 1e-6),

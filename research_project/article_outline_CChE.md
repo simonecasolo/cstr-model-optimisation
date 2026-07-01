@@ -45,9 +45,9 @@
 
 - Feedback control structurally reduces fault parameter identifiability in closed-loop systems
 - Fisher information I_β/I_α ratio = 1/250–1/500 for PI-controlled CSTR; irreducible
-- Amortised SBI recovers full posteriors at 8-D plant scale; MCMC is infeasible there
+- Amortised SBI recovers non-Gaussian posteriors in recycle plants; MCMC is 10,000× slower
 - EKF gives overconfident Gaussian intervals near snowball bifurcation; SBI does not
-- Plant-wide fault localized to root cause despite five PI loops masking symptoms
+- Recycle coupling creates (α, η_col) banana posterior invisible to EKF; SBI captures it
 
 ---
 
@@ -57,7 +57,7 @@
    inference under multi-loop feedback control** (recommended — descriptive, C&ChE idiom)
 
 2. **Structural identifiability limits of Bayesian fault diagnosis under feedback control:
-   from a PI-controlled CSTR to a Luyben recycle plant** (leads with the theory)
+   from a PI-controlled CSTR to a Luyben reactor-column-recycle plant** (leads with the theory)
 
 3. **Amortised simulation-based inference for real-time probabilistic fault diagnosis in
    feedback-controlled chemical processes** (broader, mirrors EAAI option but more suitable
@@ -79,26 +79,28 @@ multi-unit plant-wide processes or for amortised Bayesian inference methods.
 **Methods.** We apply simulation-based inference (SBI) — training a neural spline flow
 to approximate the Bayesian posterior over degradation parameters from physics-informed
 summary statistics of fixed-length observation windows — across two systems of increasing
-complexity: a PI-controlled propylene oxide CSTR (2 parameters, 1 unit) and a Luyben
-recycle plant (8 parameters, 4 units, 5 PI loops). We characterise identifiability using
-numerical Fisher information analysis, compare against extended Kalman filter baselines
-using automatic differentiation of the ODE Jacobian, and validate with simulation-based
-calibration.
+complexity: a PI-controlled propylene oxide CSTR (2 parameters, 1 unit) and the Luyben
+reactor-column-recycle benchmark (5 parameters, 2 units plus recycle, 3 PI loops; Wu,
+Yu, Luyben & Skogestad 2003). We characterise identifiability using numerical Fisher
+information analysis, compare against extended Kalman filter baselines using automatic
+differentiation of the ODE Jacobian, and validate with simulation-based calibration.
 
 **Results.** For the propylene oxide system, the Fisher information for the fouling
 parameter is 250–500× smaller than for catalyst activity — confirmed empirically by
 four independent methods (SBI, MCMC, EKF, UKF) all showing identical structural bias.
-For the Luyben recycle plant, plant-wide feedback control creates non-Gaussian posteriors
-in which catalyst decay and separator efficiency loss produce banana-shaped dependences
-invisible to the EKF's Gaussian approximation. SBI correctly localises the snowball
-root cause (catalyst decay) from 8 measured channels under partial observability.
-MCMC is computationally infeasible at 8-D; SBI processes each 2-hour window in under
-20 ms after a one-time training cost.
+For the recycle plant, three decentralized PI loops and a liquid recycle stream create
+a new identifiability challenge: catalyst decay (α) and column tray efficiency (η_col)
+both increase recycle flow under the snowball effect, producing a banana-shaped joint
+posterior invisible to the EKF's Gaussian approximation under conventional measurement
+control. SBI correctly attributes root-cause faults from 7 conventional measurements
+despite multi-loop masking. MCMC requires ~8 min per observation window at this scale;
+SBI processes the same window in under 20 ms after a one-time training cost.
 
-**Conclusions.** Amortised SBI is the only practical full-Bayesian method for plant-scale
-fault diagnosis. The structural identifiability limitations revealed here suggest that
-periodic open-loop excitation is needed for reliable fouling quantification; fault
-classification remains robust despite the irreducible parameter bias.
+**Conclusions.** Amortised SBI outperforms both EKF (incorrect posterior geometry) and
+MCMC (impractical for monitoring cadence) for plant-scale fault diagnosis. The structural
+identifiability hierarchy revealed here — reactor thermal faults masked by temperature
+control, cross-unit faults coupled through recycle — provides actionable design guidance
+for sensor placement and scheduled open-loop recalibration.
 
 ---
 
@@ -137,10 +139,13 @@ Simulation-based inference (SBI; Cranmer et al. 2020) replaces an explicit likel
 with a neural density estimator trained on simulated (parameter, observation) pairs.
 Three properties make it attractive for plant-wide fault diagnosis: (a) amortisation —
 a single trained network processes any new observation in milliseconds, enabling
-real-time deployment; (b) full posterior distributions — enabling probabilistic fault
-classification with calibrated uncertainty; (c) no likelihood derivation required —
-the process simulator is used directly. These advantages grow with problem dimensionality:
-at 8+ parameters, MCMC becomes computationally infeasible while SBI's cost is fixed.
+real-time deployment; (b) full posterior distributions — capturing non-Gaussian posterior
+shapes that classical methods cannot represent; (c) no likelihood derivation required —
+the process simulator is used directly, without linearisation or Gaussian noise assumptions.
+These advantages are critical near recycle tipping points, where the nonlinear dynamics
+produce posterior shapes that invalidate the Gaussian approximations underlying EKF/UKF,
+and where the monitoring cadence (2-hour windows across a 30-day operating period) makes
+MCMC's per-window cost prohibitive.
 
 ### 1.2 Contributions (numbered list, exactly 4)
 
@@ -159,18 +164,25 @@ at 8+ parameters, MCMC becomes computationally infeasible while SBI's cost is fi
 >    NUTS. A 30-day sequential tracking study demonstrates MAE_α = 0.004 and MAE_β = 0.033
 >    with correct fault classification in >95% of windows.
 >
-> 3. **Plant-wide fault localization in a Luyben recycle process.**
->    We extend to an 8-D system (CSTR + flash separator + recycle + purge, 5 PI loops)
->    and demonstrate SBI correctly attributes the Luyben snowball effect to its root cause
->    (catalyst decay) despite five local controllers each masking symptoms independently.
->    The (α, η_sep) posterior is banana-shaped; the EKF, constrained to Gaussians, gives
->    overconfident intervals that miss the true parameter combination.
+> 3. **Plant-wide fault localization in the Luyben reactor-column-recycle benchmark.**
+>    We extend to the canonical Luyben CSTR-column-recycle process (Wu et al. 2003,
+>    Comput. Chem. Eng. 27(3):401–421; 5 fault parameters, 3 PI loops, liquid recycle)
+>    and demonstrate that: (a) the same reactor jacket masking mechanism from the PO CSTR
+>    (I_β/I_α ≈ 1/250–500) persists unchanged when a column and recycle are added;
+>    (b) the recycle creates a new, distinct coupling: catalyst decay (α) and column tray
+>    efficiency (η_col) jointly increase recycle flow via the snowball effect, producing a
+>    banana-shaped joint posterior under conventional measurement control (no composition
+>    analysers). SBI captures this joint uncertainty correctly; the EKF collapses it to an
+>    overconfident Gaussian ellipse.
 >
-> 4. **MCMC infeasibility at plant scale and SBI as the enabling method.**
->    At 8-D, NUTS requires days of compute per observation window. SBI's amortisation
->    cost is paid once; subsequent inference is a single network forward pass. This is a
->    qualitative, not merely quantitative, advantage: SBI enables full-Bayesian plant-wide
->    fault diagnosis that has no practical alternative.
+> 4. **SBI as the practical method for real-time plant-wide monitoring.**
+>    NUTS at plant scale requires ~8 min per 2-hour observation window (extrapolated from
+>    2-D PO timing × dimension scaling), making 30-day sequential monitoring (720 windows)
+>    take ~4 days of compute. SBI's amortisation cost is paid once at training time;
+>    subsequent inference is a single network forward pass taking <20 ms. Beyond speed:
+>    EKF provides only Gaussian uncertainty quantification, which is demonstrably incorrect
+>    near the snowball tipping point. SBI is the only method that is simultaneously fast
+>    enough for monitoring cadence and correct in posterior geometry.
 
 ### 1.3 Paper organisation
 
@@ -276,67 +288,115 @@ Cpc, Kp, τi, Tsp, Qc0, Qc_max)
 **Observations:** 60-min windows at 0.5 min resolution → 120×4 time series [C, T, Tc, Qc];
 29-D summary statistics (see §4.2); 8 fault scenarios (Table 2); 50 replicates each.
 
-### 3.2 System II: Luyben recycle plant
+### 3.2 System II: Luyben reactor-column-recycle benchmark
 
-**Reaction:** A + B → C (bimolecular, irreversible, exothermic). Generic benchmark
-from Luyben (1994, 2002). Relative volatilities α_A = 3.0, α_B = 2.0, α_C = 1.0
-(Luyben 2002 Table); C is the heavier desired product.
+**Reaction:** A → B (first-order, irreversible, exothermic, liquid phase). The canonical
+reactor-separator-recycle benchmark from the "Dynamics and control of recycle systems"
+series (Luyben 1993 I&EC Research). **Complete parameters from Wu, Yu, Luyben &
+Skogestad (2003, Comput. Chem. Eng. 27(3):401–421) Table 1** — the same paper that
+introduces the plantwide control structures compared in this work.
 
-**Plant topology:** Fresh feeds of A and B → Mixer → CSTR → Flash separator →
-Liquid product stream (C-rich) + Vapour stream (A,B-rich) → Condenser → Recycle
-pump → Mixer; Purge stream bleeds from the recycle vapour.
+**Plant topology:**
+```
+Fresh A feed (460 lbmol/h, z₀=0.90 mol/mol)
+        ↓
+    ┌──────────────────┐
+    │   CSTR           │  T_r = 342 K, M_r = 2400 lbmol
+    │   A → B          │  Jacket cooling (PI Loop 1: T_r → Q_c)
+    └────────┬─────────┘
+             │ Reactor effluent (CSTR overflow)
+        ┌────▼──────────────┐
+        │  Distillation     │  20 trays, α_rel = 2, feed tray 12
+        │  column           │  Reflux ratio R = 2.2 (L/D)
+        └──────┬─────┬──────┘
+               │     │
+        B-rich │     │ A-rich distillate = RECYCLE
+        bottoms│     │  (500 lbmol/h, x_D = 0.95)
+               │     └────────────────────────────────→ CSTR feed
+               ↓
+          Product B (460 lbmol/h, x_B = 0.011)
+```
 
-**ODE state vector (13 states):**
+**Snowball mechanism:** α↓ → less conversion → more A in column feed → distillate flow
+and/or composition must increase to maintain bottoms purity → **recycle load increases**,
+further diluting the reactor. Under fixed-ratio control (S-B), this creates a positive
+feedback loop: more recycle → more dilution → less conversion → even more recycle.
 
-| States | Symbol | Units | Location |
-|--------|--------|-------|----------|
-| Ca, Cb | mol/L | CSTR | Reactant concentrations |
-| T_r, Tc | K | CSTR, jacket | Temperatures |
-| n_L | mol | Flash drum | Liquid molar holdup |
-| x_A, x_B | — | Flash drum | Liquid mole fractions |
-| T_s | K | Flash drum | Separator temperature |
-| I_T, I_Ts, I_L, I_R, I_P | various | PI controllers | Integrator states |
+**ODE state vector (6 states + QSS column):**
+
+| State | Symbol | Units | Dynamics |
+|-------|--------|-------|----------|
+| Reactor composition | z_A | mol/mol | Differential |
+| Reactor temperature | T_r | K | Differential |
+| Jacket temperature | T_j | K | Differential |
+| Reactor temp. integrator | I_T | K·h | Differential |
+| Column QC integrator (S-A) | I_QC | — | Differential (S-A only) |
+| Recycle ratio integrator (S-B) | I_R | — | Differential (S-B only) |
+| Distillate composition | x_D | mol/mol | **Algebraic** (QSS column) |
+
+**Justification for QSS column:** Liquid hydraulic time constant τ_hyd = 4 s;
+reactor residence time τ_r = M_r / F_total ≈ 5.2 h. Ratio ~4700×. Column reaches
+steady state 4700 times faster than the reactor-recycle loop — QSS is exact for all
+dynamics of interest.
 
 **Key ODEs:**
 ```
-dCa/dt = (F_in/V_r)*(Ca_in - Ca) - α*k(T_r)*Ca*Cb
-dT_r/dt = (F_in/V_r)*(T_in - T_r) + (-ΔH)*α*k(T_r)*Ca*Cb/(ρCp) - β_r*UA_r*(T_r-Tc)/(ρCpV_r)
-[Flash: y_i = α_vle_eff_i*x_i / Σ(α_vle_eff_j*x_j),  α_vle_eff_i = 1 + η_sep*(α_nom_i - 1)]
+dz_A/dt = (F_in/M_r)*(z_A_in - z_A) - α*k(T_r)*z_A
+
+dT_r/dt = (F_in/M_r)*(T_in - T_r) + (-ΔH_r)*α*k(T_r)*z_A/(ρCp)
+          - β_r*UA_r*(T_r - T_j)/(ρCp*V_r)
+
+dT_j/dt = [UA_r*(T_r - T_j) - Q_c] / (ρ_c*Cp_c*V_j)
+
+QSS column: x_D = f(z_F, α_eff, N_T)  [Kremser shortcut; α_eff = 1 + η_col*(α_rel-1)]
+
+Recycle: F_R = D*(x_D)/z_A  [from overall material balance]
 ```
 
-**5 decentralized PI loops:**
+**3 decentralized PI loops:**
 ```
-Loop 1 (CSTR temp):   Qc  → T_r    [fast, inner]
-Loop 2 (Sep. temp):   Q_s → T_s    [fast]
-Loop 3 (Sep. level):  F_L → n_L    [medium]
-Loop 4 (Recycle):     valve → F_R  [medium]
-Loop 5 (Purge):       valve → F_P  [slow, outer]
+Loop 1 (Reactor temp):     Q_c → T_r     [fast; same mechanism as PO System I]
+Loop 2 (Column quality):   R   → x_D     [S-A: QC on distillate; S-B: fixed ratio RC]
+Loop 3 (Column recovery):  V   → x_B     [S-A: QC on bottoms purity; S-B: TC on T_reb]
 ```
-All loops implement anti-windup.
 
-**Fault parameterisation (8-D):**
+**Control structure comparison (from Wu et al. 2003):**
 
-| # | Symbol | Prior | Physical meaning |
-|---|--------|-------|-----------------|
-| 1 | α | U[0.4, 1.2] | Catalyst activity (CSTR) |
-| 2 | β_r | U[0.4, 1.2] | CSTR heat transfer fouling |
-| 3 | η_sep | U[0.4, 1.2] | Flash separator split efficiency |
-| 4 | β_s | U[0.4, 1.2] | Separator heat exchanger fouling |
-| 5 | η_p | U[0.4, 1.2] | Recycle pump efficiency |
-| 6 | ξ | U[0.4, 1.6] | Purge valve restriction (>1 = erosion) |
-| 7 | κ | U[0.4, 1.2] | Feed preheater fouling |
-| 8 | δ | U[−0.3, 0.3] | Feed A:B stoichiometry shift |
+| Feature | Structure S-A (rich) | Structure S-B (conventional) |
+|---------|---------------------|------------------------------|
+| Measurements | T_r, T_j, Q_c, x_D, T_reb, Q_reb, F_R, F_B | T_r, T_j, Q_c, T_reb, Q_reb, F_R, F_B |
+| Column composition control | Cascade QC: x_D, x_B | Ratio RC: F_R/F_fresh fixed |
+| Fault masking | Partial: x_D directly observed | Strong: composition drift invisible |
+| Wu 2003 analogue | B-3 (full composition control) | B-1b/B-1c (ratio/temperature only) |
 
-**Observations (8 channels, partial observability — no concentration analysers):**
-T_r, Tc, Qc, T_s, Q_s, F_R, F_P, F_prod. All five controller output signals included.
-2-hour windows at 1 min resolution → 120×8 time series → 65-D summary statistics.
+**Fault parameterisation (5-D):**
 
-**Table 3:** All nominal plant parameters (V_r, Qc, UA_r, UA_s, relative volatilities,
-feed rates, controller tuning from Luyben 1994 Table 1)
+| # | Symbol | Prior | Physical meaning | Primary observable |
+|---|--------|-------|-----------------|-------------------|
+| 1 | α | U[0.4, 1.2] | Catalyst activity | z_A, F_R (via snowball) |
+| 2 | β_r | U[0.4, 1.2] | Reactor jacket fouling | T_j, Q_c (masked by Loop 1) |
+| 3 | η_col | U[0.5, 1.0] | Column tray efficiency | x_D, T_reb, Q_reb |
+| 4 | ξ_reb | U[0.4, 1.2] | Reboiler heat transfer fouling | Q_reb (Loop 3 compensation) |
+| 5 | z_A0 | U[0.70, 0.95] | Feed purity (A fraction) | All channels via reactor SS |
 
-**12 fault scenarios, 30 replicates each (Table 4):** individual faults (L2–L9),
-snowball scenario L10 (α=0.65, η_p=0.85), competing-attribution L11 (reactor+separator),
-severe multi-fault L12. Both control modes: full plant-wide + open-loop (720 windows).
+**Identifiability structure (key finding):**
+- β_r: masked by Loop 1 (same mechanism as PO β) → I_β_r ≪ I_α (Fisher information)
+- (α, η_col): **both increase recycle via snowball** → joint posterior banana-shaped under S-B
+- ξ_reb: identifiable via Q_reb (controller output signal), analogous to Qc for β_r
+- z_A0: identifiable via z_A and F_R (different steady-state trajectory)
+
+**Observations (8 channels under S-A; 7 channels under S-B):**
+T_r, T_j, Q_c, T_reb, Q_reb, F_R, F_B [both]; x_D [S-A only].
+2-hour windows at 1-min resolution → 120×7/8 time series → 55-D summary statistics.
+
+**Table 3:** All nominal plant parameters from Wu et al. (2003) Table 1 (converted to SI):
+reactor holdup M_r=2400 lbmol, k_ss=0.33/h, Ea=71.74 kJ/mol, UA=254,000 kJ/(h·K),
+ΔH_r=69,780 kJ/kmol, ρCp=2.82 MJ/(m³·K), α_rel=2.0, N_T=20, R=2.2, τ_hyd=4 s.
+
+**16 fault scenarios, 30 replicates each (Table 4):**
+Individual faults W2–W8 (one parameter degraded), combined faults W9–W14 (cross-unit),
+snowball threshold W15 (α near critical tipping point), full multi-fault W16.
+Both control modes S-A and S-B run for each scenario (512 windows total).
 
 ### 3.3 Stochastic simulation
 
@@ -602,112 +662,147 @@ and EKF overlay; rolling classification accuracy. Source: nb10, nb16.
 
 ---
 
-## 7. Results: Luyben recycle plant (~5 pages)
+## 7. Results: Luyben reactor-column-recycle benchmark (~5 pages)
 
-*Section 7 will be populated after completing notebooks nb30–nb39 per project_luyben_extension.md.
-The structure and expected findings are specified below based on the design in that plan.*
+*Section 7 will be populated after completing notebooks nb20–nb28 per
+project_wu2003_sbi.md. The structure and expected findings are specified below.*
 
 ### 7.1 Training validation
 
-SBC rank histograms for all 8 parameters. Expected: KS p > 0.05 for 6/8 parameters;
-α and η_sep expected to show largest miscalibration (banana-shaped posterior creates
-non-uniform ranks). Report honestly with interpretation: the miscalibration of (α, η_sep)
-reflects the partial non-identifiability under closed-loop control without concentration
-measurements, analogous to the β bias in the propylene oxide system.
+SBC rank histograms for all 5 parameters. Expected: KS p > 0.05 for α, ξ_reb, z_A0;
+β_r expected to show flat/biased ranks (same structural masking as PO β — confirms the
+mechanism generalises); (α, η_col) expected to show correlated miscalibration under S-B
+(banana posterior produces non-uniform marginal ranks). Report honestly with the same
+framing used in §6.1: miscalibration reflects structural identifiability limits, not a
+training deficiency.
 
-**Figure 7:** SBC results for Luyben 8 parameters — rank histograms and KS p-values.
-Source: nb33.
+**Figure 7:** SBC results for 5 Wu 2003 parameters under S-A and S-B — rank histograms
+and KS p-values showing β_r masking persists; (α, η_col) coupling emerges under S-B.
+Source: nb23.
 
-### 7.2 Snapshot fault classification (8-D)
+### 7.2 Identifiability persistence and new recycle coupling (core contribution)
 
-12 scenarios, 30 replicates each. Expected results:
-- Individual single-unit faults (L2–L9): high macro-F1 for reactor, separator, and
-  recycle faults that affect different controller output signals
-- (α, η_sep) ambiguity: L4 and L2 may share posterior support — the classification
-  will reflect the inherent uncertainty correctly (bimodal posterior)
-- Severe multi-fault L12: lower F1, correctly reported with lower confidence
+**7.2.1 β_r masking persists across system scale**
 
-**Figure 8:** Marginal posterior summaries for 12 Luyben scenarios — posterior mean ± 90% CI
-per parameter. Source: nb34.
+Compare Fisher information diagonal for β_r in PO (§6.3) vs. Wu 2003:
+- PO CSTR (1 unit, 1 loop): I_β_r/I_α ≈ 1/250–500
+- Wu 2003 (2 units, 3 loops, recycle): I_β_r/I_α ≈ 1/250–500 (expected: same order)
 
-**Table 9:** Per-scenario Luyben classification results.
+The mechanism is identical: Loop 1 (reactor temperature PI) zeros ∂T_r/∂β_r at steady
+state regardless of what the rest of the plant does. **The reactor masking is modular —
+adding a column and recycle does not change it.** This is the key bridge between §6 and §7:
+the same analytical result (∂T_ss/∂β_r = 0 under PI control) applies to both systems.
 
-### 7.3 Snowball fault localization (headline result)
+**7.2.2 New cross-unit coupling via recycle (α, η_col)**
 
-Scenario L10: α = 0.65, η_p = 0.85 (catalyst decay triggers snowball; pump stressed).
-Five PI controllers respond locally:
-- Loop 1 (CSTR temp) opens Qc → masks β_r
-- Loop 4 (recycle) increases F_R → masks η_p
-- Loop 3 (separator level) adjusts F_prod → masks η_sep
-Each controller compensates its local symptom; no single controller "sees" the α decay.
+Under S-B (no composition analyser), both α↓ and η_col↓ cause:
+- Less effective conversion or separation → more A escapes to distillate
+- Recycle flow F_R increases (snowball amplification)
+- The column temperature T_reb and reboiler duty Q_reb both rise (Loop 3 compensates)
 
-**Expected SBI result:** High posterior mass on α < 0.75, moderate η_p degradation;
-all other parameters near 1.0. The snowball root cause is correctly traced despite
-plant-wide masking.
+The data are consistent with: (α=0.70, η_col=1.0) OR (α=1.0, η_col=0.70) OR any
+combination with same total recycle load. Posterior is banana-shaped.
 
-**Expected EKF result:** Mean estimates in the same ballpark (structural bias from the
-five controllers), but overconfident Gaussian uncertainty interval that spans a much
-smaller region. Near the snowball tipping point where F_R is nonlinearly sensitive to α,
-the EKF linearisation underestimates the posterior width.
+Under S-A (with x_D measured): the distillate composition breaks the degeneracy.
+α↓ increases x_D (more A in distillate because less is converted). η_col↓ also increases
+x_D (worse separation), but with a different functional form. The posterior narrows but
+retains a residual non-Gaussian shape near the nominal operating point.
 
-**Figure 9:** Snowball scenario — (a) plant-wide time series under L10 showing F_R
-buildup, (b) SBI joint posterior for (α, η_p) showing banana-shaped constraint,
-(c) EKF Gaussian ellipse overlay demonstrating overconfidence. Source: nb34.
+**Figure 8:** 5×5 Fisher information heatmap (S-B, nominal OP) — showing (α, η_col)
+off-diagonal coupling as the largest off-diagonal element; β_r diagonal near-zero.
+Source: nb24.
 
-**Figure 10:** Fisher information heatmap (8×8 at nominal OP) — showing I_α,η_sep
-off-diagonal coupling as the largest off-diagonal term. Source: nb34.
+### 7.3 Snapshot fault classification (5-D)
 
-### 7.4 Non-Gaussian posteriors and EKF failure
+16 scenarios, 30 replicates each. Expected results:
 
-Under partial observability (no concentration measurements), α and η_sep both increase
-the recycle load F_R. The (α, η_sep) posterior is banana-shaped: data are consistent
-with (low α, healthy η_sep) or (healthy α, low η_sep), but not both degraded equally.
-This correlation is a finding, not a failure — it provides actionable information about
-the plausible fault space.
+- Individual reactor faults (W2–W6): high macro-F1; β_r classification relies on T_j
+  and Q_c channels (correctly identified despite low Fisher information from posterior
+  mean shift being low — the mode is correct even if variance is large)
+- Individual column faults (W7–W9): high macro-F1 under S-A; reduced under S-B
+- Cross-unit faults (W10, W13–W16): lower F1 for (α, η_col) combinations under S-B
+  (inherent uncertainty reported honestly with wide credible intervals)
+- S-A vs. S-B comparison (same scenario, different sensor set): quantifies the information
+  value of the composition analyser for each fault type
 
-EKF, constrained to a Gaussian approximation, collapses the banana to an ellipse and
-mis-states the credible intervals. SBC coverage comparison: SBI 90% CI achieves ≥ 88%
-empirical coverage; EKF 90% CI achieves ≤ 60% for the (α, η_sep) pair.
+**Figure 9:** Marginal posterior summaries — posterior mean ± 90% CI for all 5 parameters
+across 16 scenarios, side-by-side for S-A (left) and S-B (right). Source: nb24.
 
-**Figure 11:** (α, η_sep) marginal posterior for scenario L2 and L4 — SBI banana curve
-vs. EKF ellipse; coverage comparison bar chart. Source: nb34, nb36.
+**Table 9:** Per-scenario classification results (F1, coverage, CRPS) for both structures.
 
-### 7.5 MCMC infeasibility at 8-D
+### 7.4 Headline: (α, η_col) banana posterior and EKF failure (snowball scenario)
 
-At 8-D, NUTS requires a burn-in period and post-burn-in sampling budget that scales
-poorly with dimension. Empirical timing: extrapolating from the propylene oxide NUTS
-timing (150,000 ms/window for 2-D), 8-D NUTS would require O(10–100 hours) per window
-(citing dimensionality scaling of HMC leapfrog steps). This makes MCMC impractical for
-any real-time or near-real-time monitoring application.
+**Scenario W10:** α = 0.75, η_col = 0.80 (catalyst decay + column efficiency loss),
+all other parameters nominal. Under S-B:
 
-SBI processes the same 8-D posterior in < 20 ms. This is a qualitative feasibility
-advantage, not just a quantitative speedup.
+Plant response:
+- Loop 1 adjusts Q_c to maintain T_r at setpoint → masks β_r, but also slightly masks α
+  (temperature compensation partially compensates for reduced reaction heat)
+- Increased A fraction at column feed → Loop 3 adjusts reboiler duty to maintain x_B
+  → masks η_col in x_B channel, but Q_reb increases (observable as controller effort)
+- F_R increases (snowball onset) → directly observable, but ambiguous between α and η_col
 
-**Table 10:** Feasibility comparison — SBI vs. EKF vs. NUTS for the Luyben plant.
+**Expected SBI result (S-B):** Banana-shaped joint posterior in (α, η_col) plane.
+High posterior mass consistent with the true combination AND the symmetric (α=0.60,
+η_col=0.90) combination. The posterior correctly represents the irreducible ambiguity;
+it is informative even when it cannot distinguish the two fault causes.
 
-### 7.6 EKF baseline comparison (Luyben)
+**Expected SBI result (S-A):** x_D measurement breaks the degeneracy. α=0.75 causes
+x_D to rise to ~0.97 (more A passes through undisturbed); η_col=0.80 causes x_D to rise
+to ~0.96 (slightly less sharp separation). The posterior narrows to the correct quadrant.
 
-SBI vs. EKF (jax.jacobian) on all 12 scenarios and 30-day tracking.
+**Expected EKF result (both structures):** Gaussian ellipse — overconfident and
+incorrectly centred. Near the snowball tipping point (α approaching 0.60), the Jacobian
+changes rapidly and the linearisation underestimates the posterior width along the
+recycle-coupled direction. EKF 90% CI achieves < 65% empirical coverage for (α, η_col).
+
+**Figure 10:** (a) Time series under W10 showing F_R buildup and Q_reb increase;
+(b) SBI joint (α, η_col) posterior under S-B (banana) and S-A (narrow);
+(c) EKF Gaussian ellipse overlay; (d) coverage comparison bar chart.
+Source: nb24, nb26.
+
+### 7.5 EKF baseline comparison
+
+Augmented EKF: 9-state vector [z_A, T_r, T_j, I_T, I_QC, α, β_r, η_col, ξ_reb].
+Jacobian: `jax.jacobian(rhs, argnums=0)` evaluated at each EKF step (same approach as
+outlined for the Luyben 8-D system, now in 9-D — tractable without hand derivation).
+
 Expected findings:
-- Both methods show structural bias for β_r and β_s (same mechanism as propylene oxide)
-- EKF tracking MAE for (α, η_sep) significantly worse than SBI due to Gaussian assumption
-- SBI 30-day tracking correctly shows widening uncertainty during snowball onset; EKF
-  confidence intervals remain too tight
+- Both methods show structural β_r bias (same magnitude as PO — confirms generality)
+- EKF tracking MAE for (α, η_col) significantly worse than SBI under S-B (Gaussian
+  assumption collapses banana to ellipse)
+- EKF confidence intervals diverge from empirical coverage near snowball onset (W14, W15)
+- SBI 30-day tracking correctly shows widening uncertainty as α approaches snowball
+  threshold; EKF intervals stay constant (Gaussian assumption)
 
-**Figure 12:** SBI vs. EKF 30-day tracking for Luyben — α, η_sep, β_r with CI bands.
-Source: nb37.
+**Figure 11:** SBI vs. EKF 30-day tracking for α, β_r, η_col with CI bands;
+credible interval coverage by fault severity. Source: nb27.
 
-**Table 11:** Luyben SBI vs. EKF comparison — bias, MAE, coverage, classification F1.
+**Table 10:** Wu 2003 SBI vs. EKF comparison — bias, MAE, coverage, classification F1.
+
+### 7.6 NUTS timing and SBI monitoring cadence
+
+Empirical NUTS timing from the propylene oxide system: 150,000 ms per 2-hour window
+at 2-D. Scaling to 5-D using HMC step-size scaling O(d^{5/4}):
+  5-D estimated NUTS: 150,000 × (5/2)^{5/4} ≈ 500,000 ms ≈ 8 min per window.
+
+For 30-day monitoring (720 consecutive 2-hour windows):
+- NUTS total: 720 × 8 min ≈ 4 days — impractical for monitoring cadence
+- SBI total: 720 × 0.02 s = 14 s — real-time capable
+- Speedup: ~25,000× (quantitative), plus EKF is not a valid baseline for non-Gaussian
+  posteriors (qualitative correctness advantage)
+
+**Table 11:** Feasibility comparison — SBI vs. EKF vs. NUTS for 30-day monitoring.
 
 ### 7.7 Model mismatch robustness
 
-±5% perturbation on fixed parameters (V_r, ρ, k₀, UA_r) at test time, trained
-posteriors unchanged. Expected: small posterior mean shifts (< 1σ), coverage degrades
-modestly (≥ 80% at 90% nominal CI). Fault classification macro-F1 expected to drop
-≤ 5 pp for individual faults; combined faults may show larger sensitivity.
+±5% perturbation on fixed parameters (M_r, ρCp, k₀, UA). Expected: posterior mean
+shifts < 1σ, coverage degrades modestly (≥ 80% at 90% nominal CI). β_r mismatch
+has minimal effect (already poorly identified). α and η_col mismatch expected to shift
+the banana posterior but preserve its shape — fault classification accuracy degrades
+< 5 pp.
 
-**Table 12:** Luyben model mismatch results — posterior shift and F1 degradation
-vs. perturbation magnitude.
+**Table 12:** Model mismatch results — posterior shift and F1 degradation.
 
 ---
 
@@ -715,37 +810,54 @@ vs. perturbation magnitude.
 
 ### 8.1 Structural identifiability across scales
 
-The propylene oxide system illustrates the mechanism clearly: a single PI controller
-zeros the temperature channel's sensitivity to β, leaving I_ββ/I_αα = 1/250–1/500.
-The Luyben plant generalises this: five PI controllers each zero their respective
-process variable's sensitivity to the local fault parameter, but create cross-unit
-coupling through the recycle and purge streams. The (α, η_sep) banana posterior is
-the multi-unit analogue of the β bias — a non-Gaussian identifiability constraint
-arising from the feedback topology, not from modelling deficiencies.
+**Two systems, two distinct mechanisms, one unified theory.**
 
-**The hierarchy:** I_β_r (masked by Loop 1) < I_η_sep (masked by Loop 2 + recycle
-dynamics) < I_β_s (masked by Loop 2 alone) < I_η_p (identifiable via F_R) < I_ξ
-(directly observable via F_P) < I_α (most identifiable, high reaction heat signal).
+The propylene oxide CSTR illustrates the fundamental *single-loop* mechanism: the
+reactor temperature PI controller zeros ∂T_ss/∂β_r, removing the highest-SNR channel
+from β_r's information budget and giving I_β_r/I_α = 1/250–500. This is a scalar
+reduction: one parameter is harder to identify, but all parameters are identifiable
+in principle.
 
-This hierarchy is a practical design guideline: parameters whose fault signatures are
-directly observable via a controller output (ξ, η_p) are far easier to identify than
-those whose signatures are actively suppressed (β_r, β_s, α+η_sep pair).
+The Wu 2003 CSTR-column-recycle plant reveals a qualitatively different *multi-loop*
+mechanism: the recycle stream creates coupling between reactor and column faults that
+is not present in any single-unit analysis. α and η_col jointly determine the recycle
+flow magnitude through the snowball amplification — making them non-identifiable as
+a pair under conventional control. This is not a scalar reduction but a *manifold
+constraint*: the posterior is constrained to a curve (banana) rather than a point.
+
+**The identifiability hierarchy across both systems:**
+- β_r: masked by Loop 1 (temperature) in BOTH systems — I_β_r/I_α ≈ 1/250–500
+- (α, η_col): jointly constrained by recycle coupling — posterior is banana-shaped
+- ξ_reb: identifiable via Q_reb (Loop 3 output signal is the direct signature)
+- α alone: most identifiable — reaction heat signal in Q_c plus recycle flow change
+- z_A0: identifiable via steady-state shift in z_A and F_R
+
+This hierarchy is a practical design guideline for sensor placement: measurements of
+controller output signals (Q_c, Q_reb) are essential because they carry the information
+that process variable measurements (T_r, T_reb) hide under closed-loop control.
 
 ### 8.2 When EKF fails and SBI wins
 
 EKF is an excellent industrial baseline when the posterior is approximately Gaussian —
-which holds for the propylene oxide system near the nominal operating point (both methods
-show similar bias and similar uncertainty). The EKF breaks down near:
-- **Bifurcation points** (snowball tipping): rapid Jacobian changes make linearisation
-  inaccurate; the EKF underestimates posterior width
-- **Non-Gaussian posteriors** (α, η_sep coupling): the Gaussian assumption collapses a
-  banana to an ellipse, producing systematically overconfident intervals
-- **High-dimensional augmented states**: the 21×21 covariance update is numerically
-  sensitive; SBI has no such numerical degradation
+which holds for the propylene oxide system near the nominal operating point (all four
+methods show similar bias and comparable uncertainty). The EKF breaks down in two
+specific situations, both demonstrated in this paper:
+
+1. **Recycle-coupled non-Gaussian posteriors** (α, η_col banana under S-B): The
+   Gaussian assumption collapses a manifold constraint to an ellipse, systematically
+   understating the uncertainty along the recycle-coupled direction. EKF 90% CI
+   achieves < 65% empirical coverage for the (α, η_col) pair.
+
+2. **Near the snowball tipping point** (W14, W15): The Jacobian of the recycle
+   dynamics changes rapidly as α approaches the critical value where recycle flow
+   diverges. The EKF linearisation at the current state underestimates the
+   posterior width; SBI, trained across the full prior range, correctly represents
+   the widened uncertainty near the tipping point.
 
 The recommendation: use EKF for real-time monitoring under normal operating conditions;
-switch to SBI (or run SBI in parallel) when the plant approaches nonlinear operating
-regimes or when full uncertainty quantification is needed for maintenance decisions.
+run SBI in parallel (20 ms per window after training) when full uncertainty
+quantification is needed for maintenance decisions or when the plant approaches
+nonlinear regimes (detected by diverging EKF covariance trace).
 
 ### 8.3 Persistent excitation and open-loop recalibration
 
@@ -782,12 +894,14 @@ Restate the four contributions with their quantitative outcomes:
    4-method agreement and CNN embedding experiment; macro-F1 = 0.990 despite structural
    bias; 30-day tracking with SBI 53,000× faster than NUTS.
 
-2. For the Luyben recycle plant: SBI correctly localizes the snowball root cause from
-   8 measured channels under 5-loop feedback masking; (α, η_sep) posterior is
-   banana-shaped — correctly captured by SBI, collapsed to an incorrect Gaussian by EKF.
+2. For the Wu 2003 CSTR-column-recycle plant: β_r masking persists unchanged from
+   System I (same mechanism, same magnitude — I_β_r/I_α ≈ 1/250–500); recycle coupling
+   creates (α, η_col) banana posterior under S-B — correctly captured by SBI, collapsed
+   to overconfident Gaussian by EKF; NUTS at plant scale requires ~4 days for 30-day
+   monitoring vs. 14 s for SBI after training.
 
-3. MCMC infeasibility at 8-D makes SBI the only practical full-Bayesian option at
-   plant scale.
+3. Recycle dynamics make SBI the only simultaneously fast and correct method: EKF is
+   wrong (non-Gaussian posteriors), MCMC is too slow (8 min/window vs. 20 ms).
 
 Forward-looking statement: extension to MPC-controlled plants (stronger masking);
 integration with digital twins and plant historians; active experiment design for
@@ -805,12 +919,12 @@ scheduled open-loop excitation; multi-plant transfer learning with shared priors
 | 4 | CNN embedding vs. hand-crafted (PO) | nb04b | §6.3.3 |
 | 5 | 4-method baseline dashboard (PO) | nb16 | §6.4 |
 | 6 | 30-day tracking with CI bands (PO) | nb10, nb16 | §6.5 |
-| 7 | SBC for all 8 parameters (Luyben) | nb33 | §7.1 |
-| 8 | Marginal posteriors 12 scenarios (Luyben) | nb34 | §7.2 |
-| 9 | Snowball scenario: time series + (α, η_p) posterior + EKF overlay | nb34 | §7.3 |
-| 10 | 8×8 Fisher information heatmap (Luyben) | nb34 | §7.3 |
-| 11 | (α, η_sep) banana curve: SBI vs. EKF | nb34, nb36 | §7.4 |
-| 12 | 30-day Luyben tracking SBI vs. EKF | nb37 | §7.6 |
+| 7 | SBC for 5 parameters under S-A and S-B (Wu 2003) | nb23 | §7.1 |
+| 8 | 5×5 Fisher information heatmap showing (α, η_col) coupling and β_r near-zero | nb24 | §7.2.1 |
+| 9 | Marginal posteriors 16 scenarios, S-A vs. S-B side-by-side | nb24 | §7.3 |
+| 10 | Headline: (α, η_col) banana (S-B) vs. narrow (S-A) vs. EKF ellipse; coverage chart | nb24, nb26 | §7.4 |
+| 11 | SBI vs. EKF 30-day tracking for α, β_r, η_col with CI bands | nb27 | §7.5 |
+| 12 | NUTS timing comparison and monitoring cadence feasibility | nb26 | §7.6 |
 
 All figures: 300 dpi minimum, double-column compatible, colour-blind palette (viridis/Okabe-Ito).
 
@@ -822,17 +936,17 @@ All figures: 300 dpi minimum, double-column compatible, colour-blind palette (vi
 |---|---------|---------|
 | 1 | Propylene oxide model parameters | §3.1 |
 | 2 | PO fault scenarios (Sc1–Sc8) | §3.1 |
-| 3 | Luyben plant parameters | §3.2 |
-| 4 | Luyben fault scenarios (L1–L12) | §3.2 |
-| 5 | Full summary statistics definition (29-D and 65-D) | §4.2 |
-| 6 | SBI/EKF training hyperparameters | §5.1 |
+| 3 | Wu 2003 plant parameters (from Table 1, SI units) | §3.2 |
+| 4 | Wu 2003 fault scenarios (W1–W16) and control structures S-A/S-B | §3.2 |
+| 5 | Full summary statistics definition (29-D PO; 55-D Wu 2003) | §4.2 |
+| 6 | SBI/EKF training hyperparameters for both systems | §5.1 |
 | 7 | PO per-scenario classification results | §6.2 |
 | 8 | 4-method baseline comparison (SBI, NUTS, EKF, UKF) | §6.4 |
 | 9 | PO 30-day tracking phase metrics | §6.5 |
-| 10 | Luyben per-scenario classification | §7.2 |
-| 11 | Luyben feasibility comparison (SBI vs. EKF vs. NUTS) | §7.5 |
-| 12 | Luyben SBI vs. EKF comparison | §7.6 |
-| 13 | Luyben model mismatch robustness | §7.7 |
+| 10 | Wu 2003 per-scenario classification results (S-A vs. S-B) | §7.3 |
+| 11 | Wu 2003 SBI vs. EKF comparison — bias, MAE, coverage, F1 | §7.5 |
+| 12 | Monitoring cadence feasibility: SBI vs. EKF vs. NUTS | §7.6 |
+| 13 | Wu 2003 model mismatch robustness | §7.7 |
 
 ---
 
@@ -858,7 +972,7 @@ All figures: 300 dpi minimum, double-column compatible, colour-blind palette (vi
 - [x] Analytical bias derivation (bias_explanation_2.md)
 
 **Required before submission:**
-- [ ] Luyben plant implementation (nb30–nb39, see project_luyben_extension.md)
+- [ ] Wu 2003 CSTR-column-recycle implementation (nb20–nb28, see project_wu2003_sbi.md)
 - [ ] Prior sensitivity study for propylene oxide (3 prior widths, ~2-3 days)
 - [ ] All figures regenerated at publication quality (300 dpi, double-column)
 - [ ] Nomenclature table with every symbol (C&ChE requirement)

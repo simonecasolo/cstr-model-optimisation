@@ -183,20 +183,23 @@ where Q_reb_nom is derived from the nominal energy balance. Loop 3 controller ad
 
 ### 4.3 State vector
 
-**Structure S-A (composition analysers available, 7 states):**
+The current minimal explicit-loop implementation uses the same 8-state ODE layout
+for both S-A and S-B:
+
 ```
-y = [z_A, T_r, T_j, I_T, x_D, I_QC, I_R]
-     reactor  jacket  loop1 col(alg) loop2 loop3
+y = [z_A, T_r, T_j, I_T, R_state, V_norm_state, I_R, I_V]
+  reactor  jacket  loop1 reflux actuator boilup actuator loop2 loop3
 ```
 
-**Structure S-B (conventional measurements only, 6 states):**
-```
-y = [z_A, T_r, T_j, I_T, I_R_ratio, I_TC_reb]
-     reactor  jacket  loop1 ratio_ctrl  TC_loop3
-```
+where `R_state` is the reflux-ratio actuator state, `V_norm_state` is the normalised
+vapor-boilup actuator state, and `I_R`/`I_V` are the Loop 2/3 integrator states.
+S-A and S-B differ through the controller vector: S-A closes the column loops on
+composition information (`x_D`, `x_B`), while S-B uses conventional recycle-ratio and
+reboiler-temperature policies.
 
-*In practice the column variables (x_D) are algebraic in the QSS approximation; the
-actual ODE has 4 differential states (z_A, T_r, T_j, I_T) + algebraic column outputs.*
+Column compositions (`x_D`, `x_B`), recycle/product flows, `T_reb`, `Q_reb`, `R_norm`,
+and `V_norm` are extracted as algebraic or actuator-derived outputs from this QSS
+column closure.
 
 ---
 
@@ -229,6 +232,18 @@ plant-wide analogue of the PO β bias.
 ---
 
 ## 6. Control structures
+
+In this project, **S-A** and **S-B** are shorthand for the plantwide
+control-structure contrast in Wu et al. (2003). S-A denotes the
+analyser-rich composition-control structure, closest to Wu's B-3 structure;
+S-B denotes the conventional no-online-composition-analyser structure, closest
+to the B-1b/B-1c family.
+
+The distinction is both a control-policy distinction and an information
+distinction. S-A uses column composition information to manipulate reflux and
+boilup, whereas S-B relies on conventional ratio and temperature loops. The
+S-A/S-B comparison therefore quantifies how much composition sensing improves
+fault identifiability under recycle snowball and feedback masking.
 
 ### Structure S-A — Information-rich (Wu 2003 B-3)
 
@@ -308,7 +323,12 @@ phenomenon.
 
 ## 8. Observable channels
 
-**Structure S-A (8 channels):**
+The original shortcut data contract used 8 S-A channels and 7 S-B channels.
+The current minimal explicit-loop implementation adds reflux and boilup effort
+channels (`R_norm`, `V_norm`) so the controller compensation mechanisms are
+observable instead of implicit.
+
+**Structure S-A (10 channels):**
 | # | Channel | Variable | Sensitive to |
 |---|---------|----------|-------------|
 | 1 | T_r | Reactor temperature [K] | α (indirectly via heat), β_r |
@@ -319,29 +339,32 @@ phenomenon.
 | 6 | Q_reb | Reboiler duty [kJ/h] | ξ_reb (compensation), η_col |
 | 7 | F_R | Recycle (distillate) flow [lbmol/h] | α (snowball), η_col, z_A0 |
 | 8 | F_B | Product (bottoms) flow [lbmol/h] | α (production rate) |
+| 9 | R_norm | Normalised reflux-ratio effort [-] | η_col, α, S-A composition compensation |
+| 10 | V_norm | Normalised boilup effort [-] | η_col, ξ_reb, S-A/S-B reboiler compensation |
 
-**Structure S-B (7 channels):** Same minus channel 4 (no x_D composition analyser).
+**Structure S-B (9 channels):** Same minus channel 4 (`x_D`; no online composition
+analyser), retaining `R_norm` and `V_norm` as conventional controller-effort
+signals.
 
-**Key asymmetry:** Under S-B, Q_c and Q_reb carry the critical information (controller
-compensation signals). Without x_D, (α, η_col) are jointly constrained but not
-individually resolved. This is the partial observability story: conventional instruments
-are not blind, but they cannot resolve all fault combinations.
+**Key asymmetry:** Under S-B, `Q_c`, `Q_reb`, `R_norm`, and `V_norm` carry the
+critical information as controller-compensation signals. Without `x_D`, (α, η_col)
+are jointly constrained but not individually resolved. This is the partial
+observability story: conventional instruments are not blind, but they cannot resolve
+all fault combinations.
 
 ---
 
-## 9. Summary statistics (~55-D)
+## 9. Summary statistics (66-D S-B, 72-D S-A)
 
 | Group | Count | Description |
 |-------|-------|-------------|
-| Per-channel base (7 × 5) | 35 | mean, std, slope, min, max for all 7 S-B channels |
-| Final-quarter means (7) | 7 | Last-25% mean per channel — captures new quasi-SS |
-| Control effort proxies (3) | 3 | Q_c/Q_c_nom, Q_reb/Q_reb_nom, F_R/F_R_nom |
-| Physics-informed (10) | 10 | See below |
-| **Total (S-B)** | **55** | |
-| Extra for S-A (1 channel × 6) | +6 | Same stats for x_D channel |
-| **Total (S-A)** | **61** | |
+| Per-channel summaries, S-B (9 × 6) | 54 | mean, std, slope, min, max, final-quarter mean for all 9 S-B channels |
+| Physics-informed features | 12 | See below |
+| **Total (S-B)** | **66** | |
+| Extra S-A channel (`x_D`, 1 × 6) | +6 | Same six per-channel summaries for `x_D` |
+| **Total (S-A)** | **72** | |
 
-**Physics-informed features (10):**
+**Physics-informed features (12):**
 1. `UA_proxy = β_r * UA_r proxy = Q_c / max(T_r - T_j, 1e-3)` → encodes β_r
 2. `recycle_ratio = F_R / F_R_nom` → encodes α (snowball) + η_col
 3. `col_recovery_proxy = F_B / (F₀ + F_R)` → encodes α × η_col combined
@@ -352,6 +375,8 @@ are not blind, but they cannot resolve all fault combinations.
 8. `Q_c_slope` = slope of Q_c over observation window → encodes transient α response
 9. `corr(Q_c, F_R)` → encodes snowball coupling (α)
 10. `corr(Q_reb, F_R)` → encodes column-recycle coupling (η_col)
+11. `R_effort_final = R_norm[-1]` → encodes reflux-ratio compensation
+12. `V_effort_final = V_norm[-1]` → encodes boilup/reboiler compensation
 
 ---
 
@@ -366,11 +391,11 @@ are not blind, but they cannot resolve all fault combinations.
 | Max epochs | 250 |
 | SBC test cases | 500 |
 | Eval. replicates per scenario | 30 |
-| Observation window | 2 h at 1-min resolution (120 timesteps × 7/8 channels) |
+| Observation window | 2 h at 1-min resolution (120 timesteps × 9/10 channels) |
 | Prior | 5-D BoxUniform as specified in §5 |
 
-**Two posteriors trained:** one for S-A (61-D summaries, x_D available) and one for
-S-B (55-D summaries, no x_D). The S-A vs. S-B comparison is a direct quantification
+**Two posteriors trained:** one for S-A (72-D summaries, `x_D` available) and one for
+S-B (66-D summaries, no `x_D`). The S-A vs. S-B comparison is a direct quantification
 of the information value of the composition analyser.
 
 ---
@@ -393,7 +418,8 @@ F = I + A * dt   (first-order)
 P = F @ P @ F.T + Q
 ```
 
-**Measurement vector (7-D under S-B):** [T_r, T_j, Q_c, T_reb, Q_reb, F_R, F_B]
+**Measurement vector (9-D under S-B):** [T_r, T_j, Q_c, T_reb, Q_reb, F_R, F_B,
+R_norm, V_norm]
 
 **Noise covariances:** Q (process) and R (measurement) tuned on W1 (healthy) data.
 Q_α and Q_ηcol larger than Q_βr (α and η_col change faster during snowball onset).
@@ -413,7 +439,7 @@ New subpackage: `src/cstr_sbi/recycle/`
 | `__init__.py` | Exports |
 | `physics.py` | CSTR ODE + QSS column model, all constants, steady-state solver |
 | `simulator.py` | Euler-Maruyama scan (JAX), sensor noise, replicate generator |
-| `summaries.py` | 55-D (S-B) and 61-D (S-A) summary statistics |
+| `summaries.py` | 66-D (S-B) and 72-D (S-A) summary statistics |
 | `priors.py` | 5-D BoxUniform prior |
 | `scenarios.py` | 23 scenario configs (W1–W16 + open-loop variants) |
 | `inference.py` | SNPE-C wrapper, trained model loader |
@@ -434,7 +460,7 @@ New subpackage: `src/cstr_sbi/recycle/`
 | nb20 | Wu 2003 model verification | Steady state, step tests, snowball demo | Verified SS, Figure showing snowball onset |
 | nb21 | Control structure implementation | S-A and S-B closed-loop trajectories for W1–W4 | Closed-loop vs. open-loop comparison |
 | nb22 | Data generation | 1380 windows → `data/wu2003_observations.npz` | Training + test datasets |
-| nb23 | Summary statistics + discriminability | PCA/t-SNE over 23 scenarios, MI ranking | Feature selection (55-D trimmed) |
+| nb23 | Summary statistics + discriminability | PCA/t-SNE over 23 scenarios, MI ranking | Feature selection over 66-D/72-D summaries |
 | nb24 | SBI training (S-B) | Train SNPE-C on conventional measurement set; SBC | Trained posterior, rank histograms |
 | nb25 | SBI training (S-A) | Train SNPE-C on rich measurement set; SBC | Trained posterior, S-A vs. S-B comparison |
 | nb26 | Headline experiment | W12 banana posterior; W15 snowball EKF failure | Figures 10, 12 for paper |
@@ -463,7 +489,7 @@ New subpackage: `src/cstr_sbi/recycle/`
 - [ ] **nb20**: Step test β_r from 1.0 → 0.60, verify T_r stays at setpoint (Loop 1 compensates), T_j and Q_c change
 - [ ] **nb21**: Implement S-A and S-B control structures; verify W3 (α=0.65) shows x_D drift under S-B, recovered under S-A
 - [ ] **nb22**: Generate 23 × 30 × 2 = 1380 windows; check NaN rate < 1%; verify W15 (near-snowball) does not diverge
-- [ ] **`summaries.py`**: Implement 55-D features; verify no NaN; run MI ranking in nb23
+- [ ] **`summaries.py` / nb23**: Implement 66-D S-B and 72-D S-A features; verify no NaN; run MI ranking in nb23
 - [ ] **nb24**: Train S-B posterior; SBC KS p > 0.05 for α, ξ_reb, z_A0; β_r and (α,η_col) expected miscalibration is a finding not a failure
 - [ ] **nb25**: Train S-A posterior; compare SBC vs. S-B to quantify x_D information value
 - [ ] **nb26**: Run W12 (α=0.75, η_col=0.80) under S-B → confirm banana posterior; run EKF → confirm coverage < 65%
