@@ -691,37 +691,59 @@ training deficiency.
 and KS p-values showing β_r masking persists; (α, η_col) coupling emerges under S-B.
 Source: nb23.
 
-### 7.2 Identifiability persistence and new recycle coupling (core contribution)
+### 7.2 Identifiability structure — FIM analysis (core contribution)
 
-**7.2.1 β_r masking persists across system scale**
+5×5 FIM computed via finite differences on the 66-D S-B summary statistics at the nominal
+operating point. Source: nb23 §7. Figure 8 = normalised FIM heatmaps (S-B and S-A).
 
-Compare Fisher information diagonal for β_r in PO (§6.3) vs. Wu 2003:
-- PO CSTR (1 unit, 1 loop): I_β_r/I_α ≈ 1/250–500
-- Wu 2003 (2 units, 3 loops, recycle): I_β_r/I_α ≈ 1/250–500 (expected: same order)
+**7.2.1 T_r masking — shared mechanism confirmed**
 
-The mechanism is identical: Loop 1 (reactor temperature PI) zeros ∂T_r/∂β_r at steady
-state regardless of what the rest of the plant does. **The reactor masking is modular —
-adding a column and recycle does not change it.** This is the key bridge between §6 and §7:
-the same analytical result (∂T_ss/∂β_r = 0 under PI control) applies to both systems.
+∂T_r_ss/∂β_r ≡ 0 AND ∂T_r_ss/∂α ≡ 0 under Loop 1 PI control — confirmed numerically:
+T_r features contribute **0.00%** to both I_αα and I_β_r. This is the same analytical
+result as the PO system (nb15), transferred exactly to Wu 2003.
 
-**7.2.2 New cross-unit coupling via recycle (α, η_col)**
+**7.2.2 Wu 2003 FIM structure is fundamentally different from PO**
 
-Under S-B (no composition analyser), both α↓ and η_col↓ cause:
-- Less effective conversion or separation → more A escapes to distillate
-- Recycle flow F_R increases (snowball amplification)
-- The column temperature T_reb and reboiler duty Q_reb both rise (Loop 3 compensates)
+| | PO CSTR | Wu 2003 |
+|--|---------|---------|
+| I_αα/I_β_r | 250–500× | **1.1×** (nearly equal) |
+| Primary α channel | C (concentration, 60%) | corr_Qreb_FR (77%) |
+| Primary β channel | T_c, Q_c (decoupled from C) | corr_Qreb_FR (49%) — same channel |
+| (α, β_r) normalised off-diagonal | small | **+0.901** (near-degenerate) |
 
-The data are consistent with: (α=0.70, η_col=1.0) OR (α=1.0, η_col=0.70) OR any
-combination with same total recycle load. Posterior is banana-shaped.
+The PO 250× asymmetry arose because α was identified through the concentration channel C,
+which β_r cannot access. **Wu 2003 has no observable concentration channel** — z_A is an
+internal state not in S-B. Both α and β_r primarily excite the same physics correlations
+(corr_Qreb_FR, corr_Qj_FR, corr_Rn_Vn), making them nearly indistinguishable at the nominal
+operating point.
 
-Under S-A (with x_D measured): the distillate composition breaks the degeneracy.
-α↓ increases x_D (more A in distillate because less is converted). η_col↓ also increases
-x_D (worse separation), but with a different functional form. The posterior narrows but
-retains a residual non-Gaussian shape near the nominal operating point.
+This is a **more severe** identifiability challenge than PO: not just β_r is hard to identify,
+but the entire (α, β_r) subspace is jointly confounded through shared features.
 
-**Figure 8:** 5×5 Fisher information heatmap (S-B, nominal OP) — showing (α, η_col)
-off-diagonal coupling as the largest off-diagonal element; β_r diagonal near-zero.
-Source: nb23 §7 (FIM analysis block — to be computed).
+**7.2.3 (α, η_col) banana is a nonlinear effect, not a local FIM result**
+
+Local FIM at nominal: normalised (α, η_col) = **−0.142** (slightly negative). The banana
+posterior only emerges at degraded values (α≈0.75, η_col≈0.80) where the snowball
+nonlinearity makes both faults drive F_R upward in the same direction. The linear FIM
+captures only local behaviour near the nominal — it cannot detect the nonlinear degeneracy
+that SBI discovers through global prior sampling.
+
+**7.2.4 z_A0 is the most locally identifiable parameter**
+
+Largest FIM diagonal: I_z_A0 = 2.15×10¹⁴ (vs. I_αα = 2.22×10¹³). Feed purity affects
+the entire reactor steady state through the inlet composition — a decoupled signal not shared
+with other parameters.
+
+**7.2.5 S-A adds η_col information (+32% at nominal)**
+
+S-A/S-B I_η_col ratio = 1.32× — the x_D measurement provides the only locally decoupled
+η_col signal. For α and β_r, S-A slightly *reduces* local identifiability (0.90× and 0.63×)
+because Loop 2 damps x_D variance. The 75% α posterior CI reduction in nb25 is a nonlinear
+effect at degraded values, not captured by the local FIM.
+
+**Figure 8:** 5×5 normalised FIM heatmaps (S-B left, S-A right). Source: nb23 §7.
+Key features: β_r and α both near-zero T_r contribution; high (α, β_r) off-diagonal (+0.901)
+showing joint confusion; η_col off-diagonal shifts positive under S-A (+0.195 vs −0.142).
 
 ### 7.3 Snapshot fault classification (14 scenarios, posterior-mass approach)
 
