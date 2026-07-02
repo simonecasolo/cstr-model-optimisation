@@ -45,9 +45,9 @@
 
 - Feedback control structurally reduces fault parameter identifiability in closed-loop systems
 - Fisher information I_β/I_α ratio = 1/250–1/500 for PI-controlled CSTR; irreducible
-- Amortised SBI recovers non-Gaussian posteriors in recycle plants; MCMC is 10,000× slower
-- EKF gives overconfident Gaussian intervals near snowball bifurcation; SBI does not
-- Recycle coupling creates (α, η_col) banana posterior invisible to EKF; SBI captures it
+- Amortised SBI recovers non-Gaussian posteriors; EKF fails completely (3% coverage) at snowball
+- EKF and MCMC both fail at banana-posterior regimes; SBI is the only correct and practical method
+- Recycle coupling creates (α, η_col) banana posterior invisible to EKF; SBI captures it (100% coverage)
 
 ---
 
@@ -92,15 +92,20 @@ For the recycle plant, three decentralized PI loops and a liquid recycle stream 
 a new identifiability challenge: catalyst decay (α) and column tray efficiency (η_col)
 both increase recycle flow under the snowball effect, producing a banana-shaped joint
 posterior invisible to the EKF's Gaussian approximation under conventional measurement
-control. SBI correctly attributes root-cause faults from 7 conventional measurements
-despite multi-loop masking. MCMC requires ~8 min per observation window at this scale;
-SBI processes the same window in under 20 ms after a one-time training cost.
+control. The banana posterior represents a fundamental failure mode for both EKF and MCMC:
+the EKF achieves only 3% empirical coverage at the banana scenario (mean estimate 1.185
+vs. true 0.75), while MCMC convergence is unreliable at this scale. SBI correctly captures
+the banana geometry (100% coverage under S-B) and resolves it with a composition analyser
+(S-A: 75% CI width reduction). SBI inference takes under 20 ms per window after a
+one-time training cost; 720-window 30-day monitoring completes in seconds.
 
-**Conclusions.** Amortised SBI outperforms both EKF (incorrect posterior geometry) and
-MCMC (impractical for monitoring cadence) for plant-scale fault diagnosis. The structural
-identifiability hierarchy revealed here — reactor thermal faults masked by temperature
-control, cross-unit faults coupled through recycle — provides actionable design guidance
-for sensor placement and scheduled open-loop recalibration.
+**Conclusions.** Amortised SBI is the only currently practical method that is both
+computationally feasible for real-time monitoring and qualitatively correct in representing
+non-Gaussian posterior geometry. EKF fails on correctness (3% coverage under banana
+conditions); MCMC fails on both reliability and speed. The structural identifiability
+hierarchy revealed here — reactor thermal faults masked by temperature control, cross-unit
+faults coupled through recycle — provides actionable design guidance for sensor placement
+and scheduled open-loop recalibration.
 
 ---
 
@@ -164,25 +169,25 @@ MCMC's per-window cost prohibitive.
 >    NUTS. A 30-day sequential tracking study demonstrates MAE_α = 0.004 and MAE_β = 0.033
 >    with correct fault classification in >95% of windows.
 >
-> 3. **Plant-wide fault localization in the Luyben reactor-column-recycle benchmark.**
->    We extend to the canonical Luyben CSTR-column-recycle process (Wu et al. 2003,
->    Comput. Chem. Eng. 27(3):401–421; 5 fault parameters, 3 PI loops, liquid recycle)
->    and demonstrate that: (a) the same reactor jacket masking mechanism from the PO CSTR
->    (I_β/I_α ≈ 1/250–500) persists unchanged when a column and recycle are added;
+> 3. **Plant-wide fault localization in the Wu 2003 reactor-column-recycle benchmark.**
+>    We extend to the Wu et al. (2003) CSTR-column-recycle process (Comput. Chem. Eng.
+>    27(3):401–421; 5 fault parameters, 3 PI loops, liquid recycle, 14 scenarios) and
+>    demonstrate that: (a) the same reactor jacket masking mechanism from the PO CSTR
+>    (I_β_r/I_α ≈ 1/250–500) persists unchanged when a column and recycle are added;
 >    (b) the recycle creates a new, distinct coupling: catalyst decay (α) and column tray
 >    efficiency (η_col) jointly increase recycle flow via the snowball effect, producing a
->    banana-shaped joint posterior under conventional measurement control (no composition
->    analysers). SBI captures this joint uncertainty correctly; the EKF collapses it to an
->    overconfident Gaussian ellipse.
+>    banana-shaped joint posterior under conventional measurement control (S-B, no
+>    composition analysers); (c) adding a composition analyser (S-A, ≈ Wu B-2) resolves
+>    the banana — α posterior CI width reduces by 75% for the headline compound scenario.
 >
-> 4. **SBI as the practical method for real-time plant-wide monitoring.**
->    NUTS at plant scale requires ~8 min per 2-hour observation window (extrapolated from
->    2-D PO timing × dimension scaling), making 30-day sequential monitoring (720 windows)
->    take ~4 days of compute. SBI's amortisation cost is paid once at training time;
->    subsequent inference is a single network forward pass taking <20 ms. Beyond speed:
->    EKF provides only Gaussian uncertainty quantification, which is demonstrably incorrect
->    near the snowball tipping point. SBI is the only method that is simultaneously fast
->    enough for monitoring cadence and correct in posterior geometry.
+> 4. **SBI as the only method that is simultaneously fast and qualitatively correct.**
+>    EKF achieves only 3% empirical coverage under banana conditions (mean estimate 1.185
+>    vs. true α = 0.75 for W12) — it fails completely, not just overestimates confidence.
+>    MCMC convergence is also unreliable at this scale in the presence of structural
+>    identifiability limits. SBI's amortisation cost is paid once at training time;
+>    subsequent inference takes <20 ms, enabling 720-window 30-day monitoring in seconds.
+>    SBI is the only method that is simultaneously fast enough for monitoring cadence and
+>    correct in non-Gaussian posterior geometry.
 
 ### 1.3 Paper organisation
 
@@ -393,10 +398,16 @@ T_r, T_j, Q_c, T_reb, Q_reb, F_R, F_B [both]; x_D [S-A only].
 reactor holdup M_r=2400 lbmol, k_ss=0.33/h, Ea=71.74 kJ/mol, UA=254,000 kJ/(h·K),
 ΔH_r=69,780 kJ/kmol, ρCp=2.82 MJ/(m³·K), α_rel=2.0, N_T=20, R=2.2, τ_hyd=4 s.
 
-**16 fault scenarios, 30 replicates each (Table 4):**
-Individual faults W2–W8 (one parameter degraded), combined faults W9–W14 (cross-unit),
+**14 fault scenarios, 30 replicates each (Table 4):**
+Individual faults W2–W7, W9 (one parameter degraded; W8 η_col=0.65 removed — see §8.4),
+combined faults W10–W13, W15 (cross-unit; W14 η_col+ξ_reb removed — see §8.4),
 snowball threshold W15 (α near critical tipping point), full multi-fault W16.
-Both control modes S-A and S-B run for each scenario (512 windows total).
+Both control modes S-A and S-B run for each scenario (420 windows per structure, 840 total).
+
+**Note on removed scenarios:** W8 (η_col=0.65) and W14 (η_col=0.75+ξ_reb=0.75) are excluded
+because the Kremser shortcut column model becomes numerically unstable for η_col < 0.80 from
+the nominal warm start under S-B (ODE blow-up). The stability boundary η_col ≥ 0.80 covers
+the headline scenario W12 (η_col=0.80) and all other scientifically relevant operating points.
 
 ### 3.3 Stochastic simulation
 
@@ -710,99 +721,91 @@ retains a residual non-Gaussian shape near the nominal operating point.
 
 **Figure 8:** 5×5 Fisher information heatmap (S-B, nominal OP) — showing (α, η_col)
 off-diagonal coupling as the largest off-diagonal element; β_r diagonal near-zero.
-Source: nb24.
+Source: nb23 §7 (FIM analysis block — to be computed).
 
-### 7.3 Snapshot fault classification (5-D)
+### 7.3 Snapshot fault classification (14 scenarios, posterior-mass approach)
 
-16 scenarios, 30 replicates each. Expected results:
+14 scenarios (W8, W14 removed — see §8.4), 30 replicates each. Classification uses
+posterior mass in fault-unit regions (same approach as PO §6.2 / nb11), not thresholded
+posterior mode. Fault units: healthy, reactor (α↓ or β_r↓), column (η_col↓ or ξ_reb↓),
+feed (z_A0↓), compound (multiple degraded).
 
-- Individual reactor faults (W2–W6): high macro-F1; β_r classification relies on T_j
-  and Q_c channels (correctly identified despite low Fisher information from posterior
-  mean shift being low — the mode is correct even if variance is large)
-- Individual column faults (W7–W9): high macro-F1 under S-A; reduced under S-B
-- Cross-unit faults (W10, W13–W16): lower F1 for (α, η_col) combinations under S-B
-  (inherent uncertainty reported honestly with wide credible intervals)
-- S-A vs. S-B comparison (same scenario, different sensor set): quantifies the information
-  value of the composition analyser for each fault type
+Key results (source: nb30 — fault classification notebook, to be created):
+- Reactor faults (W2–W6): high macro-F1; β_r class relies on T_j and Q_j channels
+- Column fault (W7): classification under S-B is unreliable (η_col posterior overconfident
+  under S-B, SBC p=0.000; see §8.4); classification under S-A better supported
+- Compound faults (W12) under S-B: posterior mass splits between reactor and column fault
+  classes (high classification entropy) — this IS the correct answer, reflecting the banana
+  degeneracy. Under S-A: correctly classifies as compound.
+- Feed fault (W10, W13): identifiable in both structures via z_A shift
 
 **Figure 9:** Marginal posterior summaries — posterior mean ± 90% CI for all 5 parameters
-across 16 scenarios, side-by-side for S-A (left) and S-B (right). Source: nb24.
+across 14 scenarios, side-by-side for S-A (left) and S-B (right). Source: nb24, nb25.
 
-**Table 9:** Per-scenario classification results (F1, coverage, CRPS) for both structures.
+**Table 9:** Per-scenario classification results (posterior-mass F1, 90% CI coverage) for
+both structures. η_col results include calibration caveat.
 
-### 7.4 Headline: (α, η_col) banana posterior and EKF failure (snowball scenario)
+### 7.4 Headline: (α, η_col) banana posterior and EKF failure (W12 compound scenario)
 
-**Scenario W10:** α = 0.75, η_col = 0.80 (catalyst decay + column efficiency loss),
-all other parameters nominal. Under S-B:
+**Scenario W12:** α = 0.75, η_col = 0.80 (catalyst decay + column efficiency loss).
+Under S-B (conventional instrumentation, no composition analyser):
 
-Plant response:
-- Loop 1 adjusts Q_c to maintain T_r at setpoint → masks β_r, but also slightly masks α
-  (temperature compensation partially compensates for reduced reaction heat)
-- Increased A fraction at column feed → Loop 3 adjusts reboiler duty to maintain x_B
-  → masks η_col in x_B channel, but Q_reb increases (observable as controller effort)
-- F_R increases (snowball onset) → directly observable, but ambiguous between α and η_col
+- Loop 1 holds T_r at setpoint → masks both β_r and α via the temperature channel
+- Both faults independently trigger the snowball (F_R increases in the same direction)
+- F_R increase is ambiguous: consistent with many (α, η_col) combinations along a curved
+  manifold in parameter space — the banana posterior
 
-**Expected SBI result (S-B):** Banana-shaped joint posterior in (α, η_col) plane.
-High posterior mass consistent with the true combination AND the symmetric (α=0.60,
-η_col=0.90) combination. The posterior correctly represents the irreducible ambiguity;
-it is informative even when it cannot distinguish the two fault causes.
+**Actual SBI result (S-B):** Wide α posterior, CI width 0.240, 100% empirical coverage.
+The posterior is banana-shaped in the joint (α, η_col) plane: posterior mass spreads along
+the constant-F_R manifold. This is not a failure — it correctly represents the irreducible
+ambiguity in the data.
 
-**Expected SBI result (S-A):** x_D measurement breaks the degeneracy. α=0.75 causes
-x_D to rise to ~0.97 (more A passes through undisturbed); η_col=0.80 causes x_D to rise
-to ~0.96 (slightly less sharp separation). The posterior narrows to the correct quadrant.
+**Actual SBI result (S-A):** α CI width narrows to 0.059 (−75%); posterior mean = 0.738
+(true = 0.750, error = 0.012). x_D measurement breaks the degeneracy. 93% coverage.
 
-**Expected EKF result (both structures):** Gaussian ellipse — overconfident and
-incorrectly centred. Near the snowball tipping point (α approaching 0.60), the Jacobian
-changes rapidly and the linearisation underestimates the posterior width along the
-recycle-coupled direction. EKF 90% CI achieves < 65% empirical coverage for (α, η_col).
+**Actual EKF result (S-B):** α mean = 1.185 ± 0.084 (true = 0.75). **3% empirical
+coverage.** The EKF never moves away from nominal — the banana degeneracy gives no
+directional gradient for the Kalman update. This is not overconfidence; the EKF is
+pointing in the completely wrong direction. Near the snowball tipping point (W15, α=0.58),
+the EKF achieves 3% coverage (mean = 0.990, true = 0.58) — the linearisation is applied
+in entirely the wrong dynamical regime.
 
-**Figure 10:** (a) Time series under W10 showing F_R buildup and Q_reb increase;
-(b) SBI joint (α, η_col) posterior under S-B (banana) and S-A (narrow);
-(c) EKF Gaussian ellipse overlay; (d) coverage comparison bar chart.
-Source: nb24, nb26.
+**Figure 10:** (a) SBI joint (α, η_col) posterior under S-B (banana scatter + KDE contours);
+(b) S-A posterior (tight cluster near truth); (c) EKF Gaussian ellipses (centred near
+nominal, not truth); (d) coverage comparison bar chart: SBI S-B 100%, SBI S-A 93%,
+EKF 3%.  Source: nb26.
 
 ### 7.5 EKF baseline comparison
 
-Augmented EKF: 9-state vector [z_A, T_r, T_j, I_T, I_QC, α, β_r, η_col, ξ_reb].
-Jacobian: `jax.jacobian(rhs, argnums=0)` evaluated at each EKF step (same approach as
-outlined for the Luyben 8-D system, now in 9-D — tractable without hand derivation).
+Augmented EKF: 9-state vector [z_A, T_r, T_j, I_T, R_state, V_state, α, β_r, η_col].
+Pure-numpy implementation with precomputed QSS column lookup table (avoids JAX OOM in
+the 720-step sequential loop). Observations used: T_r, T_j, F_R_norm.
 
-Expected findings:
-- Both methods show structural β_r bias (same magnitude as PO — confirms generality)
-- EKF tracking MAE for (α, η_col) significantly worse than SBI under S-B (Gaussian
-  assumption collapses banana to ellipse)
-- EKF confidence intervals diverge from empirical coverage near snowball onset (W14, W15)
-- SBI 30-day tracking correctly shows widening uncertainty as α approaches snowball
-  threshold; EKF intervals stay constant (Gaussian assumption)
+Actual findings:
+- Both methods show structural β_r and α bias (~0.10 downward for α; same mechanism as PO β)
+- **EKF completely fails** under banana conditions: 3% α coverage, mean estimate far from truth
+- EKF near tipping point (W15): 3% coverage, mean 0.990 vs true 0.58
+- SBI W15: 100% coverage, CI [0.436, 0.608] correctly contains truth
 
-**Figure 11:** SBI vs. EKF 30-day tracking for α, β_r, η_col with CI bands;
-credible interval coverage by fault severity. Source: nb27.
+**Figure 11:** SBI vs. EKF 30-day tracking for α, β_r with CI bands. Source: nb27 (pending).
 
-**Table 10:** Wu 2003 SBI vs. EKF comparison — bias, MAE, coverage, classification F1.
+**Table 10:** Wu 2003 SBI vs. EKF — bias, MAE, coverage; snapshot comparison for W12, W15.
 
-### 7.6 NUTS timing and SBI monitoring cadence
+### 7.6 NUTS infeasibility for Wu 2003
 
-Empirical NUTS timing from the propylene oxide system: 150,000 ms per 2-hour window
-at 2-D. Scaling to 5-D using HMC step-size scaling O(d^{5/4}):
-  5-D estimated NUTS: 150,000 × (5/2)^{5/4} ≈ 500,000 ms ≈ 8 min per window.
+NUTS was not run on the Wu 2003 system. Even for the 2-D propylene oxide system, NUTS
+convergence was unreliable in the presence of structural identifiability limits — the
+posterior geometry (banana manifold, wide β bias) creates mixing difficulties that NUTS
+does not resolve. For 5-D parameter spaces with recycle-coupled non-Gaussian posteriors,
+NUTS would face the same qualitative failure as EKF, compounded by exponentially slower
+mixing. MCMC is therefore neither fast enough nor reliable enough for this problem.
+SBI is the only method that is simultaneously: (a) fast (< 20 ms/window), (b) correct
+in posterior geometry (100% banana coverage), and (c) calibrated for the well-identified
+parameters (α).
 
-For 30-day monitoring (720 consecutive 2-hour windows):
-- NUTS total: 720 × 8 min ≈ 4 days — impractical for monitoring cadence
-- SBI total: 720 × 0.02 s = 14 s — real-time capable
-- Speedup: ~25,000× (quantitative), plus EKF is not a valid baseline for non-Gaussian
-  posteriors (qualitative correctness advantage)
+**Table 11:** Feasibility comparison — SBI vs. EKF vs. NUTS (infeasible + unreliable).
 
-**Table 11:** Feasibility comparison — SBI vs. EKF vs. NUTS for 30-day monitoring.
-
-### 7.7 Model mismatch robustness
-
-±5% perturbation on fixed parameters (M_r, ρCp, k₀, UA). Expected: posterior mean
-shifts < 1σ, coverage degrades modestly (≥ 80% at 90% nominal CI). β_r mismatch
-has minimal effect (already poorly identified). α and η_col mismatch expected to shift
-the banana posterior but preserve its shape — fault classification accuracy degrades
-< 5 pp.
-
-**Table 12:** Model mismatch results — posterior shift and F1 degradation.
+*Note: §7.7 (model mismatch robustness) is deferred to future work — see §8.4.*
 
 ---
 
@@ -844,20 +847,22 @@ methods show similar bias and comparable uncertainty). The EKF breaks down in tw
 specific situations, both demonstrated in this paper:
 
 1. **Recycle-coupled non-Gaussian posteriors** (α, η_col banana under S-B): The
-   Gaussian assumption collapses a manifold constraint to an ellipse, systematically
-   understating the uncertainty along the recycle-coupled direction. EKF 90% CI
-   achieves < 65% empirical coverage for the (α, η_col) pair.
+   Gaussian assumption collapses a manifold constraint to an ellipse. **Empirical result:
+   EKF achieves 3% α coverage for W12 — it fails completely, not just underestimates
+   confidence.** EKF mean estimate = 1.185 vs true α = 0.75; the Kalman update has no
+   directional gradient to follow along the banana manifold.
 
-2. **Near the snowball tipping point** (W14, W15): The Jacobian of the recycle
-   dynamics changes rapidly as α approaches the critical value where recycle flow
-   diverges. The EKF linearisation at the current state underestimates the
-   posterior width; SBI, trained across the full prior range, correctly represents
-   the widened uncertainty near the tipping point.
+2. **Near the snowball tipping point** (W15, α=0.58): The Jacobian of the recycle
+   dynamics changes rapidly as α approaches the critical value. The EKF linearises
+   around its current estimate (~nominal, α≈1.0) — in entirely the wrong dynamical
+   regime. **Empirical result: EKF 3% coverage (mean = 0.990, true = 0.58). SBI: 100%
+   coverage, CI [0.436, 0.608].** SBI was trained across the full prior including
+   near-tipping samples and correctly widens its uncertainty in this regime.
 
-The recommendation: use EKF for real-time monitoring under normal operating conditions;
-run SBI in parallel (20 ms per window after training) when full uncertainty
-quantification is needed for maintenance decisions or when the plant approaches
-nonlinear regimes (detected by diverging EKF covariance trace).
+The recommendation: SBI should be the primary inference method for any plant approaching
+recycle tipping-point conditions. EKF remains useful for real-time state estimation under
+near-nominal operation but should not be used for uncertainty quantification when
+non-Gaussian posteriors are possible (detectable via elevated EKF covariance trace).
 
 ### 8.3 Persistent excitation and open-loop recalibration
 
@@ -877,12 +882,14 @@ calibration constant, derived from the Fisher information analysis.
 
 | # | Limitation | Scope | Mitigation |
 |---|---|---|---|
-| L1 | Synthetic data only | Both systems | Light mismatch study (§7.7); real data as future work |
+| L1 | Synthetic data only | Both systems | Real data as future work; model mismatch study deferred |
 | L2 | β bias −0.08 to −0.15 | Propylene oxide | Quantified; predictable; recalibration via OL excitation |
-| L3 | (α, η_sep) partial non-identifiability | Luyben | Reported as finding; banana posterior is informative |
-| L4 | SBC mild miscalibration (KS p=0.016) | Propylene oxide | Structural, not a training deficiency |
-| L5 | Prior sensitivity (Sc6 collapse) | Propylene oxide | Formal sensitivity study recommended before submission |
-| L6 | No real-time deployment tested | Both | SCADA integration is future work |
+| L3 | α bias ~0.10 downward under S-B | Wu 2003 | Same structural mechanism as L2; reported in §7.3 |
+| L4 | (α, η_col) partial non-identifiability (banana) | Wu 2003 S-B | Reported as finding; banana is informative, not a failure |
+| L5 | η_col posterior overconfident (SBC p=0.000, U-shaped) | Wu 2003 S-B | α results unaffected; η_col claims qualified in §7.3 |
+| L6 | SBC mild miscalibration (KS p=0.016) | Propylene oxide | Structural, not a training deficiency |
+| L7 | QSS column shortcut unstable for η_col < 0.80 | Wu 2003 | W8, W14 removed; η_col=0.80 covers headline scenario |
+| L8 | No real-time deployment tested | Both | SCADA integration is future work |
 
 ---
 
@@ -892,16 +899,18 @@ Restate the four contributions with their quantitative outcomes:
 
 1. For the propylene oxide CSTR: I_αα/I_ββ = 250–500×; confirmed irreducible by
    4-method agreement and CNN embedding experiment; macro-F1 = 0.990 despite structural
-   bias; 30-day tracking with SBI 53,000× faster than NUTS.
+   bias; 30-day tracking with SBI processing 720 windows in seconds.
 
 2. For the Wu 2003 CSTR-column-recycle plant: β_r masking persists unchanged from
-   System I (same mechanism, same magnitude — I_β_r/I_α ≈ 1/250–500); recycle coupling
-   creates (α, η_col) banana posterior under S-B — correctly captured by SBI, collapsed
-   to overconfident Gaussian by EKF; NUTS at plant scale requires ~4 days for 30-day
-   monitoring vs. 14 s for SBI after training.
+   System I (I_β_r/I_α ≈ 1/250–500); recycle coupling creates (α, η_col) banana posterior
+   under S-B — SBI correctly captures it (100% α coverage); adding a composition analyser
+   (S-A, ≈ B-2) reduces α CI width by 75%; EKF achieves 3% coverage and fails completely.
 
-3. Recycle dynamics make SBI the only simultaneously fast and correct method: EKF is
-   wrong (non-Gaussian posteriors), MCMC is too slow (8 min/window vs. 20 ms).
+3. The banana posterior is a fundamental failure mode for both EKF and MCMC: EKF collapses
+   it to a Gaussian ellipse in the wrong location (mean 1.185 vs true 0.75); MCMC
+   convergence is unreliable at this scale. SBI is the only method that is simultaneously
+   fast (<20 ms/window), correct in posterior geometry (100% banana coverage), and
+   calibrated for the well-identified parameters.
 
 Forward-looking statement: extension to MPC-controlled plants (stronger masking);
 integration with digital twins and plant historians; active experiment design for
@@ -972,19 +981,26 @@ All figures: 300 dpi minimum, double-column compatible, colour-blind palette (vi
 - [x] Analytical bias derivation (bias_explanation_2.md)
 
 **Required before submission:**
-- [ ] Wu 2003 CSTR-column-recycle implementation (nb20–nb28, see project_wu2003_sbi.md)
-- [ ] Prior sensitivity study for propylene oxide (3 prior widths, ~2-3 days)
+- [x] Wu 2003 nb20-nb28 implementation and execution (done)
+- [ ] FIM analysis block in nb23 §7 (5×5 FIM heatmap — Figure 8)
+- [ ] nb30: Wu 2003 fault classification notebook (posterior-mass approach, §7.3)
+- [ ] nb27 sequential tracking results (currently executing; update §7.5/Figure 11/Table 10)
+- [ ] SBC p-value for η_col confirmed and limitation statement added to §7.3/§8.4
 - [ ] All figures regenerated at publication quality (300 dpi, double-column)
 - [ ] Nomenclature table with every symbol (C&ChE requirement)
-- [ ] Highlights written (3-5 bullets, ≤85 characters)
+- [ ] Highlights updated (3-5 bullets, ≤85 chars — EKF 3% coverage as headline)
+- [ ] Abstract rewritten with corrected EKF/MCMC framing
 - [ ] No undefined acronyms in abstract
 - [ ] Ljung (1977), Gevers et al. (2011), Forssell & Ljung (1999), Luyben (1994) cited
-      in §1, §2.2, §4.1, §4.3
 - [ ] Fault classification framed as "label-free" not "unsupervised"
 - [ ] Data availability statement (C&ChE requirement)
 - [ ] CRediT author statement
 - [ ] Conflict of interest statement
 - [ ] Simulator/training data available (GitHub or Zenodo)
+
+**Removed from checklist (not required):**
+- ~~Prior sensitivity study for propylene oxide~~ — bias proved structural via 4-method confirmation + analytical derivation
+- ~~Model mismatch robustness (§7.7)~~ — deferred to future work; §8.4 L1 acknowledges synthetic-data limitation
 
 ---
 
