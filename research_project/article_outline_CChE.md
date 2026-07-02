@@ -367,7 +367,7 @@ Loop 3 (Column recovery):  V   → x_B     [S-A: QC on bottoms purity; S-B: TC o
 | Measurements | T_r, T_j, Q_c, x_D, T_reb, Q_reb, F_R, F_B | T_r, T_j, Q_c, T_reb, Q_reb, F_R, F_B |
 | Column composition control | Cascade QC: x_D, x_B | Ratio RC: F_R/F_fresh fixed |
 | Fault masking | Partial: x_D directly observed | Strong: composition drift invisible |
-| Wu 2003 analogue | B-3 (full composition control) | B-1b/B-1c (ratio/temperature only) |
+| Wu 2003 analogue | **B-2** (two comp. loops: x_D, x_B) | Simpler than B-1 (zero comp. loops) |
 
 **Fault parameterisation (5-D):**
 
