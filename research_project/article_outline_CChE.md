@@ -907,11 +907,12 @@ calibration constant, derived from the Fisher information analysis.
 | L1 | Synthetic data only | Both systems | Real data as future work; model mismatch study deferred |
 | L2 | β bias −0.08 to −0.15 | Propylene oxide | Quantified; predictable; recalibration via OL excitation |
 | L3 | α bias ~0.10 downward under S-B | Wu 2003 | Same structural mechanism as L2; reported in §7.3 |
-| L4 | (α, η_col) partial non-identifiability (banana) | Wu 2003 S-B | Reported as finding; banana is informative, not a failure |
-| L5 | η_col posterior overconfident (SBC p=0.000, U-shaped) | Wu 2003 S-B | α results unaffected; η_col claims qualified in §7.3 |
+| L4 | (α, η_col) partial non-identifiability (banana) | Wu 2003 S-B | The banana is a genuine physical degeneracy (confirmed by F_R iso-contours); SBI correctly represents wide α uncertainty (100% coverage); η_col dimension is overconfident (see L5) |
+| L5 | η_col posterior overconfident under S-B (SBC p=0.0001) | Wu 2003 S-B | Root cause: `recycle_ratio` (corr −0.977 with α) and `reb_intensity` (corr +0.642) confound η_col signal; NSF pins η_col near training mean. The banana scatter is a near-vertical stripe, not curved. α results unaffected. |
 | L6 | SBC mild miscalibration (KS p=0.016) | Propylene oxide | Structural, not a training deficiency |
 | L7 | QSS column shortcut unstable for η_col < 0.80 | Wu 2003 | W8, W14 removed; η_col=0.80 covers headline scenario |
 | L8 | No real-time deployment tested | Both | SCADA integration is future work |
+| Note | ξ_reb peaked SBC histogram (S-A) was a rejection sampling artifact | Wu 2003 S-A | With `reject_outside_prior=False`, ξ_reb SBC p=0.146 — well-calibrated. The peaked histogram reflected sbi's rejection sampler failing when posterior concentrates away from prior center, not a genuine calibration problem. |
 
 ---
 
