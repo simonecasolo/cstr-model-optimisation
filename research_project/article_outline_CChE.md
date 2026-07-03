@@ -755,7 +755,7 @@ feed (z_A0↓), compound (multiple degraded).
 Key results (source: nb30 — fault classification notebook, to be created):
 - Reactor faults (W2–W6): high macro-F1; β_r class relies on T_j and Q_j channels
 - Column fault (W7): classification under S-B is unreliable (η_col posterior overconfident
-  under S-B, SBC p=0.000; see §8.4); classification under S-A better supported
+  under S-B, SBC p=0.0001; root cause: recycle_ratio/reb_intensity α-confounding; see §8.4 L5)
 - Compound faults (W12) under S-B: posterior mass splits between reactor and column fault
   classes (high classification entropy) — this IS the correct answer, reflecting the banana
   degeneracy. Under S-A: correctly classifies as compound.
@@ -778,9 +778,15 @@ Under S-B (conventional instrumentation, no composition analyser):
   manifold in parameter space — the banana posterior
 
 **Actual SBI result (S-B):** Wide α posterior, CI width 0.240, 100% empirical coverage.
-The posterior is banana-shaped in the joint (α, η_col) plane: posterior mass spreads along
-the constant-F_R manifold. This is not a failure — it correctly represents the irreducible
-ambiguity in the data.
+The α dimension of the posterior correctly represents the irreducible ambiguity in the data.
+**Important caveat (from nb29):** the η_col dimension of the SBI posterior is overconfident
+(SBC p=0.0001) — the scatter in (α, η_col) space is a near-vertical stripe at η_col≈0.80,
+not a curved banana. The root cause is that `recycle_ratio` (corr=−0.977 with α) dominates
+the η_col information budget, confounding the two parameters. The *physical* banana manifolds
+are confirmed by the F_R iso-contour figure (nb26_banana_physics.png); the SBI approximates
+the α dimension of this manifold correctly but is miscalibrated in η_col.
+**Planned fix:** replace `reb_intensity` with `reb_per_boilup = Q_reb/V_norm` in the summary
+statistics, retrain with `zuko_nsf` (60 hidden, 3 transforms), verify η_col SBC improves.
 
 **Actual SBI result (S-A):** α CI width narrows to 0.059 (−75%); posterior mean = 0.738
 (true = 0.750, error = 0.012). x_D measurement breaks the degeneracy. 93% coverage.
