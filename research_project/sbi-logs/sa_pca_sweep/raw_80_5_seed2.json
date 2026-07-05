@@ -1,0 +1,35 @@
+{
+  "label": "raw_80_5_seed2",
+  "pca_key": "raw",
+  "pca_dim": null,
+  "arch_key": "80_5",
+  "hidden_features": 80,
+  "num_transforms": 5,
+  "seed": 2,
+  "train_time_s": 136.28773093223572,
+  "n_sbc": 400,
+  "min_ks_pvalue": 1.0405771009661519e-38,
+  "passed": false,
+  "sbc": {
+    "alpha": {
+      "ks_pvalue": 2.358199013671744e-06,
+      "mean_rank_frac": 0.4252125
+    },
+    "beta_r": {
+      "ks_pvalue": 0.004097587262520952,
+      "mean_rank_frac": 0.46113750000000003
+    },
+    "eta_col": {
+      "ks_pvalue": 1.0405771009661519e-38,
+      "mean_rank_frac": 0.70815
+    },
+    "xi_reb": {
+      "ks_pvalue": 8.437516412958973e-14,
+      "mean_rank_frac": 0.41465
+    },
+    "z_A0_eff": {
+      "ks_pvalue": 0.0019834405182523234,
+      "mean_rank_frac": 0.45766249999999997
+    }
+  }
+}

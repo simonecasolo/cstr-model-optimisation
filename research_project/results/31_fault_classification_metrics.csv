@@ -1,0 +1,15 @@
+scenario,true_unit,predicted_mode,scenario_accuracy,pooled_confidence,alpha_mean,beta_r_mean,eta_col_mean,xi_reb_mean,z_A0_eff_mean
+W1_healthy,healthy,healthy,1.0,0.844,0.966,0.961,1.0,0.999,0.871
+W2_cat_mild,reactor,reactor,1.0,0.66,0.752,0.841,1.0,1.001,0.812
+W3_cat_severe,reactor,reactor,1.0,0.912,0.589,0.85,1.0,0.999,0.842
+W4_cat_threshold,reactor,reactor,1.0,0.993,0.52,0.899,0.999,0.999,0.872
+W5_jacket_mild,reactor,reactor,1.0,0.805,0.926,0.726,1.0,0.994,0.832
+W6_jacket_severe,reactor,reactor,1.0,0.825,0.933,0.551,0.999,0.994,0.836
+W7_col_eff_mild,column,column,1.0,0.734,0.937,0.916,0.801,1.002,0.845
+W9_reb_fouling,column,column,1.0,0.825,0.963,0.957,0.999,0.699,0.869
+W10_feed_impurity,feed,healthy,0.0,0.669,1.021,1.032,0.999,0.997,0.801
+W11_reactor_combined,reactor,reactor,1.0,0.829,0.731,0.7,0.997,1.0,0.836
+W12_snowball_compound,multi,multi,1.0,0.999,0.68,0.859,0.803,0.998,0.835
+W13_cat_feed,multi,reactor,0.233,0.438,0.791,0.983,1.001,1.001,0.791
+W15_snowball_threshold,reactor,reactor,1.0,0.976,0.539,0.881,0.9,1.001,0.861
+W16_full_multi,multi,multi,1.0,1.0,0.702,0.718,0.8,0.85,0.851

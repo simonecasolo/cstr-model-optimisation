@@ -1,0 +1,172 @@
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/sbi/inference/trainers/npe/npe_base.py:196: UserWarning: Data has extreme outliers in dimension(s) [0, 1, 2, 4, 5, 7, 8, 10, 11, 13, 18, 19, 20, 23, 31, 37, 39, 51, 54, 55, 56, 57, 58, 59, 60, 67] (beyond 10.0x IQR from quartiles). This may cause precision loss during z-scoring, where distinct values become indistinguishable. Consider removing outliers from your data or setting `z_score_x='none'` (though this may affect training).
+  warn_if_invalid_for_zscoring(x)
+[train] 15000 samples, 72-D summaries, arch=zuko_nsf hidden=60 transforms=3
+ Training neural network. Epochs trained: 1 Training neural network. Epochs trained: 2 Training neural network. Epochs trained: 3 Training neural network. Epochs trained: 4 Training neural network. Epochs trained: 5 Training neural network. Epochs trained: 6 Training neural network. Epochs trained: 7 Training neural network. Epochs trained: 8 Training neural network. Epochs trained: 9 Training neural network. Epochs trained: 10 Training neural network. Epochs trained: 11 Training neural network. Epochs trained: 12 Training neural network. Epochs trained: 13 Training neural network. Epochs trained: 14 Training neural network. Epochs trained: 15 Training neural network. Epochs trained: 16 Training neural network. Epochs trained: 17 Training neural network. Epochs trained: 18 Training neural network. Epochs trained: 19 Training neural network. Epochs trained: 20 Training neural network. Epochs trained: 21 Training neural network. Epochs trained: 22 Training neural network. Epochs trained: 23 Training neural network. Epochs trained: 24 Training neural network. Epochs trained: 25 Training neural network. Epochs trained: 26 Training neural network. Epochs trained: 27 Training neural network. Epochs trained: 28 Training neural network. Epochs trained: 29 Training neural network. Epochs trained: 30 Training neural network. Epochs trained: 31 Training neural network. Epochs trained: 32 Training neural network. Epochs trained: 33 Training neural network. Epochs trained: 34 Training neural network. Epochs trained: 35 Training neural network. Epochs trained: 36 Training neural network. Epochs trained: 37 Training neural network. Epochs trained: 38 Training neural network. Epochs trained: 39 Training neural network. Epochs trained: 40 Training neural network. Epochs trained: 41 Training neural network. Epochs trained: 42 Training neural network. Epochs trained: 43 Training neural network. Epochs trained: 44 Training neural network. Epochs trained: 45 Training neural network. Epochs trained: 46 Training neural network. Epochs trained: 47 Training neural network. Epochs trained: 48 Training neural network. Epochs trained: 49 Training neural network. Epochs trained: 50 Training neural network. Epochs trained: 51 Training neural network. Epochs trained: 52 Training neural network. Epochs trained: 53 Training neural network. Epochs trained: 54 Training neural network. Epochs trained: 55 Training neural network. Epochs trained: 56 Training neural network. Epochs trained: 57 Training neural network. Epochs trained: 58 Training neural network. Epochs trained: 59 Training neural network. Epochs trained: 60 Training neural network. Epochs trained: 61 Training neural network. Epochs trained: 62 Training neural network. Epochs trained: 63 Training neural network. Epochs trained: 64 Training neural network. Epochs trained: 65 Training neural network. Epochs trained: 66 Training neural network. Epochs trained: 67 Training neural network. Epochs trained: 68 Training neural network. Epochs trained: 69 Training neural network. Epochs trained: 70 Training neural network. Epochs trained: 71 Training neural network. Epochs trained: 72 Training neural network. Epochs trained: 73 Training neural network. Epochs trained: 74 Training neural network. Epochs trained: 75 Training neural network. Epochs trained: 76 Training neural network. Epochs trained: 77 Training neural network. Epochs trained: 78 Training neural network. Epochs trained: 79 Training neural network. Epochs trained: 80 Training neural network. Epochs trained: 81 Training neural network. Epochs trained: 82 Training neural network. Epochs trained: 83 Training neural network. Epochs trained: 84 Training neural network. Epochs trained: 85 Training neural network. Epochs trained: 86 Training neural network. Epochs trained: 87 Training neural network. Epochs trained: 88 Training neural network. Epochs trained: 89 Training neural network. Epochs trained: 90 Training neural network. Epochs trained: 91 Training neural network. Epochs trained: 92 Training neural network. Epochs trained: 93 Training neural network. Epochs trained: 94 Training neural network. Epochs trained: 95 Training neural network. Epochs trained: 96 Training neural network. Epochs trained: 97 Training neural network. Epochs trained: 98 Training neural network. Epochs trained: 99 Training neural network. Epochs trained: 100 Training neural network. Epochs trained: 101 Training neural network. Epochs trained: 102 Training neural network. Epochs trained: 103 Training neural network. Epochs trained: 104 Training neural network. Epochs trained: 105 Training neural network. Epochs trained: 106 Training neural network. Epochs trained: 107 Training neural network. Epochs trained: 108 Training neural network. Epochs trained: 109 Training neural network. Epochs trained: 110 Training neural network. Epochs trained: 111 Training neural network. Epochs trained: 112 Training neural network. Epochs trained: 113 Training neural network. Epochs trained: 114 Training neural network. Epochs trained: 115 Training neural network. Epochs trained: 116 Training neural network. Epochs trained: 117 Training neural network. Epochs trained: 118 Training neural network. Epochs trained: 119 Training neural network. Epochs trained: 120 Training neural network. Epochs trained: 121 Training neural network. Epochs trained: 122 Training neural network. Epochs trained: 123 Training neural network. Epochs trained: 124 Training neural network. Epochs trained: 125 Training neural network. Epochs trained: 126 Training neural network. Epochs trained: 127 Training neural network. Epochs trained: 128 Training neural network. Epochs trained: 129 Training neural network. Epochs trained: 130 Training neural network. Epochs trained: 131 Training neural network. Epochs trained: 132 Training neural network. Epochs trained: 133 Training neural network. Epochs trained: 134 Training neural network. Epochs trained: 135 Training neural network. Epochs trained: 136 Training neural network. Epochs trained: 137 Training neural network. Epochs trained: 138 Training neural network. Epochs trained: 139 Training neural network. Epochs trained: 140 Training neural network. Epochs trained: 141 Training neural network. Epochs trained: 142 Training neural network. Epochs trained: 143 Training neural network. Epochs trained: 144 Training neural network. Epochs trained: 145 Training neural network. Epochs trained: 146 Training neural network. Epochs trained: 147 Training neural network. Epochs trained: 148 Training neural network. Epochs trained: 149 Training neural network. Epochs trained: 150 Training neural network. Epochs trained: 151 Training neural network. Epochs trained: 152 Training neural network. Epochs trained: 153 Training neural network. Epochs trained: 154 Training neural network. Epochs trained: 155 Training neural network. Epochs trained: 156 Training neural network. Epochs trained: 157 Training neural network. Epochs trained: 158 Training neural network. Epochs trained: 159 Training neural network. Epochs trained: 160 Training neural network. Epochs trained: 161 Training neural network. Epochs trained: 162 Training neural network. Epochs trained: 163 Training neural network. Epochs trained: 164 Training neural network. Epochs trained: 165 Training neural network. Epochs trained: 166 Training neural network. Epochs trained: 167 Training neural network. Epochs trained: 168 Training neural network. Epochs trained: 169 Training neural network. Epochs trained: 170 Training neural network. Epochs trained: 171 Training neural network. Epochs trained: 172 Training neural network. Epochs trained: 173 Training neural network. Epochs trained: 174 Training neural network. Epochs trained: 175 Training neural network. Epochs trained: 176 Training neural network. Epochs trained: 177 Training neural network. Epochs trained: 178 /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 9.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 5.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 10.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 12.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 7.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 6.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 8.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 7.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 41.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 54.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 10.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 14.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 52.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 49.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 15.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 6.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 10.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 27.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 6.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 22.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 21.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 10.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 9.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 18.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 7.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 19.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 20.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 20.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 5.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 6.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 27.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 24.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 12.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 15.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 14.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 77.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 33.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 5.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 23.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 25.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 51.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 9.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 19.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 18.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 7.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 7.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 8.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 5.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 15.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 8.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:179: UserWarning: 6.5% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 22.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 14.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 11.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 45.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 11.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 5.4% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 8.2% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 7.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 28.2% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 6.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 16.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 51.2% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 7.4% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 8.2% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 19.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 6.4% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 13.2% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 22.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 9.0% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 9.4% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 13.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 12.4% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/sbi_pipeline.py:220: UserWarning: 9.6% of samples drawn with reject_outside_prior=False lie outside the prior support. This may lead to incorrect inference.
+  samp = posterior.sample(
+Training neural network. Epochs trained: 179 Training neural network. Epochs trained: 180 Neural network successfully converged after 180 epochs.
+        -------------------------
+        ||||| ROUND 1 STATS |||||:
+        -------------------------
+        Epochs trained: 180
+        Best validation performance: -20.1491
+        -------------------------
+        
+[train] Completed in 106s
+[sbc]   50/200  (6s, 50 valid)
+[sbc]   100/200  (11s, 100 valid)
+[sbc]   150/200  (16s, 150 valid)
+[sbc]   200/200  (21s, 200 valid)
+[sbc] Completed in 21s, n_valid=200/200
+[sbc]   alpha      KS p=0.0736
+[sbc]   beta_r     KS p=0.2002
+[sbc]   eta_col    KS p=0.0225
+[sbc]   xi_reb     KS p=0.8933
+[sbc]   z_A0_eff   KS p=0.4502
+[save] Posterior -> /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/sbi-logs/wu2003_posterior_variant_A_sa_seed2.pkl
+[save] Results   -> /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/sbi-logs/variant_A_sa_seed2_results.json

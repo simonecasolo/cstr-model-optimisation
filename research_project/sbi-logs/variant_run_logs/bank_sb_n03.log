@@ -1,0 +1,18 @@
+[bank] Generating 15000 S-B training sims @ 0.3% noise...
+[bank]   1000/15000  (122s elapsed, 1000 valid)
+[bank]   2000/15000  (252s elapsed, 2000 valid)
+[bank]   3000/15000  (397s elapsed, 3000 valid)
+[bank]   4000/15000  (543s elapsed, 4000 valid)
+[bank]   5000/15000  (695s elapsed, 5000 valid)
+[bank]   6000/15000  (844s elapsed, 6000 valid)
+[bank]   7000/15000  (1003s elapsed, 7000 valid)
+[bank]   8000/15000  (1163s elapsed, 8000 valid)
+[bank]   9000/15000  (1318s elapsed, 9000 valid)
+[bank]   10000/15000  (1475s elapsed, 10000 valid)
+[bank]   11000/15000  (1646s elapsed, 11000 valid)
+[bank]   12000/15000  (1795s elapsed, 12000 valid)
+[bank]   13000/15000  (1918s elapsed, 13000 valid)
+[bank]   14000/15000  (2043s elapsed, 14000 valid)
+[bank]   15000/15000  (2161s elapsed, 15000 valid)
+[bank] Valid simulations: 15000/15000 in 2161s
+[bank] Saved to ../data/wu2003_sbi_train_sb_n03.npz

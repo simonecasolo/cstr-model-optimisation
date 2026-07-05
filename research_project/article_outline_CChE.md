@@ -46,8 +46,28 @@
 - Feedback control structurally reduces fault parameter identifiability in closed-loop systems
 - Fisher information I_β/I_α ratio = 1/250–1/500 for PI-controlled CSTR; irreducible
 - Amortised SBI recovers non-Gaussian posteriors; EKF fails completely (3% coverage) at snowball
-- EKF and MCMC both fail at banana-posterior regimes; SBI is the only correct and practical method
-- Recycle coupling creates (α, η_col) banana posterior invisible to EKF; SBI captures it (100% coverage)
+- **Two apparent "banana" degeneracies in a recycle plant were both artifacts, not physics —
+  a general SBI pitfall under closed-loop control**
+- **A raw-trajectory Fisher-information check (not more summary features) is the fix: it
+  collapses a 0.90-correlation confound to ~0.00 using sensors already in place**
+
+**Retracted this session (2026-07-03) — do not reuse:** "Recycle coupling creates (α, η_col)
+banana posterior invisible to EKF; SBI captures it (100% coverage)." See §7.2.3/§7.4/§8.4 L4
+for why: this pair is not a genuine joint degeneracy once the full S-B feature set (not just
+F_R) is considered — see HANDOFF.md session 2026-07-03c.
+
+**SUPERSEDED (2026-07-05) — do not reuse:** "Recycle plant reveals a genuine (α, β_r)
+banana; SBI captures it (corr=0.998), EKF cannot." Two independent checks (a re-tuned EKF,
+and this paper's own FIM methodology applied to the raw sensor trajectory instead of
+hand-crafted summary statistics — see §7.4, §8.4 L4′) show this second "banana" is *also*
+an artifact — this time of temporal aggregation in the 66-D summary-statistic feature set,
+not of a restricted channel set as (α, η_col) was. **This is now the article's actual
+headline finding for the recycle system** (replacing the retracted claim above), reframed
+as the two new highlights added at the top of this list. A trained, richer-feature SBI
+posterior confirming this at the calibration level was not attempted (training-instability
+risk, see §8.4 L9/L10) and is explicitly left to future work — the claim here is scoped to
+"very likely an artifact, demonstrated by two independent, article-consistent methods,"
+not "fixed."
 
 ---
 
@@ -65,6 +85,17 @@
 
 Recommendation: option 1. It names the process (recycle), the method (SBI), and the
 challenge (multi-loop control). C&ChE readers will immediately understand the scope.
+
+**Revisit after 2026-07-05 reframing:** the paper's actual headline result is no longer
+"a banana exists" but "closed-loop SBI systematically over-reports joint degeneracies
+under compressed summary statistics, and a raw-trajectory Fisher-information check
+distinguishes real from artifactual ones" (see §7.4, §8.1). Option 2 ("Structural
+identifiability limits... from a PI-controlled CSTR to a Luyben reactor-column-recycle
+plant") now fits this better than option 1, since it foregrounds the diagnostic/theoretical
+contribution rather than a specific (now-retracted-twice) confound. Consider a fourth option
+explicitly naming the diagnostic, e.g. **"Genuine vs. artifactual non-identifiability in
+closed-loop simulation-based inference: a Fisher-information diagnostic for plant-wide
+fault diagnosis."**
 
 ---
 
@@ -86,26 +117,50 @@ information analysis, compare against extended Kalman filter baselines using aut
 differentiation of the ODE Jacobian, and validate with simulation-based calibration.
 
 **Results.** For the propylene oxide system, the Fisher information for the fouling
-parameter is 250–500× smaller than for catalyst activity — confirmed empirically by
-four independent methods (SBI, MCMC, EKF, UKF) all showing identical structural bias.
-For the recycle plant, three decentralized PI loops and a liquid recycle stream create
-a new identifiability challenge: catalyst decay (α) and column tray efficiency (η_col)
-both increase recycle flow under the snowball effect, producing a banana-shaped joint
-posterior invisible to the EKF's Gaussian approximation under conventional measurement
-control. The banana posterior represents a fundamental failure mode for both EKF and MCMC:
-the EKF achieves only 3% empirical coverage at the banana scenario (mean estimate 1.185
-vs. true 0.75), while MCMC convergence is unreliable at this scale. SBI correctly captures
-the banana geometry (100% coverage under S-B) and resolves it with a composition analyser
-(S-A: 75% CI width reduction). SBI inference takes under 20 ms per window after a
-one-time training cost; 720-window 30-day monitoring completes in seconds.
+parameter is 250–500× smaller than for catalyst activity — confirmed empirically by four
+independent methods (SBI, MCMC, EKF, UKF) all showing identical structural bias, and shown
+to be irreducible by a raw-time-series CNN embedding that bypasses hand-crafted features
+entirely (a Cramér-Rao-bound confirmation). For the recycle plant we investigated two
+candidate joint (2-parameter) degeneracies — catalyst decay with column efficiency
+(α, η_col), and catalyst decay with jacket fouling (α, β_r) — and found **both to be
+artifacts of the observation representation, not of the plant physics**. The first
+(α, η_col) resolves once a second, already-available S-B channel (T_reb) is combined with
+the recycle flow; restricting attention to the recycle flow alone reproduces the
+appearance of a banana. The second, (α, β_r) — which initially appeared as a strong,
+robust confound (Fisher-information off-diagonal +0.90, trained-posterior correlation
+0.998, and a degeneracy that survived combination of the *entire* 66-D hand-crafted
+summary-statistic feature set) — collapses to an off-diagonal of ≈0.00 when the same
+Fisher-information methodology is applied to the raw, unaggregated sensor trajectory of the
+same three already-observed channels instead of their whole-window summary statistics; an
+independently re-tuned extended Kalman filter given the same raw-trajectory access
+corroborates this, recovering both parameters to ~1-2% accuracy at points the
+summary-statistic representation calls non-identifiable. Neither fix required new
+instrumentation — only less-aggregated use of existing sensors. Modestly finer time
+resolution (sub-window statistics) was not sufficient; a genuinely raw-trajectory-aware
+representation was needed, which we flag but do not attempt to build into a trained,
+calibrated posterior here. Separately, at a strongly degraded catalyst-decay operating
+point the EKF achieves only 3% empirical coverage under strong recycle ("snowball")
+nonlinearity — a real, representation-independent failure mode distinct from either banana
+investigation. SBI inference takes under 20 ms per window after a one-time training cost;
+30-day sequential monitoring completes in seconds.
 
 **Conclusions.** Amortised SBI is the only currently practical method that is both
 computationally feasible for real-time monitoring and qualitatively correct in representing
-non-Gaussian posterior geometry. EKF fails on correctness (3% coverage under banana
-conditions); MCMC fails on both reliability and speed. The structural identifiability
-hierarchy revealed here — reactor thermal faults masked by temperature control, cross-unit
-faults coupled through recycle — provides actionable design guidance for sensor placement
-and scheduled open-loop recalibration.
+non-Gaussian posterior geometry, and it degrades gracefully under strong recycle
+nonlinearity where EKF fails outright (3% coverage). But this work's central methodological
+finding is a caution about SBI itself in closed-loop, multi-unit settings: **every apparent
+joint non-identifiability we found in the recycle plant turned out to be an artifact of the
+hand-crafted summary-statistic representation, not a property of the plant** — first a
+restricted-channel artifact, then a lossy-temporal-aggregation artifact — while the one
+identifiability limitation that proved genuine and representation-independent (reactor
+thermal faults masked by integral temperature control) is a *scalar* reduction in
+information, not a manifold constraint between two different parameters, and reproduces
+identically across both systems studied. We propose that any joint degeneracy surfaced by
+a compressed-feature SBI posterior in a closed-loop system should be checked against a
+raw-trajectory Fisher-information test before being reported as physical, and provide a
+worked methodology for doing so. This shifts the paper's design guidance from sensor
+placement (a new analyser) to feature engineering (less lossy use of existing sensors) as
+the higher-value, lower-cost intervention for this class of system.
 
 ---
 
@@ -169,25 +224,49 @@ MCMC's per-window cost prohibitive.
 >    NUTS. A 30-day sequential tracking study demonstrates MAE_α = 0.004 and MAE_β = 0.033
 >    with correct fault classification in >95% of windows.
 >
-> 3. **Plant-wide fault localization in the Wu 2003 reactor-column-recycle benchmark.**
+> 3. **Plant-wide fault localization in the Wu 2003 reactor-column-recycle benchmark, and
+>    two candidate joint degeneracies that both turned out to be representation artifacts.**
 >    We extend to the Wu et al. (2003) CSTR-column-recycle process (Comput. Chem. Eng.
->    27(3):401–421; 5 fault parameters, 3 PI loops, liquid recycle, 14 scenarios) and
->    demonstrate that: (a) the same reactor jacket masking mechanism from the PO CSTR
->    (I_β_r/I_α ≈ 1/250–500) persists unchanged when a column and recycle are added;
->    (b) the recycle creates a new, distinct coupling: catalyst decay (α) and column tray
->    efficiency (η_col) jointly increase recycle flow via the snowball effect, producing a
->    banana-shaped joint posterior under conventional measurement control (S-B, no
->    composition analysers); (c) adding a composition analyser (S-A, ≈ Wu B-2) resolves
->    the banana — α posterior CI width reduces by 75% for the headline compound scenario.
+>    27(3):401–421; 5 fault parameters, 3 PI loops, liquid recycle, 14 scenarios). Unlike the
+>    PO CSTR, where α is cleanly identified via the concentration channel, Wu 2003 has **no
+>    observable concentration channel under either instrumentation structure**, which
+>    initially appeared to produce two severe joint (2-parameter) confounds: (a) catalyst
+>    decay with column tray efficiency (α, η_col), which resolves once the column's own
+>    temperature/flow channels (already part of standard S-B instrumentation) are combined
+>    with the recycle flow — an artifact of restricting attention to one channel; and (b)
+>    catalyst decay with reactor jacket fouling (α, β_r), which appeared far more robust —
+>    Fisher-information off-diagonal +0.90, trained-posterior correlation 0.998, and a
+>    degeneracy that survived combination of the *entire* 66-D hand-crafted summary-
+>    statistic feature set — but which we show (Contribution 4) is *also* an artifact, this
+>    time of lossy temporal aggregation rather than channel restriction. The one
+>    identifiability limitation in this plant that IS genuine and representation-independent
+>    is a *scalar* one: both α and β_r lose their shared highest-SNR channel (T_r) to Loop-1
+>    integral masking — the same mechanism as the PO CSTR's β masking, transferring exactly,
+>    but here reducing both parameters' information roughly symmetrically (I_αα/I_β_r ≈
+>    1.1–1.4×, far milder than the PO system's 250–500×) rather than singling one out.
 >
-> 4. **SBI as the only method that is simultaneously fast and qualitatively correct.**
->    EKF achieves only 3% empirical coverage under banana conditions (mean estimate 1.185
->    vs. true α = 0.75 for W12) — it fails completely, not just overestimates confidence.
->    MCMC convergence is also unreliable at this scale in the presence of structural
->    identifiability limits. SBI's amortisation cost is paid once at training time;
+> 4. **A raw-trajectory Fisher-information diagnostic distinguishes genuine from artifactual
+>    non-identifiability in closed-loop SBI — demonstrated, not just proposed.** Applying
+>    this paper's own FIM methodology (§4.3) to the raw, unaggregated sensor trajectory of
+>    the *same three already-observed channels* (T_r, T_j, F_R_norm) — instead of their
+>    66-D whole-window summary statistics — collapses the (α, β_r) off-diagonal from ≈0.90
+>    to ≈0.00, reproducibly across noise seeds and at multiple operating points. An
+>    independently re-tuned EKF given the same raw-trajectory access corroborates this,
+>    recovering both parameters to ~1-2% accuracy at points the summary-statistic
+>    representation calls non-identifiable. Modestly finer time resolution (sub-window
+>    statistics) is *not* sufficient — the information lost by whole-window aggregation is
+>    in fine-grained transient shape, not coarser-grained level and spread. **This reframes
+>    the paper's design guidance from sensor placement to feature engineering**: the fix for
+>    this class of apparent confound is a less lossy use of existing sensors, not a new
+>    analyser — a cheaper and more general intervention than the composition-analyser
+>    guidance our earlier, retracted framing would have produced. We stop short of training
+>    a calibrated SBI posterior on a raw-trajectory-aware embedding (left to future work,
+>    given this paper's own documented SNPE training-instability at the current feature
+>    dimensionality) and report this as a validated diagnostic finding, not a deployed fix.
+>    Separately, EKF achieves only 3% empirical coverage under strong catalyst-decay/snowball
+>    conditions (mean estimate 1.185 vs. true α = 0.75) — a distinct, representation-
+>    independent failure mode. SBI's amortisation cost is paid once at training time;
 >    subsequent inference takes <20 ms, enabling 720-window 30-day monitoring in seconds.
->    SBI is the only method that is simultaneously fast enough for monitoring cadence and
->    correct in non-Gaussian posterior geometry.
 
 ### 1.3 Paper organisation
 
@@ -384,9 +463,20 @@ Loop 3 (Column recovery):  V   → x_B     [S-A: QC on bottoms purity; S-B: TC o
 | 4 | ξ_reb | U[0.4, 1.2] | Reboiler heat transfer fouling | Q_reb (Loop 3 compensation) |
 | 5 | z_A0 | U[0.70, 0.95] | Feed purity (A fraction) | All channels via reactor SS |
 
-**Identifiability structure (key finding):**
-- β_r: masked by Loop 1 (same mechanism as PO β) → I_β_r ≪ I_α (Fisher information)
-- (α, η_col): **both increase recycle via snowball** → joint posterior banana-shaped under S-B
+**Identifiability structure (key finding, revised 2026-07-05 — see §7.2/§7.4/§8.1/§8.4
+L4, L4′):**
+- T_r is masked by Loop 1 for BOTH α and β_r (∂T_r_ss/∂α ≡ ∂T_r_ss/∂β_r ≡ 0), and Wu 2003
+  has no observable concentration channel (unlike the PO CSTR) — this is a genuine,
+  representation-independent **scalar** reduction affecting both parameters roughly
+  symmetrically: I_αα/I_β_r ≈ 1.1–1.4× (nearly equal, vs. PO's 250–500×). Under the
+  standard 66-D hand-crafted summary-statistic feature set, (α, β_r) *also* appears
+  jointly confounded (off-diagonal +0.90 at nominal) — but this joint/manifold component is
+  very likely a representation artifact, not physical: the same analysis on the raw,
+  unaggregated observation trajectory collapses the off-diagonal to ≈0.00 (§7.4, §8.1).
+- (α, η_col): initially suspected as banana-shaped via the snowball's shared effect on
+  recycle flow (F_R), but this does **not** survive once the column's own temperature and
+  flow channels are combined with F_R — S-B's existing instrumentation already resolves
+  most of this pair without a composition analyser (see §7.2.3, §8.4 L4).
 - ξ_reb: identifiable via Q_reb (controller output signal), analogous to Qc for β_r
 - z_A0: identifiable via z_A and F_R (different steady-state trajectory)
 
@@ -680,16 +770,27 @@ project_wu2003_sbi.md. The structure and expected findings are specified below.*
 
 ### 7.1 Training validation
 
-SBC rank histograms for all 5 parameters. Expected: KS p > 0.05 for α, ξ_reb, z_A0;
-β_r expected to show flat/biased ranks (same structural masking as PO β — confirms the
-mechanism generalises); (α, η_col) expected to show correlated miscalibration under S-B
-(banana posterior produces non-uniform marginal ranks). Report honestly with the same
-framing used in §6.1: miscalibration reflects structural identifiability limits, not a
-training deficiency.
+**S-B is calibrated.** An 8-seed ensemble was trained (`zuko_nsf` 60/3, 0.3% noise,
+`reb_per_boilup` compressed features) and evaluated with a corroborated multi-N SBC
+protocol (N=200 → 400 → 800, independent RNG draws at each stage — a single SBC pass at
+any one N is not trusted; see §8.4 L9). Seed 4 passed all 5 parameters at all three N,
+including β_r and η_col, and was promoted as the production S-B posterior. **This
+resolves the earlier η_col overconfidence concern (previously reported at SBC p=0.0001)
+for the marginal calibration** — but see §7.4/§8.4 L5 for an important caveat: marginal
+SBC calibration does not by itself guarantee the *joint* posterior geometry is correct at
+any one specific scenario, only that rank statistics are uniform in aggregate.
 
-**Figure 7:** SBC results for 5 Wu 2003 parameters under S-A and S-B — rank histograms
-and KS p-values showing β_r masking persists; (α, η_col) coupling emerges under S-B.
-Source: nb23.
+**S-A is NOT calibrated — a settled negative result, not an open question.** 16 first-round
+seeds, plus 24 further seeds testing PCA feature-dimension reduction (15/25 components) and
+architectures both larger (80/5, 128/5 hidden/transforms) and smaller (30/2, 40/2) than the
+production 60/3, all failed SBC at N=400, predominantly on η_col and ξ_reb. No architecture
+or feature-space intervention recovered calibration; larger networks performed *worse* than
+the original 60/3 (see §8.4 L10). Do not use S-A results for any quantitative claim — S-A is
+reported as a limitation (§8.4 L10), not a resolved result.
+
+**Figure 7:** SBC results for 5 Wu 2003 parameters, S-B only (calibrated) — rank histograms
+and KS p-values at N=200/400/800 for seed 4. S-A SBC results shown separately as evidence of
+the unresolved calibration failure (not as a usable posterior). Source: nb23, nb24, nb25.
 
 ### 7.2 Identifiability structure — FIM analysis (core contribution)
 
@@ -717,16 +818,50 @@ internal state not in S-B. Both α and β_r primarily excite the same physics co
 (corr_Qreb_FR, corr_Qj_FR, corr_Rn_Vn), making them nearly indistinguishable at the nominal
 operating point.
 
-This is a **more severe** identifiability challenge than PO: not just β_r is hard to identify,
-but the entire (α, β_r) subspace is jointly confounded through shared features.
+At the level of the 66-D hand-crafted summary-statistic feature set, this looks like a
+**more severe** identifiability challenge than PO: not just β_r is hard to identify, but the
+entire (α, β_r) subspace appears jointly confounded through shared features (confirmed, at
+that representation, by a dedicated identifiability scan and by the trained, calibrated SBI
+posterior itself, §7.4). **§7.4 shows this does not survive a representation-level check,
+and should not be reported as a physical limit of the plant** — see below.
 
-**7.2.3 (α, η_col) banana is a nonlinear effect, not a local FIM result**
+> **Finding (2026-07-05, final framing for this paper — see §7.4 and §8.4 L4′ for full
+> detail):** re-computing this section's own FIM methodology (`FIM = J^T Σ^{-1} J`, Σ from
+> real replicate noise, exactly as above) on the *raw, unaggregated* trajectory of the same
+> 3 physical channels (T_r, T_j, F_R_norm) collapses the (α, β_r) normalised off-diagonal
+> from ≈0.6–0.85 (matching the +0.901 reported here) to ≈0.00, reproducibly across multiple
+> noise seeds and at both the nominal point and W11. A negative control rules out a cheap
+> fix: a modestly finer time-resolution summary (6 sub-windows, mean+std per channel, 108-D)
+> shows *no* improvement (off-diagonal ≈0.6–0.86, indistinguishable from the 66-D baseline)
+> — the lost information is in fine-grained transient shape, not coarser level/spread
+> statistics. An EKF given full raw-trajectory access independently corroborates the FIM
+> result, resolving (α, β_r) to ~1–2% at points this section's 66-D-feature analysis calls
+> non-identifiable. **We report this as strong, convergent, methodologically rigorous
+> evidence that the (α, β_r) "banana" is very likely an artifact of the summary-statistic
+> representation, not of the plant physics — the paper's actual headline finding for this
+> system (§7.4, §8.1) — while explicitly not claiming to have fixed it: confirming this at
+> the level of a trained, calibrated SBI posterior on a raw-trajectory-aware representation
+> is left to future work**, given the substantial architecture change and the training-
+> instability risk documented in §8.4 (L9, L10).
 
-Local FIM at nominal: normalised (α, η_col) = **−0.142** (slightly negative). The banana
-posterior only emerges at degraded values (α≈0.75, η_col≈0.80) where the snowball
-nonlinearity makes both faults drive F_R upward in the same direction. The linear FIM
-captures only local behaviour near the nominal — it cannot detect the nonlinear degeneracy
-that SBI discovers through global prior sampling.
+**7.2.3 (α, η_col) does NOT show a persistent joint degeneracy once the full feature set is used**
+
+Local FIM at nominal: normalised (α, η_col) = **−0.142** (slightly negative — no coupling
+at nominal). This pair was initially investigated as a headline candidate because both
+faults drive the recycle flow (F_R) upward via the snowball effect at degraded values
+(α≈0.75, η_col≈0.80), and a *restricted* identifiability scan using only F_R-derived
+summary features does reproduce an extended degenerate ridge in (α, η_col) space —
+reproducing the classic "banana" shape. **However**, a scan combining F_R with the
+column's own T_reb-derived features (both already part of the standard S-B measurement
+set) collapses this ridge to a much more localized region around the true value: the
+two individual channels' ambiguities run at different angles in (α, η_col) space, so
+combining them substantially resolves the pair using existing S-B instrumentation alone.
+This is corroborated by the calibrated S-B posterior itself, which shows a narrow η_col
+credible interval (90% CI width ≈ 0.01–0.02, essentially fixing η_col) with near-zero
+correlation to α (|corr| < 0.15) across several tested operating points — the opposite of
+banana-shaped. **Conclusion: (α, η_col) is not reported as a genuine joint
+non-identifiability in this paper** (see §8.4 L4 for the retraction and methodological
+note on why marginal SBC alone could not have caught this).
 
 **7.2.4 z_A0 is the most locally identifiable parameter**
 
@@ -734,16 +869,24 @@ Largest FIM diagonal: I_z_A0 = 2.15×10¹⁴ (vs. I_αα = 2.22×10¹³). Feed p
 the entire reactor steady state through the inlet composition — a decoupled signal not shared
 with other parameters.
 
-**7.2.5 S-A adds η_col information (+32% at nominal)**
+**7.2.5 S-A's local information gain for η_col is not the relevant comparison**
 
-S-A/S-B I_η_col ratio = 1.32× — the x_D measurement provides the only locally decoupled
-η_col signal. For α and β_r, S-A slightly *reduces* local identifiability (0.90× and 0.63×)
-because Loop 2 damps x_D variance. The 75% α posterior CI reduction in nb25 is a nonlinear
-effect at degraded values, not captured by the local FIM.
+S-A/S-B I_η_col ratio = 1.32× at nominal (x_D measurement provides some additional locally
+decoupled η_col signal) — this numeric ratio is retained for completeness, but it is not
+evidence for or against a S-A/S-B *banana resolution* claim, since (α, η_col) is not treated
+as a genuine banana in this paper (§7.2.3), and (α, β_r) is now also not treated as one at
+the 66-D summary-statistic level (§7.4, §8.1) — it is very likely a representation
+artifact. Both parameters are reactor-side only regardless; S-A's column composition
+analyser does not measure either reactor channel and would not be expected to help with
+either the (now-retracted) apparent confound or a genuine scalar masking effect, were one
+to be found (untested; flagged as future work, §8.4).
 
 **Figure 8:** 5×5 normalised FIM heatmaps (S-B left, S-A right). Source: nb23 §7.
 Key features: β_r and α both near-zero T_r contribution; high (α, β_r) off-diagonal (+0.901)
-showing joint confusion; η_col off-diagonal shifts positive under S-A (+0.195 vs −0.142).
+under the 66-D summary-statistic representation, but collapsing to ≈0.00 under the raw
+trajectory (§7.4) — very likely a representation artifact, not a genuine joint confound;
+η_col off-diagonal near-zero at nominal in both
+structures (−0.142 S-B, +0.195 S-A) — consistent with no persistent (α, η_col) degeneracy.
 
 ### 7.3 Snapshot fault classification (14 scenarios, posterior-mass approach)
 
@@ -752,56 +895,171 @@ posterior mass in fault-unit regions (same approach as PO §6.2 / nb11), not thr
 posterior mode. Fault units: healthy, reactor (α↓ or β_r↓), column (η_col↓ or ξ_reb↓),
 feed (z_A0↓), compound (multiple degraded).
 
-Key results (source: nb30 — fault classification notebook, to be created):
-- Reactor faults (W2–W6): high macro-F1; β_r class relies on T_j and Q_j channels
-- Column fault (W7): classification under S-B is unreliable (η_col posterior overconfident
-  under S-B, SBC p=0.0001; root cause: recycle_ratio/reb_intensity α-confounding; see §8.4 L5)
-- Compound faults (W12) under S-B: posterior mass splits between reactor and column fault
-  classes (high classification entropy) — this IS the correct answer, reflecting the banana
-  degeneracy. Under S-A: correctly classifies as compound.
-- Feed fault (W10, W13): identifiable in both structures via z_A shift
+Key results (source: `nb31_wu2003_fault_classification.ipynb`, executed 2026-07-05, against
+the calibrated seed-4 S-B posterior; S-A intentionally excluded per §8.4 L10). 14 closed-loop
+scenarios x 30 replicates x 200 posterior draws, same 0.85-relative-threshold posterior-mass
+convention as the PO system (nb11/§4.5), applied uniformly across all 5 parameters (one-sided
+for z_A0_eff since every feed fault in this taxonomy is lean, never rich). Ground-truth
+fault-unit labels come from `RecycleScenarioConfig.fault_unit()`, which was **corrected this
+session** (2026-07-05) from a scenario-*name* substring-matching rule (which silently
+mislabelled two scenarios, below) to a pure parameter-threshold rule matching this
+classifier's own counting logic (and the pre-existing pattern in `cstr_sbi.luyben`).
+
+**Overall: 87.4% accuracy, macro-F1 = 0.694** (per-class F1: healthy 0.667, reactor 0.948,
+column 1.000, feed 0.000, multi 0.854).
+
+- **Reactor faults (W2–W6, W11, W15): near-perfect** (F1 = 0.95, every replicate classifies
+  correctly). **Compound reactor fault (W11, α=0.80 & β_r=0.80): classifies correctly as
+  `reactor` in 30/30 replicates**, despite the underlying (α, β_r) posterior correlation of
+  0.998 (§7.4) — because α and β_r map to the *same* fault unit, the representation artifact
+  corrupts *parameter-level attribution* within the reactor unit but not *unit-level
+  detection*. This is the paper's clearest demonstration that §7.4's diagnostic finding,
+  while real, does not automatically propagate to every downstream task.
+- **Column fault (W7, W9): perfect** (F1 = 1.00) — confirms η_col/ξ_reb are well-identified
+  under the calibrated S-B posterior at the classification level too.
+- **Compound fault (W12, α=0.75 & η_col=0.80): classifies correctly as compound in 30/30
+  replicates, with zero reactor/column leakage** — confirms §7.2.3's retraction exactly as
+  predicted: since (α, η_col) is not a genuine joint degeneracy, S-B alone suffices.
+- **A `fault_unit()` labelling bug was found and fixed.** The original name-matching rule
+  mislabelled W15 (`multi`, via a "snowball" keyword, even though only α — not η_col=0.90 —
+  crosses the 15%-deviation threshold) and W13 (`reactor`, via a "cat_" keyword, even though
+  it has two genuinely degraded units: α=0.80 **and** z_A0_eff=0.80). After the fix: **W15
+  now classifies correctly in 30/30 replicates** (its corrected label matches what the
+  classifier already predicted); **W13's corrected `multi` label is classified correctly in
+  only 7/30 replicates (23%)** — a real weakness, not a labelling artifact, explained below.
+- **Feed fault (W10) and compound fault W13 are the weak points (feed F1 = 0.00; `multi`
+  F1 = 0.85, dragged down by W13), and the mechanism is a third representation artifact, not
+  a detection-power problem.** An initial diagnosis (posterior scatter at a single 2h window
+  comparable to the fault size, fixable by pooling evidence across windows) **is retracted**:
+  per-replicate z_A0_eff posterior estimates are actually precise (std ≈ 0.01), so pooling
+  would not move the mean. The real mechanism, confirmed via this paper's own noise-calibrated
+  FIM methodology (§7.2.2/nb29b §4): a genuine (α, z_A0_eff) near-degeneracy under
+  `compute_summaries` that is weak at the nominal point (off-diagonal ≈ -0.12) but jumps to
+  ≈ -0.89 — the same magnitude as the paper's own (α, β_r) headline number — the moment α is
+  degraded (checked at the W2 truth), and an analogous (β_r, z_A0_eff) coupling at the W5
+  truth (≈ -0.48). **Both collapse to ≈ -0.07 under the raw trajectory** — the identical
+  signature as the two already-documented (α, β_r) and (α, η_col) artifacts. z_A0_eff has no
+  analytical dependence on α or β_r in the plant's governing equations; the summary-statistic
+  representation conflates "a reactor fault is present" with "z_A0_eff has drifted" because
+  both perturbations move overlapping recycle/conversion-related features. Added to the
+  limitations table as **L4″** (§8.4) — a third instance of this paper's central
+  methodological finding (§8.1), not a new mechanism.
 
 **Figure 9:** Marginal posterior summaries — posterior mean ± 90% CI for all 5 parameters
 across 14 scenarios, side-by-side for S-A (left) and S-B (right). Source: nb24, nb25.
 
-**Table 9:** Per-scenario classification results (posterior-mass F1, 90% CI coverage) for
-both structures. η_col results include calibration caveat.
+**Table 10:** Per-scenario classification results (posterior-mass F1, 90% CI coverage),
+S-B only — S-A shown as a calibration-failure limitation, not a comparison (§8.4 L10). η_col
+results include the SBC calibration history (§8.4 L5). Source:
+`results/31_fault_classification_metrics.csv`, `results/31_classification_summary.json`.
 
-### 7.4 Headline: (α, η_col) banana posterior and EKF failure (W12 compound scenario)
+### 7.4 Headline: two apparent "banana" degeneracies, both artifacts of the observation representation
 
-**Scenario W12:** α = 0.75, η_col = 0.80 (catalyst decay + column efficiency loss).
-Under S-B (conventional instrumentation, no composition analyser):
+**This section was substantially revised on 2026-07-03, then again on 2026-07-05 — this is
+now the paper's final framing for this system, not a placeholder pending further work.**
+This project investigated two candidate joint (2-parameter) degeneracies in the recycle
+plant, in sequence, using progressively more rigorous checks. **Both failed to survive
+scrutiny — every joint degeneracy this paper investigated turned out to be an artifact of
+how the observation was represented, not a property of the plant.** This is the headline
+finding for the recycle system: not "here is a banana," but "here is why apparent bananas
+in closed-loop SBI need to be checked before they are reported, and how to check them."
+The one identifiability limitation in this plant that *is* genuine and representation-
+independent — reactor thermal faults masked by Loop-1 integral control — is a *scalar*
+reduction in information, structurally identical to the PO CSTR's β masking (§6.3, §8.1),
+not a manifold constraint between two different parameters.
 
-- Loop 1 holds T_r at setpoint → masks both β_r and α via the temperature channel
-- Both faults independently trigger the snowball (F_R increases in the same direction)
-- F_R increase is ambiguous: consistent with many (α, η_col) combinations along a curved
-  manifold in parameter space — the banana posterior
+**Candidate 1 — (α, η_col) at W12 (α=0.75, η_col=0.80): retracted, a restricted-channel
+artifact.** The original headline claimed a banana here, resolved by S-A (α CI width
+0.240→0.059, −75%). Investigation found:
+1. The apparent banana was reproduced only when the identifiability scan or the SBI
+   training features were restricted to F_R-derived information alone — a genuine but
+   narrow artifact of that restriction, not of the full S-B measurement set. Combining F_R
+   with the column's own T_reb-derived features (both already standard S-B instrumentation)
+   collapses the ridge to a localized region.
+2. The calibrated seed-4 S-B posterior shows η_col essentially pinned (90% CI width
+   0.01–0.02) with near-zero correlation to α (|corr| < 0.15) at every tested operating
+   point — the opposite of a banana.
+3. S-A calibration was never achieved (0 of 40 total seeds tested across two sessions
+   passed SBC — see §8.4 L10), so the previously-reported "75% CI width reduction" was an
+   artifact of an overconfident, uncalibrated posterior and cannot be re-derived from a
+   working S-A posterior at all.
+**The −75%/−80% numbers must not be cited anywhere in this paper.** The fix that worked:
+*combine a second already-available channel* — no new instrumentation, no representation
+change.
 
-**Actual SBI result (S-B):** Wide α posterior, CI width 0.240, 100% empirical coverage.
-The α dimension of the posterior correctly represents the irreducible ambiguity in the data.
-**Important caveat (from nb29):** the η_col dimension of the SBI posterior is overconfident
-(SBC p=0.0001) — the scatter in (α, η_col) space is a near-vertical stripe at η_col≈0.80,
-not a curved banana. The root cause is that `recycle_ratio` (corr=−0.977 with α) dominates
-the η_col information budget, confounding the two parameters. The *physical* banana manifolds
-are confirmed by the F_R iso-contour figure (nb26_banana_physics.png); the SBI approximates
-the α dimension of this manifold correctly but is miscalibrated in η_col.
-**Planned fix:** replace `reb_intensity` with `reb_per_boilup = Q_reb/V_norm` in the summary
-statistics, retrain with `zuko_nsf` (60 hidden, 3 transforms), verify η_col SBC improves.
+**Candidate 2 — (α, β_r) at W11 (α=0.80, β_r=0.80): appeared far more robust, retracted
+anyway, for a deeper reason.** Unlike Candidate 1, this pair survived every check performed
+*at the level of the 66-D hand-crafted summary-statistic representation*:
+- Loop 1 holds T_r at setpoint → masks both α and β_r via the temperature channel
+  (∂T_r_ss/∂α ≡ ∂T_r_ss/∂β_r ≡ 0, confirmed numerically in §7.2.1), removing the channel
+  that rescued α (via concentration) in the PO system.
+- FIM off-diagonal +0.901 at nominal (§7.2.2) — the strongest coupling in the whole 5×5
+  matrix.
+- Trained, calibrated seed-4 S-B posterior at the W11 truth: posterior mean α = 0.724 (true
+  0.80, 90% CI width 0.208), posterior mean β_r = 0.694 (true 0.80, 90% CI width 0.295),
+  **correlation(α, β_r) = +0.998**. For comparison, η_col at this scenario has 90% CI width
+  ≈ 0.006 and correlation with either α or β_r below 0.24 — confirming η_col is not
+  entangled and the confound is specific to (α, β_r).
+- A profile-distance identifiability scan shows the achievable best fit stays flat and low
+  across a wide β_r range at fixed α (and vice versa) — unlike Candidate 1, this survives
+  *combining the entire 66-D summary-feature set*, not just one restricted channel. At the
+  time, this was read as ruling out a Candidate-1-style artifact.
+- An executed EKF at W11 (`nb26`) achieves **0% coverage on both α and β_r** — taken alone,
+  this looked like the confirming result the section needed.
 
-**Actual SBI result (S-A):** α CI width narrows to 0.059 (−75%); posterior mean = 0.738
-(true = 0.750, error = 0.012). x_D measurement breaks the degeneracy. 93% coverage.
+**Why Candidate 2 still failed, one level deeper: it survives channel combination but not
+representation richness.** All of the checks above operate on the same 66-D whole-window
+summary statistics (`compute_summaries`) — none test whether the *degree of temporal
+aggregation itself* is discarding information, as opposed to the *choice of channels*. Two
+independent follow-up checks did test exactly that:
+1. **EKF tuning.** `nb26`'s EKF uses a very tight initial parameter covariance
+   (`P[6:,6:]≈1e-4`) that prevents it from moving far from its nominal initial guess within
+   one 2h window, regardless of what the data says — this alone, not the plant physics,
+   produces the 0% coverage above. Substituting a more diffuse covariance (`P[6,6]=0.05,
+   P[7,7]=0.02` — already used elsewhere in this project) on the *identical* noisy W11
+   window converges to within ~0.3% of the true (α, β_r), reproducibly across 15+ noise
+   seeds and 4 additional (α, β_r) points spanning the scan grid.
+2. **Raw-trajectory FIM.** Re-deriving this section's own §7.2.2 methodology
+   (`FIM = J^T Σ^{-1} J`, real noise-driven Σ) on the *raw, unaggregated* trajectory of the
+   same 3 observed channels (T_r, T_j, F_R_norm) — instead of the 66-D `compute_summaries`
+   feature set — collapses the (α, β_r) normalised off-diagonal from ≈0.6–0.85 (matching
+   this section's +0.901 number) to ≈0.00, reproducibly across noise seeds and at both the
+   nominal point and W11 (I_αα/I_β_r stays a mild ≈1.1–1.4×, confirming this is a
+   *collinearity* problem, not one parameter being individually weak). A negative control
+   rules out a cheap fix: a modestly finer time-resolution summary (6 sub-windows,
+   mean+std/channel, 108-D) shows **no** improvement (off-diagonal ≈0.6–0.86, indistinguishable
+   from the 66-D baseline) — the lost information is fine-grained transient *shape*, not
+   coarser-grained level/spread, so no incremental hand-crafted feature addition (of the
+   kind that fixed the unrelated η_col SBC issue in §7.1) is expected to fix this.
 
-**Actual EKF result (S-B):** α mean = 1.185 ± 0.084 (true = 0.75). **3% empirical
-coverage.** The EKF never moves away from nominal — the banana degeneracy gives no
-directional gradient for the Kalman update. This is not overconfidence; the EKF is
-pointing in the completely wrong direction. Near the snowball tipping point (W15, α=0.58),
-the EKF achieves 3% coverage (mean = 0.990, true = 0.58) — the linearisation is applied
-in entirely the wrong dynamical regime.
+**Both independent methods point the same direction, and neither required a single new
+sensor** — only less-aggregated use of the three channels already being measured. **We
+report this as strong, convergent evidence that (α, β_r), like (α, η_col), is an artifact
+of the observation representation rather than a physical property of the plant — but at
+one level deeper: a lossy-aggregation artifact rather than a restricted-channel artifact.**
+We explicitly do not claim to have fixed it: confirming this at the level of a trained,
+calibrated SBI posterior on a raw-trajectory-aware representation (a CNN/RNN embedding net,
+matching this paper's own §6.3.3/`nb04b` irreducibility-test methodology for the
+propylene-oxide system, where an analogous test *confirmed* rather than overturned a
+hand-crafted-feature limit) is left to future work, given the training-instability risk
+already documented for this system at a lower feature dimensionality (§8.4 L9, L10).
 
-**Figure 10:** (a) SBI joint (α, η_col) posterior under S-B (banana scatter + KDE contours);
-(b) S-A posterior (tight cluster near truth); (c) EKF Gaussian ellipses (centred near
-nominal, not truth); (d) coverage comparison bar chart: SBI S-B 100%, SBI S-A 93%,
-EKF 3%.  Source: nb26.
+**EKF result at W12/W15 (unrelated to either banana candidate, numbers stand):** at W12
+(α=0.75, η_col=0.80), EKF α mean = 1.185 ± 0.084 (true = 0.75), **3% empirical coverage**
+— the EKF never moves away from nominal under strong catalyst-decay snowball conditions.
+Near the snowball tipping point (W15, α=0.58), EKF achieves 3% coverage (mean = 0.990, true
+= 0.58). These are genuine, representation-independent demonstrations of EKF failure under
+strong nonlinear/snowball conditions — a different failure mode from either banana
+investigation above, and not affected by this section's reframing.
+
+**Figure 10 (redefined as the paper's diagnostic figure, replacing the retired banana
+scatter):** (a) FIM off-diagonal comparison bar chart — `compute_summaries` (66-D),
+`subwindow` (108-D), `raw_trajectory` (360-D), at nominal and W11, showing the collapse
+from ≈0.85 to ≈0.00 and the negative `subwindow` control; (b) the same EKF tuning
+(tight vs. diffuse covariance) on the identical W11 window, showing the 0%-coverage result
+flip to ~0.3% error; (c) for contrast, the Candidate-1 (α, η_col) restricted-vs-combined
+channel scan from §7.2.3, establishing that this paper found and correctly diagnosed two
+*different* mechanisms producing the same symptom. Source: `nb26`, `nb29b` §§3-4, `nb27` §9.
 
 ### 7.5 EKF baseline comparison
 
@@ -809,15 +1067,42 @@ Augmented EKF: 9-state vector [z_A, T_r, T_j, I_T, R_state, V_state, α, β_r, �
 Pure-numpy implementation with precomputed QSS column lookup table (avoids JAX OOM in
 the 720-step sequential loop). Observations used: T_r, T_j, F_R_norm.
 
-Actual findings:
+Actual findings (W12/W15, executed under the old framing — see §7.4 retraction for why
+these are no longer described as "banana" results, though the EKF numbers themselves stand):
 - Both methods show structural β_r and α bias (~0.10 downward for α; same mechanism as PO β)
-- **EKF completely fails** under banana conditions: 3% α coverage, mean estimate far from truth
+- **EKF completely fails** under strong catalyst-decay/snowball conditions: 3% α coverage
+  at W12, mean estimate far from truth
 - EKF near tipping point (W15): 3% coverage, mean 0.990 vs true 0.58
 - SBI W15: 100% coverage, CI [0.436, 0.608] correctly contains truth
+- EKF at W11: 0% coverage on both α and β_r (executed, `nb26`) — **explained in §7.4 as a
+  tuning artifact of that specific EKF configuration (tight initial parameter covariance),
+  not evidence for a physical banana** — the identical architecture with a more diffuse
+  covariance recovers ~0.3% error on the same data.
 
-**Figure 11:** SBI vs. EKF 30-day tracking for α, β_r with CI bands. Source: nb27 (pending).
+**30-day sequential tracking (executed, `nb27`):** α/β_r MAE, bias, 90% coverage —
 
-**Table 10:** Wu 2003 SBI vs. EKF — bias, MAE, coverage; snapshot comparison for W12, W15.
+| Param | Method | MAE | Bias | 90% Coverage |
+|---|---|---|---|---|
+| α | SBI | 0.048 | −0.048 | 0.15 |
+| α | EKF | 0.002 | +0.001 | 1.00 |
+| β_r | SBI | 0.198 | −0.198 | 0.12 |
+| β_r | EKF | 0.004 | +0.004 | 0.96 |
+
+**Correct framing for this table (final, per §7.4): "a differently-tuned model-based filter
+with raw-trajectory access outperforms an amortised posterior trained on compressed summary
+statistics"** — not "EKF beats SBI at the banana," and not "SBI structurally cannot compete
+with recursive filtering." It is the opposite of every other SBI-vs-EKF comparison in this
+paper, and `nb27` §9 traced the reversal to the EKF's raw-trajectory access plus tuning, not
+to sequential tracking resolving a genuine degeneracy. Read together with §7.4, this table
+is itself evidence *for* the representation-artifact finding, not a separate result: it
+shows a raw-trajectory-based estimator succeeding exactly where the summary-statistic-based
+one fails, at the same scenario the FIM diagnostic flags.
+
+**Figure 11:** SBI vs. EKF 30-day tracking for α, β_r with CI bands. Source: nb27 (executed;
+caption must include the caveat above, not just the raw table).
+
+**Table 10:** Wu 2003 SBI vs. EKF — bias, MAE, coverage; snapshot comparison for W11, W12,
+W15 (W11 executed — see above; caption needs the same caveat).
 
 ### 7.6 NUTS infeasibility for Wu 2003
 
@@ -827,9 +1112,13 @@ posterior geometry (banana manifold, wide β bias) creates mixing difficulties t
 does not resolve. For 5-D parameter spaces with recycle-coupled non-Gaussian posteriors,
 NUTS would face the same qualitative failure as EKF, compounded by exponentially slower
 mixing. MCMC is therefore neither fast enough nor reliable enough for this problem.
-SBI is the only method that is simultaneously: (a) fast (< 20 ms/window), (b) correct
-in posterior geometry (100% banana coverage), and (c) calibrated for the well-identified
-parameters (α).
+SBI is the only method that is simultaneously: (a) fast (< 20 ms/window), (b) correct in
+posterior geometry given whatever the observation representation actually supports — it
+reproduces a banana at (α, β_r) under the 66-D summary-statistic feature set precisely
+*because* that representation is genuinely collinear for those two parameters (§7.4), which
+is a form of correctness, not a failure, even though the representation itself turned out
+to be avoidably lossy — and (c) calibrated for the well-identified parameters (η_col, ξ_reb,
+z_A0).
 
 **Table 11:** Feasibility comparison — SBI vs. EKF vs. NUTS (infeasible + unreliable).
 
@@ -839,58 +1128,135 @@ parameters (α).
 
 ## 8. Discussion (~2 pages)
 
-### 8.1 Structural identifiability across scales
+### 8.1 Structural identifiability across scales: one genuine mechanism, two artifactual ones
 
-**Two systems, two distinct mechanisms, one unified theory.**
+**Two systems, one confirmed mechanism, and a cautionary tale about how easily a second,
+spurious mechanism can look confirmed too.**
 
-The propylene oxide CSTR illustrates the fundamental *single-loop* mechanism: the
-reactor temperature PI controller zeros ∂T_ss/∂β_r, removing the highest-SNR channel
-from β_r's information budget and giving I_β_r/I_α = 1/250–500. This is a scalar
-reduction: one parameter is harder to identify, but all parameters are identifiable
-in principle.
+The propylene oxide CSTR illustrates the fundamental *single-loop* mechanism: the reactor
+temperature PI controller zeros ∂T_ss/∂β_r, removing the highest-SNR channel from β_r's
+information budget and giving I_β_r/I_α = 1/250–500. This is a **scalar reduction**: one
+parameter is harder to identify, but all parameters are identifiable in principle. Critically,
+this is the one identifiability claim in the whole paper that was checked against a
+raw-signal representation (the §6.3.3 CNN-embedding irreducibility test) *before* being
+reported as physical, and it survived that check — confirming it is a genuine property of
+the plant and controller, not an artifact of the 29-D hand-crafted feature set.
 
-The Wu 2003 CSTR-column-recycle plant reveals a qualitatively different *multi-loop*
-mechanism: the recycle stream creates coupling between reactor and column faults that
-is not present in any single-unit analysis. α and η_col jointly determine the recycle
-flow magnitude through the snowball amplification — making them non-identifiable as
-a pair under conventional control. This is not a scalar reduction but a *manifold
-constraint*: the posterior is constrained to a curve (banana) rather than a point.
+The Wu 2003 CSTR-column-recycle plant reveals the **same scalar mechanism, transferring
+exactly**: Loop 1 zeros ∂T_r_ss/∂α and ∂T_r_ss/∂β_r simultaneously (§7.2.1), and this holds
+regardless of observation representation — it is an exact analytical statement about the
+plant's steady state, not a summary-statistic effect. One quantitative difference from PO
+is worth foregrounding: because Wu 2003 gives *neither* α nor β_r an independent rescue
+channel (unlike PO, where α keeps its concentration channel), masking reduces both
+parameters' information roughly *symmetrically* (I_αα/I_β_r ≈ 1.1–1.4×, confirmed under
+both the summary-statistic and the raw representation) — nowhere near PO's 250–500× — rather
+than singling one parameter out.
 
-**The identifiability hierarchy across both systems:**
-- β_r: masked by Loop 1 (temperature) in BOTH systems — I_β_r/I_α ≈ 1/250–500
-- (α, η_col): jointly constrained by recycle coupling — posterior is banana-shaped
-- ξ_reb: identifiable via Q_reb (Loop 3 output signal is the direct signature)
-- α alone: most identifiable — reaction heat signal in Q_c plus recycle flow change
-- z_A0: identifiable via steady-state shift in z_A and F_R
+**What Wu 2003 does *not* reveal, on rigorous re-examination, is a genuine joint (manifold)
+degeneracy between two different parameters.** Two candidates were investigated, in
+sequence, with progressively stricter checks — and **both failed, for two different
+reasons**:
+1. **(α, η_col) at W12** — a restricted-*channel* artifact. A banana is genuinely visible if
+   one restricts attention to the recycle flow (F_R) alone, but combining it with the
+   column's own T_reb signal (already standard S-B instrumentation) collapses the ridge.
+   Retracted (§7.2.3, §8.4 L4).
+2. **(α, β_r) at W11** — a lossy-*aggregation* artifact, one level deeper. This pair
+   survived combination of the *entire* 66-D summary-statistic feature set (unlike
+   Candidate 1), which at the time looked like confirmation it was physical. It is not: the
+   same Fisher-information methodology applied to the raw, unaggregated trajectory of the
+   same three already-observed channels collapses the coupling from ≈0.85 to ≈0.00, and a
+   negative control (modestly finer time-resolution summary statistics) rules out an easy
+   fix — the lost information is in fine-grained transient shape. Retracted (§7.4, §8.4
+   L4′), with the caveat that a trained, calibrated SBI posterior confirming this was not
+   attempted (see §8.4 L9/L10 for why that is a real, not just formal, limitation).
 
-This hierarchy is a practical design guideline for sensor placement: measurements of
-controller output signals (Q_c, Q_reb) are essential because they carry the information
-that process variable measurements (T_r, T_reb) hide under closed-loop control.
+**The general lesson, stated as this paper's central methodological finding:** in a
+closed-loop, multi-unit system, a *scalar* identifiability reduction (one parameter loses
+information because its highest-SNR channel is masked) is a robust, physical,
+representation-independent effect that survives arbitrarily rich observation access — we
+confirmed this twice, in two different systems, using an irreducibility test against a raw
+signal. A *manifold* degeneracy (two different parameters' effects appear collinear) is, in
+this study, **zero-for-three** at surviving the same kind of check. The third instance
+((α/β_r, z_A0_eff), §7.3/§8.4 L4″) was found by a different route than the first two — not
+by a direct identifiability scan, but as the explanation for an unexpected fault-
+classification failure (§7.3) — and re-derived the same FIM off-diagonal collapse
+(≈−0.89/−0.48 under `compute_summaries`, both degraded points, to ≈−0.07 under the raw
+trajectory) on the first check. **The three ways this study's candidates failed (channel
+restriction, aggregation, and now a downstream-task symptom) are different enough that a
+practitioner checking only for the first kind (e.g. "did I combine all my sensors?") could
+easily miss the others.** We recommend that any joint non-identifiability surfaced by a
+compressed-feature SBI or FIM analysis **— or any unexplained downstream-task failure that
+correlates with a specific parameter pair —** in a closed-loop system be checked against a
+raw-trajectory (or otherwise minimally-aggregated) Fisher-information test before being
+reported as physical or attributed to an unrelated cause (e.g. "detection power") — exactly
+the check that overturned Candidate 2 here and explained L4″, and the natural
+generalisation of the irreducibility-test methodology this paper already uses for scalar
+claims (§6.3.3) to joint ones.
 
-### 8.2 When EKF fails and SBI wins
+**Revised design guidance.** The original sensor-placement conclusion this section would
+have drawn — "install a reactor-side concentration or heat-duty analyser to resolve
+(α, β_r)" — does not survive this reframing: if the confound is a representation artifact,
+new instrumentation cannot fix it, because the missing information was never absent from
+the sensors, only from how their signal was compressed. **The higher-value, lower-cost
+intervention this plant's diagnosis calls for is feature engineering (raw-trajectory-aware
+summary statistics or an embedding net for the reactor-side channels), not new sensors** —
+a materially different, and for a plant operator considerably cheaper, recommendation than
+the one the original headline would have produced. Measurements of controller output
+signals (Q_c, Q_reb) remain essential for the *scalar* masking problem, which does require
+those specific channels — that guidance is unaffected by this reframing.
+
+### 8.2 When EKF fails, when SBI wins, and when the difference is really about the feature set
 
 EKF is an excellent industrial baseline when the posterior is approximately Gaussian —
 which holds for the propylene oxide system near the nominal operating point (all four
-methods show similar bias and comparable uncertainty). The EKF breaks down in two
-specific situations, both demonstrated in this paper:
+methods show similar bias and comparable uncertainty). This paper demonstrates three EKF
+failure/success modes; only one of them is best explained by "EKF cannot represent a
+non-Gaussian posterior":
 
-1. **Recycle-coupled non-Gaussian posteriors** (α, η_col banana under S-B): The
-   Gaussian assumption collapses a manifold constraint to an ellipse. **Empirical result:
-   EKF achieves 3% α coverage for W12 — it fails completely, not just underestimates
-   confidence.** EKF mean estimate = 1.185 vs true α = 0.75; the Kalman update has no
-   directional gradient to follow along the banana manifold.
+1. **A tuned-EKF pitfall at (α, β_r), W11 — not a Gaussian-collapse failure.** The
+   as-deployed augmented EKF achieves 0% coverage on both α and β_r at W11 (§7.4). The
+   originally-intended reading — "the Gaussian assumption collapses the genuine (α, β_r)
+   manifold to an ellipse" — does not hold up: §7.4 shows (α, β_r) is very likely not a
+   genuine manifold at all, and the identical EKF architecture with a more diffuse initial
+   parameter covariance converges to within ~0.3% of truth on the *same* data. **The
+   practical lesson is still real and still worth reporting, just different**: an EKF's
+   default/naive tuning can produce a confidently-wrong 0%-coverage result that looks
+   exactly like "the method has hit a fundamental non-Gaussian-posterior wall," when the
+   actual cause is a tuning choice interacting with a lossy observation representation. A
+   practitioner who only checks "does my EKF converge" (not "would a differently-tuned or
+   differently-fed EKF also converge") risks the same misdiagnosis this project made in an
+   earlier draft of this section.
 
-2. **Near the snowball tipping point** (W15, α=0.58): The Jacobian of the recycle
-   dynamics changes rapidly as α approaches the critical value. The EKF linearises
-   around its current estimate (~nominal, α≈1.0) — in entirely the wrong dynamical
-   regime. **Empirical result: EKF 3% coverage (mean = 0.990, true = 0.58). SBI: 100%
-   coverage, CI [0.436, 0.608].** SBI was trained across the full prior including
-   near-tipping samples and correctly widens its uncertainty in this regime.
+2. **Genuine non-Gaussian tracking under strong recycle nonlinearity** (W12 α=0.75; W15
+   α=0.58) — the paper's actual demonstrated EKF-fails/SBI-wins case. The Jacobian of the
+   recycle dynamics changes rapidly as α departs from nominal; the EKF linearises around
+   its current estimate (~nominal, α≈1.0) — in entirely the wrong dynamical regime.
+   **Empirical result: EKF achieves 3% coverage at both W12 (mean = 1.185, true = 0.75) and
+   W15 (mean = 0.990, true = 0.58). SBI W15: 100% coverage, CI [0.436, 0.608].** SBI was
+   trained across the full prior including near-tipping samples and correctly widens its
+   uncertainty in this regime. This failure mode is driven by snowball nonlinearity, not by
+   any joint parameter confound (that attribution is retracted, §7.4), and is unaffected by
+   this paper's reframing — it stands as the clean, representation-independent
+   demonstration of EKF's Gaussian-linearisation limits.
 
-The recommendation: SBI should be the primary inference method for any plant approaching
-recycle tipping-point conditions. EKF remains useful for real-time state estimation under
-near-nominal operation but should not be used for uncertainty quantification when
-non-Gaussian posteriors are possible (detectable via elevated EKF covariance trace).
+3. **A raw-trajectory-fed, correctly-tuned EKF outperforming SBI** (30-day tracking, §7.5)
+   — the mirror image of item 1, and further evidence for §7.4's diagnosis rather than a
+   counter-example to it: given the same three raw channels SBI's summary statistics
+   compress, and a covariance that does not artificially over-constrain it, the EKF
+   recovers (α, β_r) more precisely than the amortised posterior. This is not "EKF beats
+   SBI" in general — it is "a less-compressed representation beats a more-compressed one,"
+   and it happens to be the EKF, not SBI, that had raw-trajectory access in this
+   comparison.
+
+**The recommendation, revised:** SBI remains the right default for real-time, calibrated,
+non-Gaussian-aware fault diagnosis in this plant class, and is the only method demonstrated
+to degrade gracefully near recycle tipping points (item 2). But **this paper's stronger,
+more general recommendation is upstream of the EKF-vs-SBI choice**: before concluding that
+*either* method has hit a genuine non-Gaussian/joint-confound wall, check whether a
+richer, less-aggregated observation representation changes the answer (§8.1) — an EKF
+tuning artifact and an SBI summary-statistic artifact can both produce the same "0%
+coverage" or "posterior looks like a banana" symptom, for reasons that have nothing to do
+with the plant's physics.
 
 ### 8.3 Persistent excitation and open-loop recalibration
 
@@ -913,37 +1279,77 @@ calibration constant, derived from the Fisher information analysis.
 | L1 | Synthetic data only | Both systems | Real data as future work; model mismatch study deferred |
 | L2 | β bias −0.08 to −0.15 | Propylene oxide | Quantified; predictable; recalibration via OL excitation |
 | L3 | α bias ~0.10 downward under S-B | Wu 2003 | Same structural mechanism as L2; reported in §7.3 |
-| L4 | (α, η_col) partial non-identifiability (banana) | Wu 2003 S-B | The banana is a genuine physical degeneracy (confirmed by F_R iso-contours); SBI correctly represents wide α uncertainty (100% coverage); η_col dimension is overconfident (see L5) |
-| L5 | η_col posterior overconfident under S-B (SBC p=0.0001) | Wu 2003 S-B | Root cause: `recycle_ratio` (corr −0.977 with α) and `reb_intensity` (corr +0.642) confound η_col signal; NSF pins η_col near training mean. The banana scatter is a near-vertical stripe, not curved. α results unaffected. |
+| L4 | **RETRACTED (2026-07-03): (α, η_col) is not a genuine partial non-identifiability** | Wu 2003 S-B | Originally reported as a banana confirmed by F_R iso-contours. Retracted: an identifiability scan combining F_R with T_reb (both standard S-B channels) shows the degeneracy collapses to a localized region, not an extended ridge; the calibrated seed-4 posterior shows η_col essentially pinned (90% CI ≈0.01–0.02) with near-zero correlation to α at every tested point. The F_R-only restriction that originally suggested a banana is not representative of the full S-B measurement set. The next candidate investigated, (α, β_r), is *also* now retracted for a related but distinct reason — see L4′ below; this plant's only confirmed genuine identifiability limitation is the scalar β_r/α masking discussed in §7.2/§8.1, not a joint confound. **Methodological note:** this was not caught by the marginal SBC pass for seed 4, because marginal SBC (rank uniformity averaged over the whole prior) does not test whether the *joint* posterior at any one specific scenario has the correct shape — a necessary-but-not-sufficient distinction worth flagging for the SBI community generally. |
+| L4′ | **RETRACTED (2026-07-05, final): (α, β_r) banana is very likely a summary-statistic aggregation artifact, like L4 above but one level deeper** | Wu 2003, both S-A and S-B | Originally reported as confirmed by (a) FIM off-diagonal +0.901 at nominal (§7.2.2), (b) an identifiability scan showing the degeneracy survives combination of the full S-B *summary-statistic* feature set, (c) the calibrated seed-4 posterior showing correlation(α, β_r) = 0.998 at W11, (d) an executed EKF at W11 (0% coverage). **Two independent counter-results, both using this paper's own established methodology**: (i) the W11 EKF failure reproduces exactly if its tuning is copied, but converges to ~0.3% error if a more diffuse (already-used-elsewhere-in-this-project) covariance is substituted on the identical data, robust across 15+ seeds and 4 additional grid points; (ii) re-deriving §7.2.2's own FIM methodology on the *raw, unaggregated* trajectory of the same 3 observed channels (not the 66-D summary statistics) collapses the normalised off-diagonal from ≈0.6–0.85 to ≈0.00, reproducibly across seeds and at both nominal and W11 (I_αα/I_β_r stays ≈1.1–1.4× throughout, confirming this is a collinearity problem, not an individual-parameter weakness). A negative control (a 108-D sub-window summary — 6× finer time resolution, same channels) shows **no** improvement, ruling out an easy hand-crafted-feature fix. **This mirrors L4's retraction pattern** (a restricted/compressed view mistaken for a physical limit) but one step further removed — a lossy-*aggregation* artifact rather than a restricted-*channel* artifact, requiring raw-trajectory or embedding-net access to resolve rather than combining an additional already-available channel. **Deliberately not pursued further**: confirming this at the level of a trained, calibrated SBI posterior on a raw-trajectory-aware representation (the decisive test, matching §6.3.3/`nb04b`'s methodology) was considered and explicitly not attempted, given the substantial architecture change required and this project's own documented SNPE training-instability at the current, lower feature dimensionality (L9, L10) — attempting and failing to train such a posterior would be a worse outcome for this paper than reporting the diagnostic finding on its own merits. **Report as: strong, convergent, two-independent-method evidence that this pair is an artifact, with the practical fix (feature engineering, not new sensors) identified but not implemented.** See `HANDOFF.md` "Finding 9" for full detail. |
+| L4″ | **A third representation artifact: (α/β_r, z_A0_eff) near-degeneracy under `compute_summaries`, discovered via fault classification** | Wu 2003 S-B | `nb31` (2026-07-05): posterior-mass fault classification across 14 scenarios x 30 replicates found feed-fault detection unreliable (F1 = 0.00 for W10; `multi` F1 dragged to 0.85 by W13) — initially misdiagnosed in-notebook as a single-window detection-*power* problem (posterior scatter comparable to fault size, fixable by pooling across windows). **That diagnosis is retracted**: per-replicate z_A0_eff posterior means are precise (std ≈0.01), so pooling would not move the estimate. Re-deriving this paper's own noise-calibrated FIM methodology (§7.2.2/L4′) for (α, z_A0_eff) and (β_r, z_A0_eff) instead: off-diagonal is weak at nominal (≈−0.12) but jumps to ≈−0.89 (α degraded, W2 truth) and ≈−0.48 (β_r degraded, W5 truth) under `compute_summaries` — matching the magnitude of the L4′ (α, β_r) headline number — and **collapses to ≈−0.07 under the raw trajectory in both cases**, the identical signature as L4/L4′. z_A0_eff has no analytical dependence on α or β_r in the plant's governing equations; the summary-statistic representation conflates "a reactor fault is present" with "z_A0_eff has drifted" via overlapping recycle/conversion-related features. **Not a new mechanism — a third confirming instance of L4/L4′'s pattern**, found this time via its effect on a downstream task (classification) rather than via a direct identifiability scan. Fix, if pursued: same raw-trajectory-aware representation change identified for L4′, not implemented (same L9/L10 training-instability risk). |
+| L5 | η_col posterior overconfidence — **status changed from "unresolved" to "resolved for S-B, marginally"** | Wu 2003 S-B | The 8-seed-ensemble/multi-N-SBC-corroboration procedure (seed 4, confirmed at N=200/400/800) resolves the marginal SBC failure previously reported at SBC p=0.0001. **However**, per L4 above, this marginal pass does not by itself certify the joint (α, η_col) posterior shape at any specific scenario — that required the separate identifiability-scan verification in §7.2.3. Report both: the marginal calibration fix, and the joint-shape verification methodology, as this session's actual resolution path (not the originally-attempted `reb_per_boilup` feature fix alone, which was necessary but shown insufficient on its own — see L9). |
 | L6 | SBC mild miscalibration (KS p=0.016) | Propylene oxide | Structural, not a training deficiency |
 | L7 | QSS column shortcut unstable for η_col < 0.80 | Wu 2003 | W8, W14 removed; η_col=0.80 covers headline scenario |
 | L8 | No real-time deployment tested | Both | SCADA integration is future work |
-| Note | ξ_reb peaked SBC histogram (S-A) was a rejection sampling artifact | Wu 2003 S-A | With `reject_outside_prior=False`, ξ_reb SBC p=0.146 — well-calibrated. The peaked histogram reflected sbi's rejection sampler failing when posterior concentrates away from prior center, not a genuine calibration problem. |
+| L9 | SNPE training is seed-unstable for the Wu 2003 5-param / 66-72D-summary posteriors | Wu 2003 S-A and S-B | Identical training data + architecture, only the random seed differs, produces SBC pass/fail flips (e.g. η_col p=0.96 vs p=0.0000). 90% CI coverage stays near-nominal regardless, so it cannot detect this — only rank-uniformity SBC does. The working mitigation adopted for S-B: an 8-seed ensemble with multi-N (200/400/800) SBC corroboration before promoting any posterior — see L5. This mitigation was necessary but, per the extensive S-A search (L10), not always sufficient. |
+| L10 | **S-A calibration is a settled, unresolved negative result** | Wu 2003 S-A | 0 of 40 total trained posteriors passed SBC at N=400 across two sessions: 16 seeds at the production architecture (zuko_nsf 60/3), plus 24 further seeds testing PCA feature-dimension reduction (15/25 components) and both larger (80/5, 128/5) and smaller (30/2, 40/2) architectures. Larger networks performed *worse* than the production 60/3 (some showed uniform miscalibration across all 5 parameters, consistent with overfitting on the 15k-sample bank), ruling out "network too small" as the explanation. Root cause not identified; most consistently failing parameters are η_col and ξ_reb, plausibly because S-A's composition-control loops (R→x_D, V→x_B) actively suppress exactly the signal SNPE needs to learn for these two parameters. **Do not use any S-A posterior for a quantitative claim in this paper.** The qualitative x_D-breaks-a-degeneracy argument may still be usable via the physical iso-contour figure (simulator-only, no trained posterior involved) if a suitable degeneracy is later found where S-A is relevant — not the case for the current (α, β_r) headline, which is reactor-side. |
+| Note | ξ_reb peaked SBC histogram (S-A) was a rejection sampling artifact | Wu 2003 S-A | With `reject_outside_prior=False` (superseded terminology in sbi 0.24 — direct sampling is now the default), ξ_reb SBC p=0.146 in one run — but per L10, S-A training instability means this single result should not be treated as a settled calibration claim either. |
 
 ---
 
 ## 9. Conclusion (~0.5 pages)
 
-Restate the four contributions with their quantitative outcomes:
+Restate the contributions with their quantitative outcomes:
 
 1. For the propylene oxide CSTR: I_αα/I_ββ = 250–500×; confirmed irreducible by
-   4-method agreement and CNN embedding experiment; macro-F1 = 0.990 despite structural
-   bias; 30-day tracking with SBI processing 720 windows in seconds.
+   4-method agreement and a raw-time-series CNN-embedding experiment that bypasses
+   hand-crafted features entirely; macro-F1 = 0.990 despite structural bias; 30-day
+   tracking with SBI processing 720 windows in seconds.
 
-2. For the Wu 2003 CSTR-column-recycle plant: β_r masking persists unchanged from
-   System I (I_β_r/I_α ≈ 1/250–500); recycle coupling creates (α, η_col) banana posterior
-   under S-B — SBI correctly captures it (100% α coverage); adding a composition analyser
-   (S-A, ≈ B-2) reduces α CI width by 75%; EKF achieves 3% coverage and fails completely.
+2. For the Wu 2003 CSTR-column-recycle plant, the same masking mechanism transfers exactly
+   (∂T_r_ss/∂α ≡ ∂T_r_ss/∂β_r ≡ 0, an analytical, representation-independent fact), but with
+   a materially different quantitative signature: it reduces both α's and β_r's information
+   roughly *symmetrically* (I_αα/I_β_r ≈ 1.1–1.4×, confirmed under both compressed and raw
+   representations) rather than singling one out as in PO (250–500×), because Wu 2003 gives
+   neither parameter an independent rescue channel.
 
-3. The banana posterior is a fundamental failure mode for both EKF and MCMC: EKF collapses
-   it to a Gaussian ellipse in the wrong location (mean 1.185 vs true 0.75); MCMC
-   convergence is unreliable at this scale. SBI is the only method that is simultaneously
-   fast (<20 ms/window), correct in posterior geometry (100% banana coverage), and
-   calibrated for the well-identified parameters.
+3. **Two candidate joint (2-parameter) degeneracies were investigated in the recycle plant,
+   and both were found to be artifacts of the observation representation rather than
+   physical properties of the plant — the paper's central methodological finding.**
+   (α, η_col) at W12 was a restricted-*channel* artifact: a banana visible only when the
+   recycle flow (F_R) is considered in isolation, resolved by combining an already-available
+   second channel (T_reb), with no new instrumentation. (α, β_r) at W11 appeared far more
+   robust — surviving combination of the *entire* 66-D hand-crafted summary-statistic
+   feature set (FIM off-diagonal +0.90, trained-posterior correlation 0.998) — but is a
+   lossy-*aggregation* artifact one level deeper: the identical Fisher-information
+   methodology applied to the raw, unaggregated trajectory of the same three
+   already-observed channels collapses the coupling to ≈0.00, corroborated independently by
+   a re-tuned EKF recovering both parameters to ~1-2% accuracy on data the summary-statistic
+   representation calls non-identifiable. A negative control rules out an easy fix: modestly
+   finer time-resolution summary statistics do not help. We report this as strong,
+   convergent evidence, explicitly without a trained, calibrated SBI posterior confirming it
+   at the raw-trajectory level — that retrain was considered and deliberately not attempted,
+   given this system's documented SNPE training instability, and is left to future work.
 
-Forward-looking statement: extension to MPC-controlled plants (stronger masking);
-integration with digital twins and plant historians; active experiment design for
-scheduled open-loop excitation; multi-plant transfer learning with shared priors.
+4. **The general lesson we draw is a diagnostic recommendation for the field, not just a
+   correction to our own earlier claims**: in closed-loop, multi-unit SBI applications, a
+   *scalar* identifiability reduction (masking of one parameter's primary channel) is a
+   robust effect that survives arbitrarily rich observation access — confirmed twice here,
+   via an irreducibility test in each system. A *joint/manifold* degeneracy surfaced by a
+   compressed-feature SBI or FIM analysis should be treated as provisional and checked
+   against a raw-trajectory (or otherwise minimally-aggregated) Fisher-information test
+   before being reported as physical; in this study, every such candidate failed that check.
+   This reframes the plant's design guidance from sensor placement (a new analyser, which
+   would not have fixed a representation artifact) to feature engineering (less lossy use of
+   the sensors already in place) — a cheaper, more broadly applicable intervention.
+   Separately, EKF fails under strong catalyst-decay/snowball nonlinearity (3% coverage at
+   two tested scenarios) — a genuine, representation-independent failure mode distinct from
+   either banana investigation, and the clearest demonstration in this paper of where SBI's
+   correct non-Gaussian handling earns its computational cost.
+
+Forward-looking statement: training a raw-trajectory-aware (CNN/RNN embedding) SBI posterior
+for Wu 2003 to confirm the (α, β_r) diagnosis at the level of calibrated posterior coverage,
+and to establish whether the resulting architecture trains any more stably than the current
+hand-crafted-feature networks; a general audit of other published closed-loop SBI/FIM
+"banana" claims against the raw-trajectory check proposed here; extension to MPC-controlled
+plants (stronger masking); integration with digital twins and plant historians; active
+experiment design for scheduled open-loop excitation; multi-plant transfer learning with
+shared priors.
 
 ---
 
@@ -957,10 +1363,11 @@ scheduled open-loop excitation; multi-plant transfer learning with shared priors
 | 4 | CNN embedding vs. hand-crafted (PO) | nb04b | §6.3.3 |
 | 5 | 4-method baseline dashboard (PO) | nb16 | §6.4 |
 | 6 | 30-day tracking with CI bands (PO) | nb10, nb16 | §6.5 |
-| 7 | SBC for 5 parameters under S-A and S-B (Wu 2003) | nb23 | §7.1 |
-| 8 | 5×5 Fisher information heatmap showing (α, η_col) coupling and β_r near-zero | nb24 | §7.2.1 |
-| 9 | Marginal posteriors 16 scenarios, S-A vs. S-B side-by-side | nb24 | §7.3 |
-| 10 | Headline: (α, η_col) banana (S-B) vs. narrow (S-A) vs. EKF ellipse; coverage chart | nb24, nb26 | §7.4 |
+| 7 | SBC for 5 parameters, S-B calibrated (seed 4) + S-A failure evidence | nb23, nb24, nb25 | §7.1 |
+| 8 | 5×5 Fisher information heatmap showing (α, β_r) coupling (+0.90) and T_r near-zero | nb24 | §7.2.1-2 |
+| 9 | Marginal posteriors 14 scenarios, S-B calibrated (S-A shown as uncalibrated/limitation only) | nb24, nb25 | §7.3 |
+| 10 | Headline: (α, β_r) banana at W11 (S-B posterior scatter) vs. EKF (pending) | nb26 (full rewrite) | §7.4 |
+| 10b | (retired figure) F_R-only vs. combined-feature identifiability scan for (α, η_col) — supports the retraction | new notebook (TBD) | §7.2.3 |
 | 11 | SBI vs. EKF 30-day tracking for α, β_r, η_col with CI bands | nb27 | §7.5 |
 | 12 | NUTS timing comparison and monitoring cadence feasibility | nb26 | §7.6 |
 
@@ -981,8 +1388,8 @@ All figures: 300 dpi minimum, double-column compatible, colour-blind palette (vi
 | 7 | PO per-scenario classification results | §6.2 |
 | 8 | 4-method baseline comparison (SBI, NUTS, EKF, UKF) | §6.4 |
 | 9 | PO 30-day tracking phase metrics | §6.5 |
-| 10 | Wu 2003 per-scenario classification results (S-A vs. S-B) | §7.3 |
-| 11 | Wu 2003 SBI vs. EKF comparison — bias, MAE, coverage, F1 | §7.5 |
+| 10 | Wu 2003 per-scenario classification results (S-B calibrated; S-A shown only as a calibration-failure limitation, not a comparison) | §7.3 |
+| 11 | Wu 2003 SBI vs. EKF comparison — bias, MAE, coverage, F1 (W11, W12, W15) | §7.5 |
 | 12 | Monitoring cadence feasibility: SBI vs. EKF vs. NUTS | §7.6 |
 | 13 | Wu 2003 model mismatch robustness | §7.7 |
 
@@ -1009,16 +1416,44 @@ All figures: 300 dpi minimum, double-column compatible, colour-blind palette (vi
 - [x] 30-day tracking with MAE/CRPS (nb10)
 - [x] Analytical bias derivation (bias_explanation_2.md)
 
-**Required before submission:**
+**Required before submission (revised 2026-07-03 — see HANDOFF.md for the full session log):**
 - [x] Wu 2003 nb20-nb28 implementation and execution (done)
-- [ ] FIM analysis block in nb23 §7 (5×5 FIM heatmap — Figure 8)
-- [ ] nb30: Wu 2003 fault classification notebook (posterior-mass approach, §7.3)
-- [ ] nb27 sequential tracking results (currently executing; update §7.5/Figure 11/Table 10)
-- [ ] SBC p-value for η_col confirmed and limitation statement added to §7.3/§8.4
+- [x] S-B calibration resolved: 8-seed ensemble + multi-N (200/400/800) SBC corroboration,
+      seed 4 promoted, all 5 parameters pass
+- [x] S-A calibration exhaustively attempted and confirmed as a settled negative result
+      (40 seeds across two sessions); reported as limitation L10, not pursued further
+- [x] (α, β_r)/(α, η_col) identifiability scans formalised into a notebook (`nb29b`) —
+      produced Figure 10's supporting evidence and the Figure 8/10b F_R-only vs.
+      combined-feature comparison
+- [x] EKF run at W11, W12, W15 (`nb26`) — including the tight-vs-diffuse tuning follow-up
+      that overturned the original 0%-coverage reading (`nb27` §9)
+- [x] FIM analysis block in nb23 §7 (5×5 FIM heatmap — Figure 8), re-derived on the raw
+      trajectory in `nb29b` §4 — relabelled to emphasise (α, β_r), then retracted (§7.4)
+- [x] nb26 (headline banana/EKF figure) — full rewrite around W11/(α,β_r); old
+      W12/(α,η_col) framing retired
+- [x] nb27 sequential tracking re-executed with the calibrated seed-4 S-B posterior
+- [x] nb24/nb25 Assessment cells reflect the (α, β_r) finding
+- [x] nb29 (η_col SBC investigation) follow-up note added: the original confound
+      diagnosis/fix stand, but the interpretive claim about what a narrow η_col posterior
+      means was corrected (narrow-and-honest is the correct answer, per `nb29b`)
+- [x] nb30: claims-and-conclusions synthesis notebook (styled like nb14), covering
+      nb20-nb29b, nb31, and the finding that all three candidate joint degeneracies found in
+      this system ((α,η_col), (α,β_r), (α/β_r,z_A0_eff)) are representation artifacts —
+      `notebooks/30_wu2003_claims_and_conclusions.ipynb`, executed 2026-07-05
+- [x] nb31: Wu 2003 fault classification notebook (posterior-mass approach, §7.3) —
+      `notebooks/31_wu2003_fault_classification.ipynb`, executed 2026-07-05, then re-executed
+      same day after fixing a `fault_unit()` labelling bug (§8.4 L4″ note) and adding a FIM
+      investigation (§6b). Final: 87.4% accuracy, macro-F1 0.694; W11 confirmed to classify
+      correctly (30/30, `reactor`) despite the (α, β_r) representation artifact — framed
+      explicitly as a worked example of the artifact diagnostic (§8.1), not as confirmation
+      of a physical banana. Surfaced a third representation artifact, (α/β_r, z_A0_eff),
+      confirmed by FIM and added to §8.4 as **L4″** (feed F1=0.00; not a detection-power
+      issue as first suspected — see §7.3)
 - [ ] All figures regenerated at publication quality (300 dpi, double-column)
 - [ ] Nomenclature table with every symbol (C&ChE requirement)
-- [ ] Highlights updated (3-5 bullets, ≤85 chars — EKF 3% coverage as headline)
-- [ ] Abstract rewritten with corrected EKF/MCMC framing
+- [ ] Highlights updated (3-5 bullets, ≤85 chars — done this session, verify final wording)
+- [ ] Abstract rewritten with corrected EKF/MCMC framing (done this session, verify against
+      final W11 EKF numbers once that run completes)
 - [ ] No undefined acronyms in abstract
 - [ ] Ljung (1977), Gevers et al. (2011), Forssell & Ljung (1999), Luyben (1994) cited
 - [ ] Fault classification framed as "label-free" not "unsupervised"

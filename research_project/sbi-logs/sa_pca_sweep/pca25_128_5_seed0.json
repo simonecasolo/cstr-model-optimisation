@@ -1,0 +1,35 @@
+{
+  "label": "pca25_128_5_seed0",
+  "pca_key": "pca25",
+  "pca_dim": 25,
+  "arch_key": "128_5",
+  "hidden_features": 128,
+  "num_transforms": 5,
+  "seed": 0,
+  "train_time_s": 110.10552287101746,
+  "n_sbc": 400,
+  "min_ks_pvalue": 0.0009220330105526328,
+  "passed": false,
+  "sbc": {
+    "alpha": {
+      "ks_pvalue": 0.08419590134115074,
+      "mean_rank_frac": 0.4970875
+    },
+    "beta_r": {
+      "ks_pvalue": 0.06511748679419549,
+      "mean_rank_frac": 0.5258875
+    },
+    "eta_col": {
+      "ks_pvalue": 0.0009220330105526328,
+      "mean_rank_frac": 0.4529875
+    },
+    "xi_reb": {
+      "ks_pvalue": 0.015493137121690035,
+      "mean_rank_frac": 0.45655
+    },
+    "z_A0_eff": {
+      "ks_pvalue": 0.008130081546801724,
+      "mean_rank_frac": 0.5405375
+    }
+  }
+}

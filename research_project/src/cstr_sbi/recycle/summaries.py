@@ -60,7 +60,7 @@ PHYSICS_FEATURE_NAMES = [
     "UA_proxy",          # Q_j / max(T_r - T_j, 1e-3) → encodes beta_r
     "recycle_ratio",     # F_R_norm / F_R_NOM → encodes alpha (snowball) + eta_col
     "col_recovery",      # F_B_norm / (F_R_norm + 1) → alpha × eta_col combined
-    "reb_intensity",     # Q_reb / F_R_norm → xi_reb (reboiler effort per throughput)
+    "reb_per_boilup",    # Q_reb / V_norm → column heat per boilup unit, eta_col-specific
     "recycle_excess",    # F_R_norm - 1 → snowball severity
     "Tr_Tj_ratio",       # T_r / T_j → encodes beta_r
     "Qj_slope",          # slope of Q_j → transient alpha response
@@ -144,8 +144,9 @@ def physics_features(raw: np.ndarray, t: np.ndarray | None = None) -> np.ndarray
     # 3. Column recovery proxy: F_B_norm / (F_R_norm + F_B_norm)
     col_recovery = np.mean(F_B_n / np.maximum(F_R_n + F_B_n, 1e-3))
 
-    # 4. Reboiler intensity: Q_reb / F_R_norm (per unit recycle load)
-    reb_intensity = np.mean(Q_reb / np.maximum(F_R_n, 0.1)) / QREB_NOM
+    # 4. Reboiler duty per boilup unit: Q_reb / V_norm (eta_col-specific, avoids
+    #    F_R_norm/alpha confounding present in the old reb_intensity feature)
+    reb_per_boilup = np.mean(Q_reb / np.maximum(V_norm * QREB_NOM, 1e3))
 
     # 5. Recycle excess relative to nominal
     recycle_excess = np.mean(F_R_n) - 1.0
@@ -177,7 +178,7 @@ def physics_features(raw: np.ndarray, t: np.ndarray | None = None) -> np.ndarray
     corr_Rn_Vn = _safe_corr(R_norm, V_norm)
 
     return np.array([
-        UA_proxy, recycle_ratio, col_recovery, reb_intensity,
+        UA_proxy, recycle_ratio, col_recovery, reb_per_boilup,
         recycle_excess, Tr_Tj_ratio, Qj_slope, Vn_final, Rn_final,
         corr_Qj_FR, corr_Qreb_FR, corr_Rn_Vn,
     ], dtype=np.float32)
@@ -202,6 +203,21 @@ def _safe_corr(a: np.ndarray, b: np.ndarray) -> float:
 # Full summary vector
 # ---------------------------------------------------------------------------
 
+def _compress_heavy_tails(x: np.ndarray) -> np.ndarray:
+    """Signed log1p compression to tame heavy-tailed summary statistics.
+
+    Raw-unit channels (Q_j, Q_reb, UA_proxy) and channel stats for near-runaway
+    prior draws (T_r, T_j, V_norm) span many orders of magnitude with a handful
+    of extreme outliers (>10x IQR). sbi's mean/std z-scoring is dominated by
+    these outliers, which destabilises SNPE flow training in a seed-dependent
+    way (identical data/architecture, different random init -> pass/fail SBC).
+    A variance-stabilising signed-log compression preserves sign and ordering
+    while bounding outlier influence, applied uniformly so downstream code
+    doesn't need to track which dimensions were heavy-tailed.
+    """
+    return np.sign(x) * np.log1p(np.abs(x))
+
+
 def compute_summaries(
     raw: np.ndarray,
     structure: str = "S-B",
@@ -217,7 +233,8 @@ def compute_summaries(
 
     Returns
     -------
-    (66,) for S-B  or  (72,) for S-A  float32 summary vector
+    (66,) for S-B  or  (72,) for S-A  float32 summary vector, signed-log
+    compressed (see _compress_heavy_tails).
     """
     if structure == "S-A":
         obs = raw[:, SA_INDICES]
@@ -228,7 +245,8 @@ def compute_summaries(
 
     chan_stats = channel_summaries(obs, t)
     phys_feats = physics_features(raw, t)
-    return np.concatenate([chan_stats, phys_feats]).astype(np.float32)
+    summary = np.concatenate([chan_stats, phys_feats]).astype(np.float32)
+    return _compress_heavy_tails(summary)
 
 
 def compute_summaries_batch(

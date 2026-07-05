@@ -1,0 +1,59 @@
+{
+  "accuracy": 0.8738095238095238,
+  "macro_f1": 0.6936502230976789,
+  "per_class_f1": {
+    "healthy": 0.6666666666666666,
+    "reactor": 0.9480812641083521,
+    "column": 1.0,
+    "feed": 0.0,
+    "multi": 0.8535031847133758
+  },
+  "confusion_matrix": [
+    [
+      30,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      210,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      60,
+      0,
+      0
+    ],
+    [
+      30,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      23,
+      0,
+      0,
+      67
+    ]
+  ],
+  "class_names": [
+    "healthy",
+    "reactor",
+    "column",
+    "feed",
+    "multi"
+  ],
+  "n_scenarios": 14,
+  "n_replicates_per_scenario": 30,
+  "n_posterior_samples_per_replicate": 200,
+  "threshold": 0.85
+}

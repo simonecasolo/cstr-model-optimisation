@@ -49,27 +49,34 @@ class RecycleScenarioConfig:
             dtype=jnp.float32,
         )
 
-    def fault_unit(self) -> str:
-        """Primary degraded unit for hierarchical classification."""
-        n = self.name
-        if "healthy" in n:
+    def fault_unit(self, thresh: float = 0.90, z0_tol: float = 0.05) -> str:
+        """Primary degraded unit for hierarchical classification.
+
+        Derived purely from parameter deviations (no name-substring matching) --
+        counts how many of the 3 units (reactor/column/feed) are degraded and
+        returns "multi" for 2+. This mirrors the counting logic in
+        `nb31_wu2003_fault_classification.ipynb`'s posterior-mass classifier
+        (`sample_fault_unit`) and the existing pattern in
+        `cstr_sbi.luyben.scenarios.LuybenScenarioConfig.fault_unit`, which never used
+        name matching. An earlier name-substring-based version of this method
+        mislabelled W15 (`multi` via a "snowball" keyword match, despite its
+        eta_col=0.90 deviation being below `thresh`) and W13 (`reactor` via a "cat_"
+        keyword match, despite it having two degraded units, alpha and z_A0_eff) --
+        see HANDOFF.md for the corroborating investigation.
+        """
+        reactor_bad = self.alpha < thresh or self.beta_r < thresh
+        column_bad  = self.eta_col < thresh or self.xi_reb < thresh
+        feed_bad    = abs(self.z_A0_eff - float(Z0_NOM)) > z0_tol
+        n_bad = int(reactor_bad) + int(column_bad) + int(feed_bad)
+        if n_bad == 0:
             return "healthy"
-        if "cat_" in n or "jacket_" in n or "reactor_" in n:
-            return "reactor"
-        if "col_" in n or "reb_" in n:
-            return "column"
-        if "feed_" in n:
-            return "feed"
-        if "snowball" in n or "multi" in n:
+        if n_bad >= 2:
             return "multi"
-        # fallback: check parameter deviations
-        if self.alpha < 0.90 or self.beta_r < 0.90:
+        if reactor_bad:
             return "reactor"
-        if self.eta_col < 0.90 or self.xi_reb < 0.90:
+        if column_bad:
             return "column"
-        if abs(self.z_A0_eff - float(Z0_NOM)) > 0.05:
-            return "feed"
-        return "healthy"
+        return "feed"
 
 
 _Z0 = float(Z0_NOM)   # 0.90
