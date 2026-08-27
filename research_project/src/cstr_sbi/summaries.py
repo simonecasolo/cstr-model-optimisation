@@ -198,7 +198,7 @@ def compute_summary_statistics(
             jnp.maximum(C_mean, _eps) /
             jnp.maximum(ci_nominal - C_mean, _eps)
         ),
-        a_min=-8.0, a_max=2.0,
+        -8.0, 2.0,
     )
 
     return jnp.concatenate(

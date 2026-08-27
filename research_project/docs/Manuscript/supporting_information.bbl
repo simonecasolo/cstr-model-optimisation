@@ -1,0 +1,98 @@
+%apsrev4-2.bst 2019-01-14 (MD) hand-edited version of apsrev4-1.bst
+%Control: key (0)
+%Control: author (8) initials jnrlst
+%Control: editor formatted (1) identically to author
+%Control: production of article title (0) allowed
+%Control: page (0) single
+%Control: year (1) truncated
+%Control: production of eprint (0) enabled
+\begin{thebibliography}{3}%
+\makeatletter
+\providecommand \@ifxundefined [1]{%
+ \@ifx{#1\undefined}
+}%
+\providecommand \@ifnum [1]{%
+ \ifnum #1\expandafter \@firstoftwo
+ \else \expandafter \@secondoftwo
+ \fi
+}%
+\providecommand \@ifx [1]{%
+ \ifx #1\expandafter \@firstoftwo
+ \else \expandafter \@secondoftwo
+ \fi
+}%
+\providecommand \natexlab [1]{#1}%
+\providecommand \enquote  [1]{``#1''}%
+\providecommand \bibnamefont  [1]{#1}%
+\providecommand \bibfnamefont [1]{#1}%
+\providecommand \citenamefont [1]{#1}%
+\providecommand \href@noop [0]{\@secondoftwo}%
+\providecommand \href [0]{\begingroup \@sanitize@url \@href}%
+\providecommand \@href[1]{\@@startlink{#1}\@@href}%
+\providecommand \@@href[1]{\endgroup#1\@@endlink}%
+\providecommand \@sanitize@url [0]{\catcode `\\12\catcode `\$12\catcode
+  `\&12\catcode `\#12\catcode `\^12\catcode `\_12\catcode `\%12\relax}%
+\providecommand \@@startlink[1]{}%
+\providecommand \@@endlink[0]{}%
+\providecommand \url  [0]{\begingroup\@sanitize@url \@url }%
+\providecommand \@url [1]{\endgroup\@href {#1}{\urlprefix }}%
+\providecommand \urlprefix  [0]{URL }%
+\providecommand \Eprint [0]{\href }%
+\providecommand \doibase [0]{https://doi.org/}%
+\providecommand \selectlanguage [0]{\@gobble}%
+\providecommand \bibinfo  [0]{\@secondoftwo}%
+\providecommand \bibfield  [0]{\@secondoftwo}%
+\providecommand \translation [1]{[#1]}%
+\providecommand \BibitemOpen [0]{}%
+\providecommand \bibitemStop [0]{}%
+\providecommand \bibitemNoStop [0]{.\EOS\space}%
+\providecommand \EOS [0]{\spacefactor3000\relax}%
+\providecommand \BibitemShut  [1]{\csname bibitem#1\endcsname}%
+\let\auto@bib@innerbib\@empty
+%</preamble>
+\bibitem [{\citenamefont {Tejero-Cantero}\ \emph {et~al.}(2020)\citenamefont
+  {Tejero-Cantero}, \citenamefont {Boelts}, \citenamefont {Deistler},
+  \citenamefont {Lueckmann}, \citenamefont {Durkan}, \citenamefont
+  {Gon{\c{c}}alves}, \citenamefont {Ziegler}, \citenamefont {Cranmer},\ and\
+  \citenamefont {Macke}}]{TejeroCantero2020}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {{\'A}.}~\bibnamefont
+  {Tejero-Cantero}}, \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {Boelts}}, \bibinfo {author} {\bibfnamefont {M.}~\bibnamefont {Deistler}},
+  \bibinfo {author} {\bibfnamefont {J.-M.}\ \bibnamefont {Lueckmann}}, \bibinfo
+  {author} {\bibfnamefont {C.}~\bibnamefont {Durkan}}, \bibinfo {author}
+  {\bibfnamefont {P.~J.}\ \bibnamefont {Gon{\c{c}}alves}}, \bibinfo {author}
+  {\bibfnamefont {D.~S.}\ \bibnamefont {Ziegler}}, \bibinfo {author}
+  {\bibfnamefont {K.}~\bibnamefont {Cranmer}},\ and\ \bibinfo {author}
+  {\bibfnamefont {J.~H.}\ \bibnamefont {Macke}},\ }\bibfield  {title} {\bibinfo
+  {title} {\texttt{sbi}: {A} toolkit for simulation-based inference},\ }\href
+  {https://doi.org/10.21105/joss.02505} {\bibfield  {journal} {\bibinfo
+  {journal} {Journal of Open Source Software}\ }\textbf {\bibinfo {volume}
+  {5}},\ \bibinfo {pages} {2505} (\bibinfo {year} {2020})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Wu}\ \emph {et~al.}(2003)\citenamefont {Wu},
+  \citenamefont {Yu}, \citenamefont {Luyben},\ and\ \citenamefont
+  {Skogestad}}]{Wu2003}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {K.-L.}\ \bibnamefont
+  {Wu}}, \bibinfo {author} {\bibfnamefont {C.-C.}\ \bibnamefont {Yu}}, \bibinfo
+  {author} {\bibfnamefont {W.~L.}\ \bibnamefont {Luyben}},\ and\ \bibinfo
+  {author} {\bibfnamefont {S.}~\bibnamefont {Skogestad}},\ }\bibfield  {title}
+  {\bibinfo {title} {Reactor/separator processes with recycle --- 2. design for
+  composition control},\ }\href {https://doi.org/10.1016/S0098-1354(02)00218-1}
+  {\bibfield  {journal} {\bibinfo  {journal} {Computers \& Chemical
+  Engineering}\ }\textbf {\bibinfo {volume} {27}},\ \bibinfo {pages} {401}
+  (\bibinfo {year} {2003})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Cranmer}\ \emph {et~al.}(2020)\citenamefont
+  {Cranmer}, \citenamefont {Brehmer},\ and\ \citenamefont
+  {Louppe}}]{Cranmer2020}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {K.}~\bibnamefont
+  {Cranmer}}, \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont {Brehmer}},\
+  and\ \bibinfo {author} {\bibfnamefont {G.}~\bibnamefont {Louppe}},\
+  }\bibfield  {title} {\bibinfo {title} {The frontier of simulation-based
+  inference},\ }\href {https://doi.org/10.1073/pnas.1912789117} {\bibfield
+  {journal} {\bibinfo  {journal} {Proceedings of the National Academy of
+  Sciences}\ }\textbf {\bibinfo {volume} {117}},\ \bibinfo {pages} {30055}
+  (\bibinfo {year} {2020})}\BibitemShut {NoStop}%
+\end{thebibliography}%

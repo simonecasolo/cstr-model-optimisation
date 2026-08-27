@@ -182,11 +182,10 @@ SCENARIO_CONFIGS: dict[str, RecycleScenarioConfig] = {
     "W12_snowball_compound": _sc(
         12, "W12_snowball_compound", alpha=0.75, eta_col=0.80,
         description=(
-            "HEADLINE scenario. Catalyst decay (alpha=0.75) + column efficiency "
+            "Catalyst decay (alpha=0.75) + column separation loss "
             "(eta_col=0.80) both increase recycle via snowball effect. "
-            "Joint (alpha, eta_col) posterior is banana-shaped under S-B; "
-            "narrows under S-A (x_D measurement breaks degeneracy). "
-            "EKF collapses banana to overconfident Gaussian ellipse."
+            "Used to test whether summary statistics introduce a cross-unit "
+            "alpha/eta_col attribution artefact."
         ),
     ),
 

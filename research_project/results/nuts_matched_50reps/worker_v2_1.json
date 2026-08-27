@@ -1,0 +1,22 @@
+[
+  {
+    "idx": 121,
+    "alpha_true": 1.0,
+    "beta_true": 0.699999988079071,
+    "alpha_mean": 1.0108006000518799,
+    "beta_mean": 0.6960839033126831,
+    "beta_std": 0.0041995299980044365,
+    "wall_time_s": 3055.907890667033,
+    "status": "ok"
+  },
+  {
+    "idx": 122,
+    "status": "timeout",
+    "timeout_s": 10800
+  },
+  {
+    "idx": 123,
+    "status": "timeout",
+    "timeout_s": 10800
+  }
+]

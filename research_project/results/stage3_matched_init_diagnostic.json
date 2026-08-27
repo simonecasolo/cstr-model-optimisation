@@ -1,0 +1,36 @@
+{
+  "production": {
+    "label": "production_n10000_fixed",
+    "alpha_mean": 0.9494892764091492,
+    "alpha_bias": -0.05051072359085085,
+    "alpha_mae": 0.05051072359085083,
+    "beta_mean": 0.5512452870607376,
+    "beta_bias": -0.14875471293926235,
+    "beta_mae": 0.14875471293926235
+  },
+  "control": {
+    "label": "control_n2000_fixed",
+    "alpha_mean": 0.9698931968212128,
+    "alpha_bias": -0.030106803178787223,
+    "alpha_mae": 0.030106803178787233,
+    "beta_mean": 0.5955114030838012,
+    "beta_bias": -0.10448859691619872,
+    "beta_mae": 0.10448859691619869,
+    "wall_time_s": 43.28365808300441
+  },
+  "matched": {
+    "label": "matched_n2000_scenario_specific",
+    "alpha_mean": 1.00363454580307,
+    "alpha_bias": 0.0036345458030699884,
+    "alpha_mae": 0.006180398464202881,
+    "beta_mean": 0.6985922312736511,
+    "beta_bias": -0.0014077687263488459,
+    "beta_mae": 0.011748224735260004,
+    "wall_time_s": 1067.9104412499873
+  },
+  "meta": {
+    "n_sim_diagnostic": 2000,
+    "seed": 20260813,
+    "n_sc2_replicates": 50
+  }
+}

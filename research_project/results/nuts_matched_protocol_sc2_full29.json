@@ -1,0 +1,17 @@
+{
+  "sc2_idx": 100,
+  "alpha_true": 1.0,
+  "beta_true": 0.699999988079071,
+  "alpha_mean": 0.9940626621246338,
+  "beta_mean": 0.7508732676506042,
+  "beta_bias": 0.0508732795715332,
+  "beta_mae": 0.05087324604392052,
+  "beta_std": 0.004771200008690357,
+  "n_warmup": 300,
+  "n_samples": 500,
+  "n_chains": 2,
+  "wall_time_s": 2578.7366712499934,
+  "reference_old_protocol": {
+    "note": "samps_sc2_full_29 in results/mcmc_posteriors_m5.npz"
+  }
+}

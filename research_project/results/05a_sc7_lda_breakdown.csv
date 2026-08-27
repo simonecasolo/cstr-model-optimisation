@@ -1,0 +1,4 @@
+features,sc7_accuracy,n,predicted_labels
+physics (2),0.96,50,"{np.str_('fouling_dominant'): 48, np.str_('healthy'): 2}"
+minimal (6),0.98,50,"{np.str_('fouling_dominant'): 49, np.str_('healthy'): 1}"
+full (29),1.0,50,{np.str_('fouling_dominant'): 50}

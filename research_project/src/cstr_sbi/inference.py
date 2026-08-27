@@ -308,6 +308,7 @@ def simulation_wrapper_sbi(
     dt: float = 0.01,
     dt_out: float = 0.5,
     seed: int = 0,
+    scenario_specific_warm_start: bool = False,
 ):
     """Bridge between sbi's torch-tensor parameter batch and the JAX simulator.
 
@@ -318,10 +319,25 @@ def simulation_wrapper_sbi(
         UA and k0 are fixed at their nominal values internally.
     y0
         Warm-start initial condition ``[C, T, Tc, I]``. Defaults to
-        ``NOMINAL_Y0_CL`` (the healthy closed-loop steady-state IC).
+        ``NOMINAL_Y0_CL`` (the healthy closed-loop steady-state IC). Ignored
+        when ``scenario_specific_warm_start=True`` (see below).
         **Pass a pre-computed warm IC here rather than calling
         ``warm_start_ic`` inside the loop** — per-sample warm-starting adds
         O(n_batch) expensive ODE solves and may fail for extreme prior draws.
+    scenario_specific_warm_start
+        2026-08-13, reviewer_response_plan.md Major Comment 7 / Stage 3 item 8:
+        if True, compute a per-sample warm start ``warm_start_ic(params, ...)``
+        for *this training draw's own* (alpha, beta) instead of reusing the
+        single fixed ``y0`` for every prior draw. This matches the protocol
+        already used for the *evaluation* data in ``notebooks/02_data_generation.ipynb``
+        (each scenario is warm-started at its own steady state), closing the
+        train/test initial-condition mismatch this investigation found: with
+        the default ``False``, every training window contains an implicit
+        healthy-onset transient regardless of how faulted the sampled theta
+        is, while evaluation windows never do. Costs ~0.35s/call extra (one
+        additional `diffrax` steady-state solve per training sample) — for
+        ``n_simulations=10_000`` this adds roughly an hour; use a reduced
+        budget for a diagnostic run.
 
     Returns
     -------
@@ -330,6 +346,7 @@ def simulation_wrapper_sbi(
     import torch
     from cstr_sbi.physics import K0_NOMINAL, UA_NOMINAL
     from cstr_sbi.simulator import apply_sensor_layer, DEFAULT_SENSOR_NOISE_PCT
+    # warm_start_ic already imported at module level (line 69)
 
     theta_np = theta_torch.detach().cpu().numpy()
     n_batch = theta_np.shape[0]
@@ -339,9 +356,10 @@ def simulation_wrapper_sbi(
         alpha, beta = float(theta_np[i, 0]), float(theta_np[i, 1])
         # Build full 4-D params with fixed UA and k0.
         params = jnp.array([UA_NOMINAL, K0_NOMINAL, alpha, beta], dtype=jnp.float32)
+        y0_i = warm_start_ic(params, inlet, ctrl) if scenario_specific_warm_start else y0
         proc_key, sens_key = jax.random.split(jax.random.PRNGKey(seed + i))
         _, ys, qc = simulate_em_window(
-            params, inlet, ctrl, y0,
+            params, inlet, ctrl, y0_i,
             key=proc_key, t_window=t_window, dt=dt, dt_out=dt_out,
         )
         t_out = jnp.arange(1, ys.shape[0] + 1) * dt_out
@@ -364,8 +382,11 @@ def simulation_wrapper_sbi_raw(
     dt: float = 0.01,
     dt_out: float = 0.5,
     seed: int = 0,
+    scenario_specific_warm_start: bool = False,
 ):
     """Like ``simulation_wrapper_sbi`` but returns raw flattened observations.
+
+    See ``simulation_wrapper_sbi``'s docstring for ``scenario_specific_warm_start``.
 
     Returns
     -------
@@ -374,6 +395,7 @@ def simulation_wrapper_sbi_raw(
     import torch
     from cstr_sbi.physics import K0_NOMINAL, UA_NOMINAL
     from cstr_sbi.simulator import apply_sensor_layer, DEFAULT_SENSOR_NOISE_PCT
+    # warm_start_ic already imported at module level (line 69)
 
     theta_np = theta_torch.detach().cpu().numpy()
     n_batch = theta_np.shape[0]
@@ -382,9 +404,10 @@ def simulation_wrapper_sbi_raw(
     for i in range(n_batch):
         alpha, beta = float(theta_np[i, 0]), float(theta_np[i, 1])
         params = jnp.array([UA_NOMINAL, K0_NOMINAL, alpha, beta], dtype=jnp.float32)
+        y0_i = warm_start_ic(params, inlet, ctrl) if scenario_specific_warm_start else y0
         proc_key, sens_key = jax.random.split(jax.random.PRNGKey(seed + i))
         _, ys, qc = simulate_em_window(
-            params, inlet, ctrl, y0,
+            params, inlet, ctrl, y0_i,
             key=proc_key, t_window=t_window, dt=dt, dt_out=dt_out,
         )
         obs_packed = jnp.stack([ys[:, 0], ys[:, 1], ys[:, 2], qc], axis=1)
@@ -411,6 +434,7 @@ def train_sbi_posterior(
     y0: jnp.ndarray = NOMINAL_Y0_CL,
     embedding_net: "torch.nn.Module | None" = None,
     use_raw_obs: bool = False,
+    scenario_specific_warm_start: bool = False,
 ):
     """Train an SNPE_C posterior with an NSF density estimator (M4).
 
@@ -432,6 +456,12 @@ def train_sbi_posterior(
         If True, pass raw flattened ``(n_timesteps * 4,)`` observations to the
         density estimator instead of 29-D summary statistics. Requires
         ``embedding_net`` to be set.
+    scenario_specific_warm_start
+        2026-08-13, matched-initialization-protocol experiment (Major Comment 7):
+        forwarded to ``simulation_wrapper_sbi`` — if True, every training
+        simulation is warm-started at its own sampled (alpha, beta)'s steady
+        state, matching the evaluation-data protocol, instead of the single
+        fixed healthy warm-start ``y0`` used for every prior draw by default.
 
     Returns
     -------
@@ -472,7 +502,8 @@ def train_sbi_posterior(
     def wrapper(theta: "torch.Tensor") -> "torch.Tensor":
         _counter[0] += 1
         return sim_fn(theta, inlet=inlet, ctrl=ctrl, y0=y0,
-                      seed=_counter[0])
+                      seed=_counter[0],
+                      scenario_specific_warm_start=scenario_specific_warm_start)
 
     t0 = time.perf_counter()
     theta, x = simulate_for_sbi(

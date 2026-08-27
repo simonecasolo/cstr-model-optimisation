@@ -5,5 +5,5 @@
   "num_transforms": 5,
   "training_batch_size": 256,
   "max_num_epochs": 200,
-  "wall_time_s": 211.52840633300366
+  "wall_time_s": 4731.370576166984
 }

@@ -471,7 +471,20 @@ def recycle_rhs(
         + (-DH_RXN) * k_eff * z_A / CP_MOLAR
         - Q_transfer / (MR_NOM * CP_MOLAR)
     )
-    dT_j = (Q_transfer - beta_r * Q_j) / MJ_CPJ
+    # FIXED (2026-08-12, reviewer_response_plan.md Major Comment 6, Finding 3 /
+    # pending_manuscript_fixes.md Stage 2): beta_r must not scale the actively-
+    # commanded duty Q_j, only the conductive term Q_transfer (already beta_r-
+    # scaled via UA_eff above) -- jacket fouling attenuates heat transfer through
+    # the wall, not the controller's commanded duty. The previous
+    # `(Q_transfer - beta_r * Q_j)` form double-counted fouling on Q_j with no
+    # physical justification found anywhere in the text or code comments, and
+    # was inconsistent with the sibling (unused-by-the-paper) implementation in
+    # `cstr_sbi.luyben.physics`, which never scales Q_j this way. This changes
+    # System II's reactor-jacket ODE: all cached System II training banks,
+    # trained posteriors (sbi-logs/*.pkl), and downstream results computed
+    # before this fix are stale and must be regenerated in Stage 3's matched-
+    # protocol retraining, not reused as-is.
+    dT_j = (Q_transfer - Q_j) / MJ_CPJ
 
     return jnp.array([dz_A, dT_r, dT_j, dI_T])
 
@@ -543,7 +556,20 @@ def recycle_rhs_explicit(
         + (-DH_RXN) * k_eff * z_A / CP_MOLAR
         - Q_transfer / (MR_NOM * CP_MOLAR)
     )
-    dT_j = (Q_transfer - beta_r * Q_j) / MJ_CPJ
+    # FIXED (2026-08-12, reviewer_response_plan.md Major Comment 6, Finding 3 /
+    # pending_manuscript_fixes.md Stage 2): beta_r must not scale the actively-
+    # commanded duty Q_j, only the conductive term Q_transfer (already beta_r-
+    # scaled via UA_eff above) -- jacket fouling attenuates heat transfer through
+    # the wall, not the controller's commanded duty. The previous
+    # `(Q_transfer - beta_r * Q_j)` form double-counted fouling on Q_j with no
+    # physical justification found anywhere in the text or code comments, and
+    # was inconsistent with the sibling (unused-by-the-paper) implementation in
+    # `cstr_sbi.luyben.physics`, which never scales Q_j this way. This changes
+    # System II's reactor-jacket ODE: all cached System II training banks,
+    # trained posteriors (sbi-logs/*.pkl), and downstream results computed
+    # before this fix are stale and must be regenerated in Stage 3's matched-
+    # protocol retraining, not reused as-is.
+    dT_j = (Q_transfer - Q_j) / MJ_CPJ
 
     return jnp.array([dz_A, dT_r, dT_j, dI_T, dR_state, dV_state, dI_R, dI_V])
 

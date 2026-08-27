@@ -1,0 +1,32 @@
+[
+  {
+    "idx": 104,
+    "alpha_true": 1.0,
+    "beta_true": 0.699999988079071,
+    "alpha_mean": 1.0012837648391724,
+    "beta_mean": 0.7044598460197449,
+    "beta_std": 0.0042418516241014,
+    "wall_time_s": 3119.5465072920197,
+    "status": "ok"
+  },
+  {
+    "idx": 105,
+    "status": "timeout",
+    "timeout_s": 10800
+  },
+  {
+    "idx": 106,
+    "status": "timeout",
+    "timeout_s": 10800
+  },
+  {
+    "idx": 107,
+    "alpha_true": 1.0,
+    "beta_true": 0.699999988079071,
+    "alpha_mean": 1.009781837463379,
+    "beta_mean": 0.7004711627960205,
+    "beta_std": 0.004398615099489689,
+    "wall_time_s": 2713.114685583976,
+    "status": "ok"
+  }
+]

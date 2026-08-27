@@ -4,21 +4,21 @@
     "alpha_true": 1.0,
     "beta_true": 1.0,
     "true_class": "healthy",
-    "alpha_post_mean": 0.9577952027320862,
-    "beta_post_mean": 0.909699559211731,
+    "alpha_post_mean": 0.9618139863014221,
+    "beta_post_mean": 0.9078682661056519,
     "alpha_cov90": 0.0,
-    "beta_cov90": 0.18,
-    "fault_class_acc": 0.96
+    "beta_cov90": 0.04,
+    "fault_class_acc": 0.6
   },
   "Sc1_closed_healthy": {
     "mode": "closed_loop",
     "alpha_true": 1.0,
     "beta_true": 1.0,
     "true_class": "healthy",
-    "alpha_post_mean": 0.999350905418396,
-    "beta_post_mean": 1.003092646598816,
-    "alpha_cov90": 0.94,
-    "beta_cov90": 0.86,
+    "alpha_post_mean": 0.9993821978569031,
+    "beta_post_mean": 0.9999556541442871,
+    "alpha_cov90": 0.96,
+    "beta_cov90": 0.9,
     "fault_class_acc": 1.0
   },
   "Sc2_closed_fouling": {
@@ -26,10 +26,10 @@
     "alpha_true": 1.0,
     "beta_true": 0.7,
     "true_class": "fouling_dominant",
-    "alpha_post_mean": 0.9495030045509338,
-    "beta_post_mean": 0.5514925122261047,
-    "alpha_cov90": 0.0,
-    "beta_cov90": 0.0,
+    "alpha_post_mean": 1.000068187713623,
+    "beta_post_mean": 0.6978564262390137,
+    "alpha_cov90": 0.92,
+    "beta_cov90": 0.86,
     "fault_class_acc": 1.0
   },
   "Sc3_closed_decay": {
@@ -37,10 +37,10 @@
     "alpha_true": 0.7,
     "beta_true": 1.0,
     "true_class": "decay_dominant",
-    "alpha_post_mean": 0.7012572288513184,
-    "beta_post_mean": 1.0074553489685059,
-    "alpha_cov90": 0.76,
-    "beta_cov90": 0.8,
+    "alpha_post_mean": 0.7003090381622314,
+    "beta_post_mean": 1.0057406425476074,
+    "alpha_cov90": 0.94,
+    "beta_cov90": 0.9,
     "fault_class_acc": 1.0
   },
   "Sc4_closed_combined": {
@@ -48,21 +48,21 @@
     "alpha_true": 0.85,
     "beta_true": 0.85,
     "true_class": "combined",
-    "alpha_post_mean": 0.8391878604888916,
-    "beta_post_mean": 0.7968705892562866,
-    "alpha_cov90": 0.0,
-    "beta_cov90": 0.44,
-    "fault_class_acc": 0.94
+    "alpha_post_mean": 0.8510916829109192,
+    "beta_post_mean": 0.8458061814308167,
+    "alpha_cov90": 0.88,
+    "beta_cov90": 0.94,
+    "fault_class_acc": 1.0
   },
   "Sc5_closed_saturated": {
     "mode": "closed_loop",
     "alpha_true": 1.0,
     "beta_true": 0.4,
     "true_class": "fouling_dominant",
-    "alpha_post_mean": 1.459428310394287,
-    "beta_post_mean": 0.16957679390907288,
-    "alpha_cov90": 0.04,
-    "beta_cov90": 0.06,
+    "alpha_post_mean": 1.0151066780090332,
+    "beta_post_mean": 0.43595993518829346,
+    "alpha_cov90": 0.7,
+    "beta_cov90": 0.6,
     "fault_class_acc": 1.0
   },
   "Sc6_open_with_fault": {
@@ -70,21 +70,21 @@
     "alpha_true": 1.0,
     "beta_true": 0.7,
     "true_class": "fouling_dominant",
-    "alpha_post_mean": 1.0292651653289795,
-    "beta_post_mean": 0.8978810906410217,
-    "alpha_cov90": 0.0,
+    "alpha_post_mean": 1.0240871906280518,
+    "beta_post_mean": 0.9306496977806091,
+    "alpha_cov90": 0.06,
     "beta_cov90": 0.0,
-    "fault_class_acc": 0.04
+    "fault_class_acc": 0.02
   },
   "Sc7_closed_drift": {
     "mode": "closed_loop",
     "alpha_true": 1.0,
     "beta_true": 0.85,
     "true_class": "fouling_dominant",
-    "alpha_post_mean": 0.9833333492279053,
-    "beta_post_mean": 0.7854652404785156,
+    "alpha_post_mean": 0.9734525084495544,
+    "beta_post_mean": 0.890604555606842,
     "alpha_cov90": 0.0,
-    "beta_cov90": 0.36,
-    "fault_class_acc": 0.94
+    "beta_cov90": 0.52,
+    "fault_class_acc": 0.5
   }
 }

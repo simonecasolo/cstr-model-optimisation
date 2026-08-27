@@ -130,19 +130,43 @@ def generate_degradation_stream(
     seed: int = 0,
     inlet: jnp.ndarray | None = None,
     ctrl: jnp.ndarray | None = None,
-    alpha_threshold: float = 0.85,
-    beta_threshold: float = 0.85,
+    alpha_threshold: float = 0.90,
+    beta_threshold: float = 0.90,
+    alpha_end: float = 0.85,
+    beta_end: float = 0.85,
+    beta_tau_hours: float = 200.0,
 ) -> list[dict]:
     """Generate a 30-day degradation trajectory sliced into 60-min windows.
 
-    Implements Scenario 8 (sequential degradation tracking) from the spec.
-    Both α(t) and β(t) decay linearly from 1.0 to 0.9 over ``Tcrit`` minutes
-    (10% degradation per 30 days, linearised Kern-Seaton / acid-neutralisation).
+    Implements Scenario 8 (sequential degradation tracking) from the spec, using
+    the two functional forms `main.tex` (`sec:sequential_tracking`) describes: a
+    **linear** catalyst-decay curve for alpha and an **asymptotic Kern-Seaton**
+    fouling curve for beta —
+
+        alpha(t) = 1 - a * (t_hours / Tcrit_hours)
+        beta(t)  = 1 - b * (1 - exp(-t_hours / beta_tau_hours))
+
+    where ``t_hours = t_start / 60`` (main.tex's own formulas are written in
+    hours, normalising against the 720-hour, 30-day run — one window per hour).
+
+    FIXED (2026-08-17, HANDOFF.md TOP PRIORITY / Item 8): this function previously
+    implemented a much milder, purely **linear** decay for *both* parameters,
+    reaching only 0.9 at day 30 for each — matching neither functional form
+    `main.tex` describes (linear vs. asymptotic) nor its stated end-values
+    (alpha* ~= 0.40, beta* ~= 0.48). This was a pre-existing mismatch between the
+    manuscript text and the implementation, found while re-checking
+    `notebooks/10_sequential_degradation_tracking.ipynb` this session. Per user
+    decision (2026-08-17), the *functional forms* are now implemented as
+    described, but at a less severe target than main.tex's original text:
+    ``alpha_end``/``beta_end`` default to 0.85 (not 0.40/0.48) — the amplitudes
+    ``a``, ``b`` are solved so that ``alpha(Tcrit) == alpha_end`` and
+    ``beta(Tcrit) == beta_end`` exactly, given ``beta_tau_hours`` (default 200 h,
+    the same time constant main.tex specifies).
 
     Parameters
     ----------
     Tcrit
-        Critical time (minutes) at which degradation reaches 10%.
+        Total run duration (minutes) at which alpha/beta reach alpha_end/beta_end.
         Default: 43 200 min = 30 days.
     dt_window
         Window size in minutes (default 60).
@@ -153,6 +177,11 @@ def generate_degradation_stream(
         Base JAX random seed.
     inlet, ctrl
         Override nominal inlet / controller arrays if needed.
+    alpha_end, beta_end
+        Target alpha/beta values at t = Tcrit (default 0.85 each).
+    beta_tau_hours
+        Time constant (hours) of beta's asymptotic Kern-Seaton approach curve
+        (default 200, matching main.tex).
 
     Returns
     -------
@@ -172,6 +201,8 @@ def generate_degradation_stream(
             x_summary = compute_summary_statistics(w["obs"][0], w["t"])
             samples = posterior.sample(5000, x=x_summary)
     """
+    import math
+
     import jax
     from cstr_sbi.physics import NOMINAL_CTRL, NOMINAL_INLET_CL, K0_NOMINAL, UA_NOMINAL
     from cstr_sbi.simulator import generate_replicates, warm_start_ic
@@ -184,12 +215,20 @@ def generate_degradation_stream(
     n_windows = int(Tcrit / dt_window)
     master_key = jax.random.PRNGKey(seed)
 
+    tcrit_hours = Tcrit / 60.0
+    alpha_amp = 1.0 - alpha_end
+    beta_frac_at_end = 1.0 - math.exp(-tcrit_hours / beta_tau_hours)
+    beta_amp = (1.0 - beta_end) / beta_frac_at_end
+
     stream = []
     for win_idx in range(n_windows):
         t_start = win_idx * dt_window
-        # Linear degradation model.
-        alpha_true = float(1.0 - 0.1 * t_start / Tcrit)
-        beta_true  = float(1.0 - 0.1 * t_start / Tcrit)
+        t_hours = t_start / 60.0
+        # Linear catalyst decay (alpha) and asymptotic Kern-Seaton fouling (beta),
+        # per main.tex sec:sequential_tracking's functional forms, recalibrated to
+        # alpha_end/beta_end at t=Tcrit rather than main.tex's original 0.40/0.48.
+        alpha_true = float(1.0 - alpha_amp * (t_hours / tcrit_hours))
+        beta_true  = float(1.0 - beta_amp * (1.0 - math.exp(-t_hours / beta_tau_hours)))
         alpha_true = max(alpha_true, 0.4)
         beta_true  = max(beta_true,  0.4)
 
@@ -204,7 +243,8 @@ def generate_degradation_stream(
             t_window=dt_window,
         )
 
-        # Classification thresholds — default 0.85 aligned with metrics.classify_fault.
+        # Classification thresholds — default 0.90 aligned with metrics.classify_fault
+        # (recalibrated 2026-08-17, HANDOFF.md TOP PRIORITY / Item 8).
         alpha_thresh = alpha_threshold
         beta_thresh  = beta_threshold
         if alpha_true >= alpha_thresh and beta_true >= beta_thresh:
