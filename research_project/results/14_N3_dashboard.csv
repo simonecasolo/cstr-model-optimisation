@@ -1,0 +1,22 @@
+claim,value (loaded from results/)
+Production posterior (nb36),"20000 simulations x 5-member ensemble; features S1m_measured_inlet; interior SBC KS p alpha 0.063, beta 0.030; TARP p 0.710; 90% coverage 0.919 / 0.905; sd 0.036 / 0.043"
+"Macro-F1 (nb11, L1 = 6,000 windows)",Sc1-Sc5 0.907 (accuracy 0.912); with Sc7 0.824
+"Per-scenario accuracy / beta coverage / beta sd (nb11, L1)",Sc1 0.970 / 0.916 / 0.044; Sc2 0.857 / 0.904 / 0.044; Sc3 0.992 / 0.925 / 0.045; Sc4 0.766 / 0.910 / 0.045; Sc5 0.977 / 0.927 / 0.043; Sc7 0.341 / 0.002 / 0.029
+30-day tracking (nb10),"alpha MAE 0.040, beta MAE 0.038; 90% coverage 0.885 / 0.878; beta bias -0.029 (persistent inlet offsets); class accuracy 0.675"
+"EKF/UKF vs SBI (nb16, D1 Sc1-Sc5 pooled)","EKF untuned: beta coverage 0.68, RMSE 0.093, tail windows 8; UKF untuned: beta coverage 0.74, RMSE 0.075, tail windows 2; EKF tuned: beta coverage 0.76, RMSE 0.087, tail windows 6; UKF tuned: beta coverage 0.67, RMSE 0.044, tail windows 1; for comparison SBI production (nb11, L1 = 1,000 windows per scenario, a different set): mean beta coverage 0.92, mean sd 0.044"
+Drift-aware posterior (nb09),"verdict FIXED; macro-F1 Sc1-Sc5 0.8771; Sc7 beta coverage 0.900, bias -0.024"
+"Gate (nb38, D1)","false-alarm rate (all windows) Sc1 0.02, Sc2 0.00, Sc3 0.02, Sc4 0.00, Sc5 0.02; Sc7 detection 0.62 overall, 1.00 unsaturated"
+Information (nb08),CRB beta nominal 0.014-0.023; inlet as a nuisance 0.043-0.048; alpha 0.026-0.062 (unchanged)
+Feature ablation (nb18),"A base 29: beta sd 0.126, macro-F1 0.65; B base 29 + measured temperatures: beta sd 0.043, macro-F1 0.82; D S1m: beta sd 0.042, macro-F1 0.81; E estimators + measured temperatures: beta sd 0.053, macro-F1 0.74; D minus per-channel statistics: beta sd 0.048, macro-F1 0.76"
+Sbi timing (nb12),"                                        item  ms_median  ms_p05  ms_p95
+         single window: features + 100 draws     20.946  20.162  40.846
+        single window: features + 1000 draws     51.367  26.527  53.060
+        single window: features + 2000 draws     99.108  97.819 114.430
+batch of 300 windows, 1000 draws: per window     13.202     NaN     NaN
+   batch of 300 windows: features per window      0.296     NaN     NaN"
+Break-even (nb12),"filter          sbi_mode  t_filter_ms  t_sbi_ms  break_even_windows
+   EKF       batched SBI       32.483    13.202           18680.643
+   EKF single-window SBI       32.483    51.367                 inf
+   UKF       batched SBI      483.716    13.202             765.517
+   UKF single-window SBI      483.716    51.367             833.093"
+L-C2ST positive controls (nb37),comp|beta shifted +0.10: p<0.05 in 1.00; comp|production posterior: p<0.05 in 0.32; default|beta shifted +0.10: p<0.05 in 0.92; default|production posterior: p<0.05 in 0.00; std|beta shifted +0.10: p<0.05 in 1.00; std|production posterior: p<0.05 in 0.00; std|width x0.5: p<0.05 in 1.00
