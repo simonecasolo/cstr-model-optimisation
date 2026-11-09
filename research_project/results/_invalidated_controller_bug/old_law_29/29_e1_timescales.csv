@@ -1,0 +1,7 @@
+quantity,value
+window length (min),60.0
+alpha drift over one window,0.00020833333333333332
+beta drift (initial) over one window,0.0007710684606054443
+time for alpha to move 0.01 (min),2880.0000000000005
+time for beta to move 0.01 (min),778.141022042166
+30-day horizon (min),43200.0

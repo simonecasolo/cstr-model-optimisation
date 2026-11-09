@@ -1,0 +1,5 @@
+control,frac_p_below_0_05,median_p,min_p
+production posterior (the test windows above),0.0,0.1,0.07
+beta shifted +0.05,0.0,0.1,0.07
+beta shifted +0.10,0.0,0.1,0.07
+width x0.5,0.0,0.1,0.07

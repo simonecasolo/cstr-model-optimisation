@@ -1,0 +1,5 @@
+true,healthy,fouling_dominant,decay_dominant,combined
+healthy,970,20,10,0
+fouling_dominant,127,1834,1,38
+decay_dominant,0,0,992,8
+combined,32,108,94,766

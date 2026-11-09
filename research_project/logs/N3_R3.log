@@ -1,0 +1,49 @@
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/append_nb03_section10.py", line 237, in <module>
+    main("--execute" in sys.argv, sensor=_sensor)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/append_nb03_section10.py", line 223, in main
+    client.execute()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+res10 = SS.stage_decide()
+print("CHOICE:", res10["choice"], "| winners:", res10["winners"])
+print(f"section 10 wall time {(time.time() - T0_10) / 60:.1f} min")
+if res10["choice"] != "S0_base29":
+    raise RuntimeError("STOP: a candidate summary set wins under this sensor model -- "
+                       "promoting it is a user decision (re-run plan, Phase 1b)")
+------------------
+
+----- stdout -----
+                 n_features  ks_a_int  ks_b_int  tarp_ks    rmse  rmse_se      f1  cov90_a  cov90_b     eff  eff_se  calib_ok
+set                                                                                                                          
+S0_base29                29    0.1282    0.1110   0.0056  0.0385   0.0002  0.8644   0.8770   0.8603  0.8800  0.0141     False
+S1_base_est              32    0.6517    0.7619   0.0481  0.0370   0.0001  0.8670   0.8887   0.8803  0.8672  0.0100      True
+S2_base_est_dyn          42    0.0025    0.0274   0.0338  0.0372   0.0001  0.8436   0.8920   0.8830  0.9035  0.0251     False
+S3_compact               19    0.0523    0.4907   0.0793  0.0391   0.0001  0.8414   0.8813   0.8717  0.9802  0.0155      True
+S4_est_only               5    0.2323    0.2465   0.4517  0.0410   0.0001  0.8162   0.8990   0.8947  1.2000  0.0165      True
+winners: ['S1_base_est'] | CHOICE: S1_base_est
+CHOICE: S1_base_est | winners: ['S1_base_est']
+section 10 wall time 32.1 min
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[7], line 5[0m
+[1;32m      3[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m"[39m[38;5;124msection 10 wall time [39m[38;5;132;01m{[39;00m(time[38;5;241m.[39mtime()[38;5;250m [39m[38;5;241m-[39m[38;5;250m [39mT0_10)[38;5;250m [39m[38;5;241m/[39m[38;5;250m [39m[38;5;241m60[39m[38;5;132;01m:[39;00m[38;5;124m.1f[39m[38;5;132;01m}[39;00m[38;5;124m min[39m[38;5;124m"[39m)
+[1;32m      4[0m [38;5;28;01mif[39;00m res10[[38;5;124m"[39m[38;5;124mchoice[39m[38;5;124m"[39m] [38;5;241m!=[39m [38;5;124m"[39m[38;5;124mS0_base29[39m[38;5;124m"[39m:
+[0;32m----> 5[0m     [38;5;28;01mraise[39;00m [38;5;167;01mRuntimeError[39;00m([38;5;124m"[39m[38;5;124mSTOP: a candidate summary set wins under this sensor model -- [39m[38;5;124m"[39m
+[1;32m      6[0m                        [38;5;124m"[39m[38;5;124mpromoting it is a user decision (re-run plan, Phase 1b)[39m[38;5;124m"[39m)
+
+[0;31mRuntimeError[0m: STOP: a candidate summary set wins under this sensor model -- promoting it is a user decision (re-run plan, Phase 1b)
+
+EXIT_STATUS=1

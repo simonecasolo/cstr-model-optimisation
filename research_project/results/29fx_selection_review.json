@@ -1,0 +1,6 @@
+{
+  "choice": "P1b",
+  "approved": true,
+  "reason": "Flag caused by full-set alpha SBC failing for every protocol incl. matched pairs (5k-budget estimator limit, handled by nb31); P1b best on all other P2-column calibration measures.",
+  "time": "Sun Nov  8 17:19:26 2026"
+}

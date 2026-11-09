@@ -1,0 +1,17 @@
+op_point,theta_point,channel,dX_dalpha,dX_dbeta,saturated_branch
+buggy,"healthy(1,1)",C,-0.01744597735803058,0.0,False
+buggy,"healthy(1,1)",T,0.0,0.0,False
+buggy,"healthy(1,1)",Tc,-1.1288245189717827,12.01430242122683,False
+buggy,"healthy(1,1)",I,179.87315603187142,-1486.6219516374229,False
+buggy,"sc4_equiv(0.85,0.85)",C,-0.02399217825611536,0.0,False
+buggy,"sc4_equiv(0.85,0.85)",T,0.0,0.0,False
+buggy,"sc4_equiv(0.85,0.85)",Tc,-1.826341061041603,16.354592634903042,False
+buggy,"sc4_equiv(0.85,0.85)",I,1173.9850756401254,-9551.226183743707,False
+corrected,"healthy(1,1)",C,-0.1640479373585524,0.0,False
+corrected,"healthy(1,1)",T,0.0,0.0,False
+corrected,"healthy(1,1)",Tc,-10.614557738847452,2.972433061074753,False
+corrected,"healthy(1,1)",I,45430.46996766924,-10377.231776624554,False
+corrected,"sc4_equiv(0.85,0.85)",C,-0.17519685981465805,0.0,False
+corrected,"sc4_equiv(0.85,0.85)",T,0.0,0.0,False
+corrected,"sc4_equiv(0.85,0.85)",Tc,-13.33639719699704,1.836580623057671,False
+corrected,"sc4_equiv(0.85,0.85)",I,1554.651962996337,-100.74041771537736,False

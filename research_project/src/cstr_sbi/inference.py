@@ -68,6 +68,7 @@ from cstr_sbi.priors import (
 )
 from cstr_sbi.simulator import simulate_em_window, warm_start_ic
 from cstr_sbi.summaries import compute_summary_statistics
+from cstr_sbi.physics import simulate_open_loop_trajectory_fixed
 
 
 # ---------------------------------------------------------------------------
@@ -78,12 +79,15 @@ def cstr_generative_model(
     obs_summary: jnp.ndarray | None = None,
     *,
     sigma_obs: jnp.ndarray | float = 1.0,
+    cov_obs: jnp.ndarray | None = None,
     inlet: jnp.ndarray = NOMINAL_INLET_CL,
     ctrl: jnp.ndarray = NOMINAL_CTRL,
     y0: jnp.ndarray = NOMINAL_Y0_CL,
     t_window: float = 60.0,
     dt_out: float = 0.5,
     n_save: int | None = None,
+    matched_warm_start: bool = False,
+    mode: str = "closed_loop",
 ):
     """NumPyro generative model for the **2-D** CSTR inference problem.
 
@@ -92,7 +96,20 @@ def cstr_generative_model(
     K0_NOMINAL) — they are NOT sampled.  See spec §3.3 and notebook 05 §5a
     for why UA and k0 must be fixed (structural non-identifiability).
 
-    Likelihood: diagonal Gaussian on the 29-D summary statistics.
+    Likelihood: diagonal Gaussian on the 29-D summary statistics by default
+    (``cov_obs=None``), OR a full-covariance multivariate Gaussian if
+    ``cov_obs`` (a ``(29, 29)`` matrix) is given.
+
+    ADDED (2026-11-06, coordinator-flagged): the diagonal default assumes the
+    29 engineered summary statistics are independent given theta, which is
+    the SAME assumption `notebooks/system_I/20_...ipynb`'s Theory E found to
+    be wrong for the local-FIM diagnostic (the full empirical covariance has
+    large off-diagonal terms; using it instead of the diagonal approximation
+    closed most of the local-FIM-vs-trained-posterior gap at several
+    scenarios). Passing the same full empirical covariance here as `cov_obs`
+    makes NUTS's own likelihood internally consistent with that finding,
+    rather than NUTS silently inheriting the same misspecification Theory E
+    diagnosed elsewhere. `sigma_obs` is ignored when `cov_obs` is given.
 
     Uses the **deterministic diffrax Tsit5** integrator (not Euler-Maruyama)
     so that the model is fully differentiable and JIT-compiles end-to-end
@@ -115,28 +132,103 @@ def cstr_generative_model(
     n_save
         Number of saved time points.  If ``None``, computed from
         ``t_window / dt_out``.
+    matched_warm_start
+        ADDED 2026-11-07 (coordinator-flagged mismatch, notebook 20 Section 5).
+        If ``False`` (default, UNCHANGED prior behaviour): every posterior
+        draw's trajectory starts from the SAME fixed ``y0`` (healthy nominal
+        steady state by default) regardless of the sampled ``alpha,beta`` --
+        this is the "fixed warm start" protocol. If ``True``: ``y0`` is
+        instead recomputed PER DRAW as ``warm_start_ic(params, inlet, ctrl)``
+        at that draw's own sampled ``(alpha, beta)`` -- the exact same
+        function/call SBI's "matched protocol" training
+        (``scenario_specific_warm_start=True`` in ``simulation_wrapper_sbi``)
+        uses to generate its training data. The external ``y0`` argument is
+        ignored when ``matched_warm_start=True``. This matters because the
+        OBSERVED data NUTS is asked to fit (when generated via this
+        project's own matched-protocol simulator wrappers, e.g.
+        ``sim_raw_po`` in notebook 20) is itself generated under the matched
+        convention -- with ``matched_warm_start=False``, NUTS's internal
+        model and the data-generating process it is fitting are literally
+        different generative models (a train/eval protocol mismatch
+        structurally identical to the one already found and fixed for SBI's
+        beta-bias, apparently never ported to this NUTS model).
+    mode
+        ADDED 2026-11-07 (notebook 21, open-loop model-mismatch diagnosis). If
+        ``"closed_loop"`` (default, UNCHANGED prior behaviour), this function
+        behaves EXACTLY as before -- it always simulates the PI-controller
+        closed-loop dynamics regardless of what generated the observed data.
+        If ``"open_loop"``: branches to simulate the 3-state open-loop CSTR
+        (``simulate_open_loop_trajectory_fixed``, fixed-step Tsit5, NUTS/JIT-
+        safe) with ``[UA, k0]`` scaled directly by ``[beta, alpha]`` (same
+        fault-encoding convention as ``ScenarioConfig.open_loop_params`` and
+        ``scripts/nb20_nuts_worker.py``'s open-loop data-gen branch) and a
+        FIXED, theta-independent warm start (the healthy-nominal closed-loop
+        steady state truncated to its first 3 states, ``[C, T, Tc]`` --
+        matching ``nb20_nuts_worker``'s own open-loop convention, since the
+        open-loop simulator has no feedback to re-settle to a new steady
+        state under a fault, by construction). ``matched_warm_start`` is
+        ignored when ``mode="open_loop"`` (there is nothing to match: the
+        open-loop warm start was never theta-dependent in the first place,
+        for either the model or the data it is fitting). This exists because
+        ``cstr_generative_model`` was found (notebook 20, Theory C) to ALWAYS
+        use the closed-loop simulator even when the real observed data came
+        from Sc0/Sc6's open-loop generation -- a genuine model mismatch (not
+        just a bad warm start), diagnosed as the likely cause of those two
+        scenarios' badly non-converging NUTS chains (R-hat in the
+        hundreds-to-thousands) even after the diagonal-vs-full-covariance
+        likelihood fix. ``inlet``/``ctrl`` keep their closed-loop-shaped
+        defaults (``NOMINAL_INLET_CL`` is 3-D, ``[Ci,Ti,Tci]``) for backward
+        compatibility; in open-loop mode the constant coolant flow ``Qc`` is
+        taken from ``ctrl[3]`` (``NOMINAL_CTRL``'s ``Qc0`` entry, identical
+        value to ``NOMINAL_INLET``'s own 4th entry) so the same default
+        arguments work for both modes without the caller having to pass a
+        separate 4-D open-loop inlet.
     """
     from cstr_sbi.physics import K0_NOMINAL, UA_NOMINAL
+    from cstr_sbi.simulator import warm_start_ic
 
     alpha = numpyro.sample("alpha", dist.Uniform(ALPHA_LOW, ALPHA_HIGH))
     beta  = numpyro.sample("beta",  dist.Uniform(BETA_LOW,  BETA_HIGH))
 
-    # UA and k0 are fixed design constants — not sampled.
-    params = jnp.array([UA_NOMINAL, K0_NOMINAL, alpha, beta])
-
     if n_save is None:
         n_save = int(round(t_window / dt_out))
 
-    ts, ys, qc = simulate_closed_loop_trajectory(
-        params, inlet, ctrl, y0,
-        t_final=t_window, n_save=n_save,
-    )
-    obs_packed = jnp.stack([ys[:, 0], ys[:, 1], ys[:, 2], qc], axis=1)
-    summary = compute_summary_statistics(obs_packed, ts)
+    if mode == "open_loop":
+        # [UA_eff, k0_eff] = [beta, alpha] * [UA_NOMINAL, K0_NOMINAL] -- same
+        # fault-encoding convention as ScenarioConfig.open_loop_params() and
+        # nb20_nuts_worker's open-loop data-gen branch.
+        params_ol = jnp.array([beta * UA_NOMINAL, alpha * K0_NOMINAL])
+        inlet_ol = jnp.concatenate([jnp.asarray(inlet)[:3], jnp.asarray(ctrl)[3:4]])
+        y0_ol = jnp.asarray(y0)[:3]
+
+        _ts, ys_ol = simulate_open_loop_trajectory_fixed(
+            params_ol, inlet_ol, y0_ol,
+            t_final=t_window, n_save=n_save,
+        )
+        qc_const = jnp.full((ys_ol.shape[0],), inlet_ol[3])
+        obs_packed = jnp.stack([ys_ol[:, 0], ys_ol[:, 1], ys_ol[:, 2], qc_const], axis=1)
+        summary = compute_summary_statistics(obs_packed, _ts)
+    else:
+        # UA and k0 are fixed design constants — not sampled.
+        params = jnp.array([UA_NOMINAL, K0_NOMINAL, alpha, beta])
+
+        y0_used = warm_start_ic(params, inlet, ctrl) if matched_warm_start else y0
+
+        ts, ys, qc = simulate_closed_loop_trajectory(
+            params, inlet, ctrl, y0_used,
+            t_final=t_window, n_save=n_save,
+        )
+        obs_packed = jnp.stack([ys[:, 0], ys[:, 1], ys[:, 2], qc], axis=1)
+        summary = compute_summary_statistics(obs_packed, ts)
+
+    if cov_obs is not None:
+        likelihood = dist.MultivariateNormal(loc=summary, covariance_matrix=cov_obs)
+    else:
+        likelihood = dist.Normal(summary, sigma_obs).to_event(1)
 
     numpyro.sample(
         "obs",
-        dist.Normal(summary, sigma_obs).to_event(1),
+        likelihood,
         obs=obs_summary,
     )
 
@@ -193,9 +285,12 @@ def run_mcmc_baseline(
     obs_summary: np.ndarray,
     *,
     sigma_obs: np.ndarray | float | None = None,
+    cov_obs: np.ndarray | None = None,
     inlet: jnp.ndarray = NOMINAL_INLET_CL,
     ctrl: jnp.ndarray = NOMINAL_CTRL,
     y0: jnp.ndarray | None = None,
+    matched_warm_start: bool = False,
+    mode: str = "closed_loop",
     n_chains: int = 4,
     n_samples: int = 500,
     n_warmup: int = 300,
@@ -212,11 +307,26 @@ def run_mcmc_baseline(
         ``compute_summary_statistics``).
     sigma_obs
         Likelihood scale.  If ``None``, estimated from the Sc1 replicates
-        in ``data/observations.npz`` via ``estimate_sigma_obs``.
+        in ``data/observations.npz`` via ``estimate_sigma_obs``. Ignored if
+        ``cov_obs`` is given.
+    cov_obs
+        ADDED 2026-11-06: optional full ``(29, 29)`` likelihood covariance
+        matrix. If given, ``cstr_generative_model`` uses a full-covariance
+        multivariate Gaussian likelihood instead of the diagonal default --
+        see that function's own docstring for why (Theory E's full-vs-diagonal
+        finding in notebook 20).
     y0
         Initial state for the Euler-Maruyama integrator.  If ``None``,
         uses the warm-start IC computed from the nominal closed-loop
-        parameters.
+        parameters (truncated to the first 3 states, ``[C, T, Tc]``, when
+        ``mode="open_loop"`` -- see ``cstr_generative_model``'s docstring).
+    mode
+        ADDED 2026-11-07 (notebook 21): passed straight through to
+        ``cstr_generative_model``. ``"closed_loop"`` (default) preserves all
+        existing behaviour; ``"open_loop"`` fits the open-loop generative
+        model instead -- see that function's own docstring for the full
+        rationale and the ``matched_warm_start``-is-ignored caveat in that
+        mode.
     n_chains, n_samples, n_warmup
         NUTS budget.  Defaults give ~30–60 min wall time on a single CPU
         for a 27-D summary likelihood.
@@ -236,7 +346,10 @@ def run_mcmc_baseline(
     wall_time_s
         Total wall-clock time in seconds (includes warmup).
     """
-    if sigma_obs is None:
+    if cov_obs is not None:
+        cov_obs = jnp.asarray(cov_obs, dtype=jnp.float32)
+        sigma_obs = jnp.ones(cov_obs.shape[0], dtype=jnp.float32)  # unused when cov_obs is set
+    elif sigma_obs is None:
         sigma_obs = jnp.asarray(estimate_sigma_obs(observations_npz))
     else:
         sigma_obs = jnp.asarray(sigma_obs, dtype=jnp.float32)
@@ -246,6 +359,11 @@ def run_mcmc_baseline(
     if y0 is None:
         from cstr_sbi.physics import NOMINAL_PARAMS_CL
         y0 = warm_start_ic(NOMINAL_PARAMS_CL, inlet, ctrl)
+        if mode == "open_loop":
+            # Open-loop state is [C, T, Tc] -- no controller/integral state.
+            # Fixed, theta-independent warm start (see cstr_generative_model's
+            # docstring): mirrors nb20_nuts_worker's open-loop data-gen branch.
+            y0 = y0[:3]
 
     kernel = NUTS(
         cstr_generative_model,
@@ -268,9 +386,12 @@ def run_mcmc_baseline(
         jax.random.PRNGKey(seed),
         obs_summary=obs_jnp,
         sigma_obs=sigma_obs,
+        cov_obs=cov_obs,
         inlet=jnp.asarray(inlet),
         ctrl=jnp.asarray(ctrl),
         y0=jnp.asarray(y0),
+        matched_warm_start=matched_warm_start,
+        mode=mode,
     )
     wall_time_s = time.perf_counter() - t0
 

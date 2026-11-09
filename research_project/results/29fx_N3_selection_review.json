@@ -1,0 +1,11 @@
+{
+  "choice": "P2",
+  "approved": true,
+  "time": "Mon Nov  9 08:10:38 2026",
+  "by": "user (Simone Casolo), 2026-11-09, in conversation with Claude",
+  "reason": "Pre-set nb29 rule selects P2 under N3 (only protocol passing the P2-column calibration gate: min KS median 0.021, TARP KS 0.016; P1b min KS 0.0069, TARP 0.19; RMSE equal 0.0402). Rule followed rather than overridden; margins are small (near-tie), so P1b is reported side by side in the paper. N0 production stays P1b (SI).",
+  "report_side_by_side": [
+    "P1b",
+    "P2"
+  ]
+}

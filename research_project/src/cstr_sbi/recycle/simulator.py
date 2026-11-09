@@ -37,6 +37,9 @@ from cstr_sbi.recycle.summaries import (
     RAW_CHANNELS,
     SA_CHANNELS, SA_INDICES,
     SB_CHANNELS, SB_INDICES,
+    SC_CHANNELS,
+    FEED_ANALYZER_NOISE_PCT,
+    feed_analyzer_reading,
     compute_summaries,
 )
 
@@ -162,6 +165,40 @@ def structure_view(raw_reps: np.ndarray, structure: str) -> np.ndarray:
     return raw_reps[..., idx]
 
 
+def generate_sc_observations(
+    observations_sb: np.ndarray,
+    labels: pd.DataFrame,
+    t_h: np.ndarray,
+    *,
+    feed_analyzer_noise_pct: float = FEED_ANALYZER_NOISE_PCT,
+    seed: int | None = None,
+) -> np.ndarray:
+    """Augment an existing S-B observation dataset with the synthetic feed-analyzer
+    channel, producing the S-C (10-channel) view -- see
+    docs/Manuscript/system_ii_analyzer_rework_plan.md.
+
+    Deliberately does **not** re-simulate: the feed-analyzer reading is synthesized
+    directly from each window's `z_A0_eff` (already in `labels`), so this is a cheap
+    ``O(n_windows)`` augmentation of an already-generated S-B dataset, not a new
+    ODE-integration pass. `labels` must be row-aligned with `observations_sb`
+    (as returned by `generate_dataset`/`load_dataset`) and have a `z_A0_eff` column.
+
+    Returns
+    -------
+    (n_windows, n_save, N_SB + 1) array: S-B's channels followed by the feed-analyzer
+    reading, matching `SC_CHANNELS`'s order.
+    """
+    rng = np.random.default_rng(seed)
+    n_windows = observations_sb.shape[0]
+    z_a0_values = labels["z_A0_eff"].to_numpy(dtype=np.float32)
+    theta_dummy = np.zeros(5, dtype=np.float32)
+    feed_col = np.empty((n_windows, len(t_h), 1), dtype=observations_sb.dtype)
+    for i in range(n_windows):
+        theta_dummy[4] = z_a0_values[i]
+        feed_col[i, :, 0] = feed_analyzer_reading(theta_dummy, t_h, rng, feed_analyzer_noise_pct)
+    return np.concatenate([observations_sb, feed_col], axis=-1)
+
+
 # ---------------------------------------------------------------------------
 # Full dataset generation
 # ---------------------------------------------------------------------------
@@ -276,11 +313,21 @@ def generate_dataset(
 
 
 def save_dataset(dataset: dict, path: str | Path) -> Path:
-    """Save a generated dataset to ``.npz``."""
+    """Save a generated dataset to ``.npz``.
+
+    ``observations_sc``/``sc_channels`` are optional (added by
+    ``generate_sc_observations``, not by ``generate_dataset`` itself) -- saved only
+    if present in ``dataset``, so this stays backwards-compatible with S-A/S-B-only
+    datasets.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     labels = dataset["labels"]
     sc_table = dataset["scenario_table"]
+    extra = {}
+    if "observations_sc" in dataset:
+        extra["observations_sc"] = dataset["observations_sc"]
+        extra["sc_channels"] = np.asarray(dataset.get("sc_channels", SC_CHANNELS), dtype=object)
     np.savez_compressed(
         path,
         t_h=dataset["t_h"],
@@ -294,17 +341,19 @@ def save_dataset(dataset: dict, path: str | Path) -> Path:
         n_replicates=np.asarray(dataset["n_replicates"]),
         noise_pct=np.asarray(dataset["noise_pct"]),
         seed=np.asarray(dataset["seed"]),
+        **extra,
     )
     return path
 
 
 def load_dataset(path: str | Path) -> dict:
-    """Load a dataset saved by ``save_dataset``."""
+    """Load a dataset saved by ``save_dataset``. Includes ``observations_sc``/
+    ``sc_channels`` if present in the file, otherwise those keys are omitted."""
     path = Path(path)
     data = np.load(path, allow_pickle=True)
     labels = pd.DataFrame.from_records(data["labels"])
     sc_table = pd.DataFrame.from_records(data["scenario_table"])
-    return {
+    out = {
         "t_h":              data["t_h"],
         "observations_sa":  data["observations_sa"],
         "observations_sb":  data["observations_sb"],
@@ -317,3 +366,7 @@ def load_dataset(path: str | Path) -> dict:
         "noise_pct":        float(data["noise_pct"]),
         "seed":             int(data["seed"]),
     }
+    if "observations_sc" in data:
+        out["observations_sc"] = data["observations_sc"]
+        out["sc_channels"] = list(data["sc_channels"])
+    return out

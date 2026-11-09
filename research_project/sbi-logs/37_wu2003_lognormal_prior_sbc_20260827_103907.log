@@ -1,0 +1,216 @@
+[NbConvertApp] Converting notebook notebooks/37_wu2003_lognormal_prior_sbc.ipynb to notebook
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/traitlets/config/application.py", line 1082, in launch_instance
+    app.start()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+all_results = []
+t_all = time.time()
+for seed in TORCH_SEEDS:
+    variant = f'lognormal_prior_n{N_TRAIN}_seed{seed}'
+    posterior_path = SBI_LOGS / f'wu2003_posterior_{variant}.pkl'
+    print(f'\n=== {variant} ===')
+    t_train = time.time()
+    posterior, train_wall_s = train_lognormal_posterior(seed)
+    with open(posterior_path, 'wb') as f:
+        pickle.dump({
+            'posterior': posterior,
+            'variant': variant,
+            'n_train': N_TRAIN,
+            'torch_seed': seed,
+            'arch': ARCH,
+            'hidden_features': HIDDEN,
+            'num_transforms': TRANSFORMS,
+            'prior': 'truncated_lognormal_centered_nominal',
+            'nominal_theta': NOMINAL_THETA.tolist(),
+            'log_sigma': LOG_SIGMA.tolist(),
+            'prior_low': PRIOR_LOW_5D.tolist(),
+            'prior_high': PRIOR_HIGH_5D.tolist(),
+            'bank_path': str(BANK_PATH),
+            'train_wall_s': train_wall_s,
+        }, f)
+    print(f'saved posterior: {posterior_path}')
+
+    t_sbc = time.time()
+    sbc = run_lognormal_sbc(posterior, n_sbc=N_SBC, n_post=N_POST, seed=SBC_SEED_BASE + seed)
+    sbc_wall_s = time.time() - t_sbc
+
+    row = {
+        'seed': seed,
+        'variant': variant,
+        'n_train': N_TRAIN,
+        'train_wall_s': train_wall_s,
+        'sbc_wall_s': sbc_wall_s,
+        'posterior_path': str(posterior_path),
+        'sbc': sbc,
+    }
+    all_results.append(row)
+    summary = {
+        'status': 'in_progress',
+        'structure': STRUCTURE,
+        'noise_pct': NOISE_PCT,
+        'n_train': N_TRAIN,
+        'completed_seeds': [r['seed'] for r in all_results],
+        'torch_seeds': TORCH_SEEDS,
+        'arch': ARCH,
+        'hidden_features': HIDDEN,
+        'num_transforms': TRANSFORMS,
+        'max_epochs': MAX_EPOCHS,
+        'stop_after_epochs': STOP_AFTER_EPOCHS,
+        'n_sbc': N_SBC,
+        'n_post': N_POST,
+        'reject_outside_prior': True,
+        'prior': {
+            'type': 'truncated_lognormal_centered_nominal',
+            'nominal_theta': NOMINAL_THETA.tolist(),
+            'log_sigma': LOG_SIGMA.tolist(),
+            'low': PRIOR_LOW_5D.tolist(),
+            'high': PRIOR_HIGH_5D.tolist(),
+        },
+        'training_bank': {
+            'path': str(BANK_PATH),
+            'source_bank': str(FULL_BANK_PATH),
+            'importance_ess': float(ess),
+            'unique_rows': int(len(np.unique(idx))),
+        },
+        'results': all_results,
+        'elapsed_wall_s': time.time() - t_all,
+    }
+    with open(SUMMARY_PATH, 'w') as f:
+        json.dump(summary, f, indent=2)
+    pd.DataFrame([flatten_result(r) for r in all_results]).to_csv(CSV_PATH, index=False)
+
+final_summary = {**summary, 'status': 'complete'}
+with open(SUMMARY_PATH, 'w') as f:
+    json.dump(final_summary, f, indent=2)
+result_df = pd.DataFrame([flatten_result(r) for r in all_results]).sort_values('min_ks_pvalue', ascending=False)
+result_df.to_csv(CSV_PATH, index=False)
+display(result_df)
+print(f'total wall time: {(time.time() - t_all)/3600:.2f} h')
+------------------
+
+----- stdout -----
+
+=== lognormal_prior_n5000_seed0 ===
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAssertionError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[6], line 8[0m
+[1;32m      6[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m'[39m[38;5;130;01m\n[39;00m[38;5;124m=== [39m[38;5;132;01m{[39;00mvariant[38;5;132;01m}[39;00m[38;5;124m ===[39m[38;5;124m'[39m)
+[1;32m      7[0m t_train [38;5;241m=[39m time[38;5;241m.[39mtime()
+[0;32m----> 8[0m posterior, train_wall_s [38;5;241m=[39m [43mtrain_lognormal_posterior[49m[43m([49m[43mseed[49m[43m)[49m
+[1;32m      9[0m [38;5;28;01mwith[39;00m [38;5;28mopen[39m(posterior_path, [38;5;124m'[39m[38;5;124mwb[39m[38;5;124m'[39m) [38;5;28;01mas[39;00m f:
+[1;32m     10[0m     pickle[38;5;241m.[39mdump({
+[1;32m     11[0m         [38;5;124m'[39m[38;5;124mposterior[39m[38;5;124m'[39m: posterior,
+[1;32m     12[0m         [38;5;124m'[39m[38;5;124mvariant[39m[38;5;124m'[39m: variant,
+[0;32m   (...)[0m
+[1;32m     24[0m         [38;5;124m'[39m[38;5;124mtrain_wall_s[39m[38;5;124m'[39m: train_wall_s,
+[1;32m     25[0m     }, f)
+
+Cell [0;32mIn[4], line 9[0m, in [0;36mtrain_lognormal_posterior[0;34m(torch_seed)[0m
+[1;32m      7[0m summaries_t [38;5;241m=[39m torch[38;5;241m.[39mtensor(summary_train, dtype[38;5;241m=[39mtorch[38;5;241m.[39mfloat32)
+[1;32m      8[0m density_estimator [38;5;241m=[39m posterior_nn(model[38;5;241m=[39mARCH, hidden_features[38;5;241m=[39mHIDDEN, num_transforms[38;5;241m=[39mTRANSFORMS)
+[0;32m----> 9[0m inference [38;5;241m=[39m [43mSNPE[49m[43m([49m[43mprior[49m[38;5;241;43m=[39;49m[43mprior_logn[49m[43m,[49m[43m [49m[43mdensity_estimator[49m[38;5;241;43m=[39;49m[43mdensity_estimator[49m[43m)[49m
+[1;32m     10[0m inference[38;5;241m.[39mappend_simulations(thetas_t, summaries_t)
+[1;32m     11[0m t0 [38;5;241m=[39m time[38;5;241m.[39mtime()
+
+File [0;32m~/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/sbi/inference/trainers/npe/npe_c.py:125[0m, in [0;36mNPE_C.__init__[0;34m(self, prior, density_estimator, device, logging_level, summary_writer, tracker, show_progress_bars)[0m
+[1;32m    101[0m [38;5;250m[39m[38;5;124mr[39m[38;5;124;03m"""Initialize NPE-C.[39;00m
+[1;32m    102[0m 
+[1;32m    103[0m [38;5;124;03mArgs:[39;00m
+[0;32m   (...)[0m
+[1;32m    121[0m [38;5;124;03m    show_progress_bars: Whether to show a progressbar during training.[39;00m
+[1;32m    122[0m [38;5;124;03m"""[39;00m
+[1;32m    124[0m kwargs [38;5;241m=[39m del_entries([38;5;28mlocals[39m(), entries[38;5;241m=[39m([38;5;124m"[39m[38;5;124mself[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124m__class__[39m[38;5;124m"[39m))
+[0;32m--> 125[0m [38;5;28;43msuper[39;49m[43m([49m[43m)[49m[38;5;241;43m.[39;49m[38;5;21;43m__init__[39;49m[43m([49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/sbi/inference/trainers/npe/npe_base.py:93[0m, in [0;36mPosteriorEstimatorTrainer.__init__[0;34m(self, prior, density_estimator, device, logging_level, summary_writer, tracker, show_progress_bars)[0m
+[1;32m     61[0m [38;5;28;01mdef[39;00m[38;5;250m [39m[38;5;21m__init__[39m(
+[1;32m     62[0m     [38;5;28mself[39m,
+[1;32m     63[0m     prior: Optional[Distribution] [38;5;241m=[39m [38;5;28;01mNone[39;00m,
+[0;32m   (...)[0m
+[1;32m     72[0m     show_progress_bars: [38;5;28mbool[39m [38;5;241m=[39m [38;5;28;01mTrue[39;00m,
+[1;32m     73[0m ):
+[1;32m     74[0m [38;5;250m    [39m[38;5;124;03m"""Base class for Sequential Neural Posterior Estimation methods.[39;00m
+[1;32m     75[0m 
+[1;32m     76[0m [38;5;124;03m    We note that the different subclasses (NPE_A, NPE_B, NPE_C) have the same[39;00m
+[0;32m   (...)[0m
+[1;32m     90[0m [38;5;124;03m    See docstring of `NeuralInference` class for all other arguments.[39;00m
+[1;32m     91[0m [38;5;124;03m    """[39;00m
+[0;32m---> 93[0m     [38;5;28;43msuper[39;49m[43m([49m[43m)[49m[38;5;241;43m.[39;49m[38;5;21;43m__init__[39;49m[43m([49m
+[1;32m     94[0m [43m        [49m[43mprior[49m[38;5;241;43m=[39;49m[43mprior[49m[43m,[49m
+[1;32m     95[0m [43m        [49m[43mdevice[49m[38;5;241;43m=[39;49m[43mdevice[49m[43m,[49m
+[1;32m     96[0m [43m        [49m[43mlogging_level[49m[38;5;241;43m=[39;49m[43mlogging_level[49m[43m,[49m
+[1;32m     97[0m [43m        [49m[43msummary_writer[49m[38;5;241;43m=[39;49m[43msummary_writer[49m[43m,[49m
+[1;32m     98[0m [43m        [49m[43mtracker[49m[38;5;241;43m=[39;49m[43mtracker[49m[43m,[49m
+[1;32m     99[0m [43m        [49m[43mshow_progress_bars[49m[38;5;241;43m=[39;49m[43mshow_progress_bars[49m[43m,[49m
+[1;32m    100[0m [43m    [49m[43m)[49m
+[1;32m    102[0m     [38;5;66;03m# As detailed in the docstring, `density_estimator` is either a string or[39;00m
+[1;32m    103[0m     [38;5;66;03m# a callable. The function creating the neural network is attached to[39;00m
+[1;32m    104[0m     [38;5;66;03m# `_build_neural_net`. It will be called in the first round and receive[39;00m
+[1;32m    105[0m     [38;5;66;03m# thetas and xs as inputs, so that they can be used for shape inference and[39;00m
+[1;32m    106[0m     [38;5;66;03m# potentially for z-scoring.[39;00m
+[1;32m    107[0m     check_estimator_arg(density_estimator)
+
+File [0;32m~/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/sbi/inference/trainers/base.py:201[0m, in [0;36mNeuralInference.__init__[0;34m(self, prior, device, logging_level, summary_writer, tracker, show_progress_bars)[0m
+[1;32m    182[0m [38;5;250m[39m[38;5;124mr[39m[38;5;124;03m"""Base class for inference methods.[39;00m
+[1;32m    183[0m 
+[1;32m    184[0m [38;5;124;03mArgs:[39;00m
+[0;32m   (...)[0m
+[1;32m    197[0m [38;5;124;03m        sampling.[39;00m
+[1;32m    198[0m [38;5;124;03m"""[39;00m
+[1;32m    200[0m [38;5;28mself[39m[38;5;241m.[39m_device [38;5;241m=[39m process_device(device)
+[0;32m--> 201[0m [43mcheck_prior[49m[43m([49m[43mprior[49m[43m)[49m
+[1;32m    202[0m check_if_prior_on_device([38;5;28mself[39m[38;5;241m.[39m_device, prior)
+[1;32m    203[0m [38;5;28mself[39m[38;5;241m.[39m_prior [38;5;241m=[39m prior
+
+File [0;32m~/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/sbi/utils/user_input_checks.py:31[0m, in [0;36mcheck_prior[0;34m(prior)[0m
+[1;32m     29[0m     [38;5;28;01mpass[39;00m
+[1;32m     30[0m [38;5;28;01melse[39;00m:
+[0;32m---> 31[0m     [38;5;28;01massert[39;00m [38;5;28misinstance[39m(
+[1;32m     32[0m         prior, Distribution
+[1;32m     33[0m     ), [38;5;124m"""[39m[38;5;124mPrior must be a PyTorch Distribution. See FAQ 7 for more details or use[39m
+[1;32m     34[0m [38;5;124m    `sbi.utils.user_input_checks.process_prior` for wrapping scipy and lists of[39m
+[1;32m     35[0m [38;5;124m    independent priors.[39m[38;5;124m"""[39m
+
+[0;31mAssertionError[0m: Prior must be a PyTorch Distribution. See FAQ 7 for more details or use
+        `sbi.utils.user_input_checks.process_prior` for wrapping scipy and lists of
+        independent priors.
+

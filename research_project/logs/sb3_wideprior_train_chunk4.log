@@ -1,0 +1,25 @@
+=== chunk worker 'train_chunk4' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk4.npz, n_rows=280, seed=910104 ===
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[train_chunk4] 50/280 rows, 135 attempts, 4435s elapsed, accept_rate=0.37, ETA=5.7h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[train_chunk4] 100/280 rows, 269 attempts, 8828s elapsed, accept_rate=0.37, ETA=4.4h
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/generate_sb3_wideprior_chunk.py", line 33, in <module>
+    generate_bank(args.out, args.n_rows, seed=args.seed, label=args.label)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/generate_sb3_wideprior_bank.py", line 99, in generate_bank
+    np.savez(partial_path, thetas=np.stack(theta_rows), summaries=np.stack(summary_rows), attempts=attempts)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_npyio_impl.py", line 667, in savez
+    _savez(file, args, kwds, False)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_npyio_impl.py", line 764, in _savez
+    zipf = zipfile_factory(file, mode="w", compression=compression)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_npyio_impl.py", line 102, in zipfile_factory
+    return zipfile.ZipFile(file, *args, **kwargs)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/zipfile.py", line 1251, in __init__
+    self.fp = io.open(file, filemode)
+OSError: [Errno 28] No space left on device: 'data/wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk4.partial.npz'

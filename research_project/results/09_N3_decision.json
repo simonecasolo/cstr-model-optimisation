@@ -1,0 +1,26 @@
+{
+ "verdict": "FIXED",
+ "criteria": {
+  "(i) SBC: interior KS p >= 0.01 (alpha, beta, dT) and TARP p >= 0.01": true,
+  "(ii) Sc7: beta coverage >= 0.80 and |beta bias| <= 0.05": true,
+  "(iii) Sc7: dT coverage >= 0.80 and |dT bias| <= 0.30 K": true,
+  "(iv) Sc1-Sc5: beta coverage >= 0.80 each and macro-F1 >= 0.877": true
+ },
+ "macro_f1_Sc1_5": 0.87709696885957,
+ "sc7": {
+  "data": "L1",
+  "scenario": "Sc7",
+  "n": 1000,
+  "class_acc": 0.82,
+  "cov90_b": 0.9,
+  "sd_b": 0.06921359896659851,
+  "bias_b": -0.024386541917920113,
+  "cov90_a": 0.909,
+  "sd_a": 0.05962800979614258,
+  "bias_a": -0.004476612899452448,
+  "dT_true": 2.0,
+  "dT_bias": -0.12195316219329834,
+  "dT_sd": 0.2004583179950714,
+  "cov90_dT": 0.92
+ }
+}

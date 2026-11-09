@@ -1,0 +1,51 @@
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_31.py", line 304, in <module>
+    print(build(execute="--execute" in sys.argv, sensor=_sensor))
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_31.py", line 295, in build
+    client.execute()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import torch
+post, info = B.load_production_posterior()
+test = we.load_npz(B.OUT / f"test_{B._tok(PROTOCOL)}.npz")
+x = test["x_sc"][test["sc_name"] == "Sc4_closed_combined"][:1]
+s = post.sample((5000,), x=torch.as_tensor(x[0], dtype=torch.float32),
+                show_progress_bars=False, reject_outside_prior=False).numpy()
+print(info["protocol"], info["production_budget"], "ensemble" if info["use_ensemble"] else "single",
+      "| Sc4 mean", s.mean(0).round(3), "corr", round(float(np.corrcoef(s.T)[0, 1]), 3))
+print(f"notebook wall time {(time.time() - T0) / 60:.1f} min")
+------------------
+
+----- stderr -----
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nflows/transforms/lu.py:80: UserWarning: torch.triangular_solve is deprecated in favor of torch.linalg.solve_triangularand will be removed in a future PyTorch release.
+torch.linalg.solve_triangular has its arguments reversed and does not return a copy of one of the inputs.
+X = torch.triangular_solve(B, A).solution
+should be replaced with
+X = torch.linalg.solve_triangular(A, B). (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp:2279.)
+  outputs, _ = torch.triangular_solve(
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[11], line 6[0m
+[1;32m      3[0m test [38;5;241m=[39m we[38;5;241m.[39mload_npz(B[38;5;241m.[39mOUT [38;5;241m/[39m [38;5;124mf[39m[38;5;124m"[39m[38;5;124mtest_[39m[38;5;132;01m{[39;00mB[38;5;241m.[39m_tok(PROTOCOL)[38;5;132;01m}[39;00m[38;5;124m.npz[39m[38;5;124m"[39m)
+[1;32m      4[0m x [38;5;241m=[39m test[[38;5;124m"[39m[38;5;124mx_sc[39m[38;5;124m"[39m][test[[38;5;124m"[39m[38;5;124msc_name[39m[38;5;124m"[39m] [38;5;241m==[39m [38;5;124m"[39m[38;5;124mSc4_closed_combined[39m[38;5;124m"[39m][:[38;5;241m1[39m]
+[1;32m      5[0m s [38;5;241m=[39m [43mpost[49m[38;5;241;43m.[39;49m[43msample[49m[43m([49m[43m([49m[38;5;241;43m5000[39;49m[43m,[49m[43m)[49m[43m,[49m[43m [49m[43mx[49m[38;5;241;43m=[39;49m[43mtorch[49m[38;5;241;43m.[39;49m[43mas_tensor[49m[43m([49m[43mx[49m[43m[[49m[38;5;241;43m0[39;49m[43m][49m[43m,[49m[43m [49m[43mdtype[49m[38;5;241;43m=[39;49m[43mtorch[49m[38;5;241;43m.[39;49m[43mfloat32[49m[43m)[49m[43m,[49m
+[0;32m----> 6[0m [43m                [49m[43mshow_progress_bars[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m[43m [49m[43mreject_outside_prior[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m[38;5;241;43m.[39;49m[43mnumpy[49m[43m([49m[43m)[49m
+[1;32m      7[0m [38;5;28mprint[39m(info[[38;5;124m"[39m[38;5;124mprotocol[39m[38;5;124m"[39m], info[[38;5;124m"[39m[38;5;124mproduction_budget[39m[38;5;124m"[39m], [38;5;124m"[39m[38;5;124mensemble[39m[38;5;124m"[39m [38;5;28;01mif[39;00m info[[38;5;124m"[39m[38;5;124muse_ensemble[39m[38;5;124m"[39m] [38;5;28;01melse[39;00m [38;5;124m"[39m[38;5;124msingle[39m[38;5;124m"[39m,
+[1;32m      8[0m       [38;5;124m"[39m[38;5;124m| Sc4 mean[39m[38;5;124m"[39m, s[38;5;241m.[39mmean([38;5;241m0[39m)[38;5;241m.[39mround([38;5;241m3[39m), [38;5;124m"[39m[38;5;124mcorr[39m[38;5;124m"[39m, [38;5;28mround[39m([38;5;28mfloat[39m(np[38;5;241m.[39mcorrcoef(s[38;5;241m.[39mT)[[38;5;241m0[39m, [38;5;241m1[39m]), [38;5;241m3[39m))
+[1;32m      9[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m"[39m[38;5;124mnotebook wall time [39m[38;5;132;01m{[39;00m(time[38;5;241m.[39mtime()[38;5;250m [39m[38;5;241m-[39m[38;5;250m [39mT0)[38;5;250m [39m[38;5;241m/[39m[38;5;250m [39m[38;5;241m60[39m[38;5;132;01m:[39;00m[38;5;124m.1f[39m[38;5;132;01m}[39;00m[38;5;124m min[39m[38;5;124m"[39m)
+
+[0;31mRuntimeError[0m: Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+
+EXIT_STATUS=1

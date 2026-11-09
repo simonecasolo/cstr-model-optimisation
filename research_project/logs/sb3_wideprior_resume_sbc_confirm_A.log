@@ -1,0 +1,21 @@
+=== chunk worker 'sbc_confirm_A' started: out=sb3_sbc_set_n400_sb3_wideprior_stage1bfix_partA.npz, n_rows=130, seed=910301 ===
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_confirm_A] 50/130 rows, 131 attempts, 3658s elapsed, accept_rate=0.38, ETA=1.6h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_confirm_A] 100/130 rows, 255 attempts, 7022s elapsed, accept_rate=0.39, ETA=0.6h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_confirm_A] DONE: 130 rows, 313 attempts, final accept_rate=0.42, 8693s total
+=== chunk worker 'sbc_confirm_A' finished ===

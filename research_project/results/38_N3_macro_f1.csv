@@ -1,0 +1,5 @@
+variant,macro_f1_Sc1_5,macro_f1_all_six,accuracy_Sc1_5
+gate + drift-aware (guarded; headline),0.9394404769456309,0.9010580610839785,0.94
+production 2-D only,0.9394404769456309,0.8743802181699661,0.94
+drift-aware only,0.8964361046769503,0.8829720244229133,0.9
+sensitivity: gate without the saturation guard,0.894347847295927,0.8819673882775516,0.896

@@ -1,0 +1,8 @@
+point,pair,corr_mean
+Nominal,eta_col/z_A0_eff,0.5019040650367078
+Nominal,alpha/eta_col,-0.5824773146559429
+"nb39/41 degraded (xi_reb=0.70, z_A0_eff=0.80)",alpha/z_A0_eff,-0.29395787583155436
+W2 (alpha=0.85),alpha/z_A0_eff,0.653057510902962
+nb40 P4 (random prior draw),alpha/z_A0_eff,0.48235560644360875
+nb40 P4 (random prior draw),eta_col/z_A0_eff,0.24719112589527392
+"nb41 interior eta_col=0.85, z_A0_eff=0.80",eta_col/z_A0_eff,0.3820717269784353

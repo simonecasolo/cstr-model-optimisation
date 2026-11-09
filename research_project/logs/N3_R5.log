@@ -1,0 +1,97 @@
+[NbConvertApp] Converting notebook notebooks/system_I/07_failure_baseline_open_vs_closed.ipynb to notebook
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/traitlets/config/application.py", line 1082, in launch_instance
+    app.start()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# Section 3b -- sample_posterior draws WITHOUT restricting to the prior box (reject_outside_prior=False);
+# a warning above reported that for at least one (posterior, scenario) pair all samples fall outside it.
+# Measure that, and recompute the beta metrics on the in-prior samples only.
+from cstr_sbi.priors import ALPHA_LOW, ALPHA_HIGH, BETA_LOW, BETA_HIGH
+LO, HI = np.array([ALPHA_LOW, BETA_LOW]), np.array([ALPHA_HIGH, BETA_HIGH])
+rows_leak = []
+for sc_id in [2, 6]:
+    r = results[sc_id]
+    for samps, model in [(r["samps_cl"], "CL-SBI"), (r["samps_ol"], "OL-SBI")]:
+        inside = np.all((samps >= LO) & (samps <= HI), axis=2)          # (N_REP, N_SAMP)
+        cov, acc, bmean = [], [], []
+        for i in range(samps.shape[0]):
+            v = samps[i][inside[i]]
+            if len(v) < 50:
+                continue
+            lo5, hi95 = np.percentile(v[:, 1], [5, 95])
+            cov.append(lo5 <= r["beta_true"] <= hi95)
+            acc.append(classify_fault(v)["class"] == "fouling_dominant")
+            bmean.append(v[:, 1].mean())
+        rows_leak.append(dict(
+            scenario=f"Sc{sc_id}", model=model, frac_outside_prior=float(1 - inside.mean()),
+            alpha_mean_raw=float(samps[:, :, 0].mean()), beta_mean_raw=float(samps[:, :, 1].mean()),
+            n_windows_with_50_inside=len(cov),
+            beta_mean_inprior=float(np.mean(bmean)) if bmean else np.nan,
+            beta_cov90_inprior=float(np.mean(cov)) if cov else np.nan,
+            fault_acc_inprior=float(np.mean(acc)) if acc else np.nan,
+            class_counts_raw=pd.Series([classify_fault(samps[i])["class"] for i in range(samps.shape[0])]).value_counts().to_dict()))
+import pandas as pd
+df_leak = pd.DataFrame(rows_leak)
+display(df_leak)
+df_leak.to_csv(RESULTS / f"07_cl_vs_ol_prior_leakage{SFX}.csv", index=False)
+print("A model whose samples lie largely outside the prior is extrapolating beyond its training data:"
+      " its point estimates are not interpretable as inference, only its failure is.")
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[4], line 27[0m
+[1;32m     18[0m             acc[38;5;241m.[39mappend(classify_fault(v)[[38;5;124m"[39m[38;5;124mclass[39m[38;5;124m"[39m] [38;5;241m==[39m [38;5;124m"[39m[38;5;124mfouling_dominant[39m[38;5;124m"[39m)
+[1;32m     19[0m             bmean[38;5;241m.[39mappend(v[:, [38;5;241m1[39m][38;5;241m.[39mmean())
+[1;32m     20[0m         rows_leak[38;5;241m.[39mappend([38;5;28mdict[39m(
+[1;32m     21[0m             scenario[38;5;241m=[39m[38;5;124mf[39m[38;5;124m"[39m[38;5;124mSc[39m[38;5;132;01m{[39;00msc_id[38;5;132;01m}[39;00m[38;5;124m"[39m, model[38;5;241m=[39mmodel, frac_outside_prior[38;5;241m=[39m[38;5;28mfloat[39m([38;5;241m1[39m [38;5;241m-[39m inside[38;5;241m.[39mmean()),
+[1;32m     22[0m             alpha_mean_raw[38;5;241m=[39m[38;5;28mfloat[39m(samps[:, :, [38;5;241m0[39m][38;5;241m.[39mmean()), beta_mean_raw[38;5;241m=[39m[38;5;28mfloat[39m(samps[:, :, [38;5;241m1[39m][38;5;241m.[39mmean()),
+[1;32m     23[0m             n_windows_with_50_inside[38;5;241m=[39m[38;5;28mlen[39m(cov),
+[1;32m     24[0m             beta_mean_inprior[38;5;241m=[39m[38;5;28mfloat[39m(np[38;5;241m.[39mmean(bmean)) [38;5;28;01mif[39;00m bmean [38;5;28;01melse[39;00m np[38;5;241m.[39mnan,
+[1;32m     25[0m             beta_cov90_inprior[38;5;241m=[39m[38;5;28mfloat[39m(np[38;5;241m.[39mmean(cov)) [38;5;28;01mif[39;00m cov [38;5;28;01melse[39;00m np[38;5;241m.[39mnan,
+[1;32m     26[0m             fault_acc_inprior[38;5;241m=[39m[38;5;28mfloat[39m(np[38;5;241m.[39mmean(acc)) [38;5;28;01mif[39;00m acc [38;5;28;01melse[39;00m np[38;5;241m.[39mnan,
+[0;32m---> 27[0m             class_counts_raw[38;5;241m=[39m[43mpd[49m[38;5;241m.[39mSeries([classify_fault(samps[i])[[38;5;124m"[39m[38;5;124mclass[39m[38;5;124m"[39m] [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m(samps[38;5;241m.[39mshape[[38;5;241m0[39m])])[38;5;241m.[39mvalue_counts()[38;5;241m.[39mto_dict()))
+[1;32m     28[0m [38;5;28;01mimport[39;00m[38;5;250m [39m[38;5;21;01mpandas[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[38;5;21;01mpd[39;00m
+[1;32m     29[0m df_leak [38;5;241m=[39m pd[38;5;241m.[39mDataFrame(rows_leak)
+
+[0;31mNameError[0m: name 'pd' is not defined
+
+EXIT_STATUS=1

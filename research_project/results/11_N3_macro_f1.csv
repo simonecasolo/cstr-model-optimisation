@@ -1,0 +1,7 @@
+set,scenarios,n,accuracy,macro_f1
+"L1 (1,000 per scenario)",Sc1-Sc5 (headline),5000,0.9124,0.9071522724563392
+"L1 (1,000 per scenario)",all six,6000,0.8171666666666667,0.8242732887251694
+"L1 (1,000 per scenario)",Sc7 only,1000,0.341,0.5085756897837435
+D1 (50 per scenario),Sc1-Sc5 (headline),250,0.936,0.9359590127574513
+D1 (50 per scenario),all six,300,0.8633333333333333,0.8686117264059932
+D1 (50 per scenario),Sc7 only,50,0.5,0.6666666666666666

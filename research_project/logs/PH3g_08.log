@@ -1,0 +1,39 @@
+START 21:13:47
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_08.py", line 132, in <module>
+    print(build(execute="--execute" in sys.argv))
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_08.py", line 125, in build
+    client.execute()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+ref = pd.read_csv(R / "03s_N3_fim.csv"); ref = ref[ref.set == "S1_base_est"].set_index("point")
+nom = fim[fim["mode"] == "nominal (S1)"].set_index("point")
+cmp_ = pd.DataFrame({"crb_a_here": nom.loc[ref.index, "crb_sd_a"], "crb_a_nb03": ref.crb_sd_a, "crb_b_here": nom.loc[ref.index, "crb_sd_b"], "crb_b_nb03": ref.crb_sd_b})
+cmp_["ratio_a"] = cmp_.crb_a_here / cmp_.crb_a_nb03; cmp_["ratio_b"] = cmp_.crb_b_here / cmp_.crb_b_nb03; display(cmp_.round(3))
+assert ((cmp_.ratio_a - 1).abs() < 0.25).all() and ((cmp_.ratio_b - 1).abs() < 0.25).all(), "agreement check failed"
+print("check passed: nominal-mode CRBs agree with notebook 03 section 10b within 25%")
+
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAssertionError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[3], line 5[0m
+[1;32m      3[0m cmp_ [38;5;241m=[39m pd[38;5;241m.[39mDataFrame({[38;5;124m"[39m[38;5;124mcrb_a_here[39m[38;5;124m"[39m: nom[38;5;241m.[39mloc[ref[38;5;241m.[39mindex, [38;5;124m"[39m[38;5;124mcrb_sd_a[39m[38;5;124m"[39m], [38;5;124m"[39m[38;5;124mcrb_a_nb03[39m[38;5;124m"[39m: ref[38;5;241m.[39mcrb_sd_a, [38;5;124m"[39m[38;5;124mcrb_b_here[39m[38;5;124m"[39m: nom[38;5;241m.[39mloc[ref[38;5;241m.[39mindex, [38;5;124m"[39m[38;5;124mcrb_sd_b[39m[38;5;124m"[39m], [38;5;124m"[39m[38;5;124mcrb_b_nb03[39m[38;5;124m"[39m: ref[38;5;241m.[39mcrb_sd_b})
+[1;32m      4[0m cmp_[[38;5;124m"[39m[38;5;124mratio_a[39m[38;5;124m"[39m] [38;5;241m=[39m cmp_[38;5;241m.[39mcrb_a_here [38;5;241m/[39m cmp_[38;5;241m.[39mcrb_a_nb03; cmp_[[38;5;124m"[39m[38;5;124mratio_b[39m[38;5;124m"[39m] [38;5;241m=[39m cmp_[38;5;241m.[39mcrb_b_here [38;5;241m/[39m cmp_[38;5;241m.[39mcrb_b_nb03; display(cmp_[38;5;241m.[39mround([38;5;241m3[39m))
+[0;32m----> 5[0m [38;5;28;01massert[39;00m ((cmp_[38;5;241m.[39mratio_a [38;5;241m-[39m [38;5;241m1[39m)[38;5;241m.[39mabs() [38;5;241m<[39m [38;5;241m0.25[39m)[38;5;241m.[39mall() [38;5;129;01mand[39;00m ((cmp_[38;5;241m.[39mratio_b [38;5;241m-[39m [38;5;241m1[39m)[38;5;241m.[39mabs() [38;5;241m<[39m [38;5;241m0.25[39m)[38;5;241m.[39mall(), [38;5;124m"[39m[38;5;124magreement check failed[39m[38;5;124m"[39m
+[1;32m      6[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mcheck passed: nominal-mode CRBs agree with notebook 03 section 10b within 25[39m[38;5;124m%[39m[38;5;124m"[39m)
+
+[0;31mAssertionError[0m: agreement check failed
+
+EXIT_STATUS=1 21:20:29

@@ -25,7 +25,7 @@ from cstr_sbi.recycle.physics import PARAM_NAMES
 SBI_LOGS = ROOT / "sbi-logs"
 RESULTS = ROOT / "results"
 
-THRESH, Z0_NOM = 0.85, 0.90
+THRESH, Z0_NOM = 0.90, 0.90
 FAULT_UNITS = ["healthy", "reactor", "column", "feed", "multi"]
 
 

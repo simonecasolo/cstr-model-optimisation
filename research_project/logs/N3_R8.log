@@ -1,0 +1,52 @@
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_36.py", line 140, in <module>
+    print(build(execute="--execute" in sys.argv))
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_36.py", line 133, in build
+    client.execute()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+acc, acc_res = P.stage_accept()
+acc_g = acc[acc.short.isin(["Sc1", "Sc2", "Sc3", "Sc4"])]
+for k in ("bias_b", "z_bias_b", "cov90_truth_b", "sd_b", "class_acc"):
+    print(k)
+    display(acc_g.pivot_table(index="condition", columns="short", values=k).reindex(list(P.M.CONDITIONS)).round(3))
+m35 = pd.read_csv(R / "35_N3_metrics.csv"); m35["short"] = m35.scenario.str.split("_").str[0]
+ref = m35[m35.variant.isin(["oracle", "eps0.1", "production"]) & m35.short.isin(["Sc1", "Sc2", "Sc3", "Sc4"])]
+comp = pd.concat([acc_g.assign(variant="nb36 production (eps 0.1, 160k study)"), ref])
+summ = comp.groupby(["variant"]).agg(cov90_b_min=("cov90_truth_b", "min"), cov90_b_mean=("cov90_truth_b", "mean"),
+                                     abs_bias_b=("bias_b", lambda v: np.abs(v).mean()), sd_b=("sd_b", "median"),
+                                     class_acc=("class_acc", "mean"))
+display(summ.round(3))
+print(f"notebook wall time {(time.time() - T0) / 60:.1f} min")
+------------------
+
+----- stdout -----
+acceptance: 4 violating cell(s); accepted = False
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[5], line 1[0m
+[0;32m----> 1[0m acc, acc_res [38;5;241m=[39m [43mP[49m[38;5;241;43m.[39;49m[43mstage_accept[49m[43m([49m[43m)[49m
+[1;32m      2[0m acc_g [38;5;241m=[39m acc[acc[38;5;241m.[39mshort[38;5;241m.[39misin([[38;5;124m"[39m[38;5;124mSc1[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mSc2[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mSc3[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mSc4[39m[38;5;124m"[39m])]
+[1;32m      3[0m [38;5;28;01mfor[39;00m k [38;5;129;01min[39;00m ([38;5;124m"[39m[38;5;124mbias_b[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mz_bias_b[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mcov90_truth_b[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124msd_b[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mclass_acc[39m[38;5;124m"[39m):
+
+File [0;32m~/inso-po-RD/cstr-model-optimisation/research_project/scripts/nb36_production_measured_inlet.py:249[0m, in [0;36mstage_accept[0;34m()[0m
+[1;32m    247[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m"[39m[38;5;124macceptance: [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(bad)[38;5;132;01m}[39;00m[38;5;124m violating cell(s); accepted = [39m[38;5;132;01m{[39;00mres[[38;5;124m'[39m[38;5;124maccepted[39m[38;5;124m'[39m][38;5;132;01m}[39;00m[38;5;124m"[39m)
+[1;32m    248[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m res[[38;5;124m"[39m[38;5;124maccepted[39m[38;5;124m"[39m]:
+[0;32m--> 249[0m     [38;5;28;01mraise[39;00m [38;5;167;01mRuntimeError[39;00m([38;5;124m"[39m[38;5;124mSTOP: the measured-inlet production posterior fails acceptance -- user decision[39m[38;5;124m"[39m)
+[1;32m    250[0m [38;5;28;01mreturn[39;00m df, res
+
+[0;31mRuntimeError[0m: STOP: the measured-inlet production posterior fails acceptance -- user decision
+
+EXIT_STATUS=1

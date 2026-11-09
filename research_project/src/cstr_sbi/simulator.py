@@ -262,15 +262,27 @@ def warm_start_ic(
     ctrl: jnp.ndarray = NOMINAL_CTRL,
     t_warm: float = 1500.0,
 ) -> jnp.ndarray:
-    """Run the deterministic closed-loop simulator to (near) steady state and
-    return the resulting ``[C, T, Tc, I]`` as an EM warm-start IC.
+    """Return the exact closed-loop steady state ``[C, T, Tc, I]`` as an EM
+    warm-start IC.
 
     This is the M2-side answer to the M1 finding that a cold IC
     ``[0.5, 300, 297, 0]`` causes Tsit5 to break: each scenario gets its
     own warm-start, computed once and reused across all replicates.
-    """
-    from cstr_sbi.physics import NOMINAL_Y0_CL
 
-    return simulate_closed_loop_to_steady_state(
-        params, inlet, ctrl, NOMINAL_Y0_CL, t_final=t_warm,
-    )
+    2026-11-07 nb22 warm-start audit: this used to forward-integrate the
+    closed-loop ODE for ``t_warm`` minutes and return the endpoint
+    (``simulate_closed_loop_to_steady_state``). That was found to leave the
+    slow PI-integrator state ``I`` un-converged at the project's default
+    ``t_warm=1500`` for every closed-loop scenario except the trivial
+    saturated case, and naively raising ``t_warm`` hit a second bug
+    (``diffeqsolve``'s ``max_steps`` silently truncating the run via
+    ``throw=False``). Fixed by solving for the exact steady state via
+    root-finding instead (``closed_loop_steady_state_exact``) -- see that
+    function's docstring in ``cstr_sbi.physics`` for the derivation. The
+    ``t_warm`` parameter is now unused and kept only for call-site/signature
+    backward compatibility; it is not a forward-integration horizon anymore.
+    """
+    from cstr_sbi.physics import closed_loop_steady_state_exact
+
+    del t_warm  # no longer a forward-integration horizon; kept for compat
+    return closed_loop_steady_state_exact(params, inlet, ctrl)

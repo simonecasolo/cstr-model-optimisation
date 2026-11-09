@@ -1,0 +1,5 @@
+posterior,subset,n,mean_rank,ks_p
+seed4,near edge (<=20% half-range),64,232.0,0.09843317666355023
+seed4,away from edge,236,202.6864471435547,1.9992098962680065e-06
+cached,near edge (<=20% half-range),64,209.984375,0.00022685390980102144
+cached,away from edge,236,218.77117919921875,0.00410045784869281

@@ -1,0 +1,14 @@
+=== chunk worker 'train_chunk3' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk3.npz, n_rows=280, seed=910103 ===
+[train_chunk3] resuming from partial: 150/280 rows, 383 attempts
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[train_chunk3] 200/280 rows, 502 attempts, 3390s elapsed, accept_rate=0.40, ETA=0.4h
+[train_chunk3] 250/280 rows, 637 attempts, 7288s elapsed, accept_rate=0.39, ETA=0.2h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[train_chunk3] DONE: 280 rows, 718 attempts, final accept_rate=0.39, 9692s total
+=== chunk worker 'train_chunk3' finished ===

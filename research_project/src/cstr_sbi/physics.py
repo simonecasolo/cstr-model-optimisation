@@ -63,7 +63,11 @@ TCI_NOMINAL: float = 297.0    # K,       coolant inlet temperature
 # PI controller (cstr_parameters_recommended.md Section 3.2)
 #
 # Sign convention.  We use the spec equation
-#     Qc(t) = Qc0 + Kp*(T - Tsp) + (1/tau_i) * integral(T - Tsp) dt
+#     Qc(t) = Qc0 + Kp*[ (T - Tsp) + (1/tau_i) * integral(T - Tsp) dt ]
+#
+# 2026-11-08 FIX: Kp previously did NOT multiply the integral term
+# (Qc = Qc0 + Kp*(T-Tsp) + I/tau_i, which is also dimensionally inconsistent).
+# Standard form now used; I = integral(T-Tsp) dt has units K*min.
 # (research_spec.md Section 3.2). With this convention the proportional
 # gain MUST be positive for the controller to increase cooling when the
 # reactor overheats: T > Tsp -> error positive -> Qc grows.
@@ -302,11 +306,15 @@ def compute_qc(T: float, I: float, ctrl: jnp.ndarray) -> jnp.ndarray:
     """Return the (clamped) coolant flow rate ``Qc`` from the PI controller.
 
     ``ctrl`` packs ``[Kp, tau_i, Tsp, Qc0, Qc_min, Qc_max]``. The unclamped
-    output is ``Qc0 + Kp*(T - Tsp) + I/tau_i``; valve limits are applied via
+    output is the standard (dimensionally consistent) PI law
+    ``Qc0 + Kp*[(T - Tsp) + I/tau_i]`` with ``I = integral(T - Tsp) dt`` in K*min
+    (controller-form fix, 2026-11-08: Kp now multiplies the integral term; the
+    previous ``Kp*(T-Tsp) + I/tau_i`` had integral gain 1/tau_i instead of
+    Kp/tau_i, i.e. 150x too weak, with a 1.6e3-5.5e3 min slow mode); valve limits are applied via
     ``jnp.clip``.
     """
     Kp, tau_i, Tsp, Qc0, Qc_min, Qc_max = ctrl
-    qc_unclamped = Qc0 + Kp * (T - Tsp) + I / tau_i
+    qc_unclamped = Qc0 + Kp * ((T - Tsp) + I / tau_i)
     return jnp.clip(qc_unclamped, Qc_min, Qc_max)
 
 
@@ -346,7 +354,7 @@ def cstr_closed_loop_rhs(
     C, T, Tc, I = y[0], y[1], y[2], y[3]
 
     # PI controller (with anti-windup via conditional integration)
-    qc_unclamped = Qc0 + Kp * (T - Tsp) + I / tau_i
+    qc_unclamped = Qc0 + Kp * ((T - Tsp) + I / tau_i)
     Qc = jnp.clip(qc_unclamped, Qc_min, Qc_max)
     not_saturated = (qc_unclamped > Qc_min) & (qc_unclamped < Qc_max)
     dI = jnp.where(not_saturated, T - Tsp, 0.0)
@@ -369,6 +377,178 @@ def cstr_closed_loop_rhs(
 # ---------------------------------------------------------------------------
 # Closed-loop integrators
 # ---------------------------------------------------------------------------
+
+
+def closed_loop_steady_state_exact(
+    params: jnp.ndarray,
+    inlet: jnp.ndarray,
+    ctrl: jnp.ndarray = NOMINAL_CTRL,
+) -> jnp.ndarray:
+    """Exact closed-loop steady state via root-finding, not forward integration.
+
+    2026-11-07 nb22 warm-start audit: ``warm_start_ic`` (via
+    ``simulate_closed_loop_to_steady_state``) forward-integrates for a fixed
+    ``t_warm`` and returns the endpoint. ``C``, ``T``, ``Tc`` converge quickly
+    but the PI integrator state ``I`` is a genuinely slow mode and was found
+    to still be drifting at the project's default ``t_warm=1500`` (and
+    naively raising ``t_warm`` hits a second bug: ``diffeqsolve``'s
+    ``max_steps`` silently truncates the run with ``throw=False``, no
+    warning). This function instead solves the steady-state algebraic
+    equations directly:
+
+    * **Non-saturated branch.** ``dI/dt=0`` with the anti-windup gate open
+      pins ``T = Tsp`` *exactly* (integral control removes steady-state
+      temperature error) -- consistent with this project's own existing
+      argument elsewhere about integral-control steady-state behaviour.
+      Given ``T = Tsp``, ``C``, ``Tc``, ``Qc`` follow in closed form from
+      ``dC/dt=0``, ``dT/dt=0``, ``dTc/dt=0`` in turn, and ``I`` follows from
+      the controller law. No iteration needed.
+    * **Saturated branch** (e.g. Sc2/Sc5's heavy fouling, where even the
+      maximum coolant flow cannot remove enough heat to reach ``Tsp``):
+      ``T`` no longer equals ``Tsp``. ``Qc`` is pinned at the active bound
+      and a 1-D root-find (Arrhenius-nonlinear in ``T``) gives ``T``; ``C``
+      and ``Tc`` follow in closed form from ``T``; ``I`` is set to the value
+      that makes the *unclamped* controller output touch the active bound
+      (the value the real dynamics approach in the limit of sustained
+      saturation -- the anti-windup gate itself does not pin a unique ``I``,
+      since any ``I`` keeping ``qc_unclamped`` beyond the bound satisfies
+      ``dI/dt=0``; this is the natural boundary-continuous choice).
+
+      **Which bound is active is decided by feasibility, not by the sign of
+      the non-saturated candidate's implied ``Qc``.** An earlier version of
+      this function picked the bound from the sign/magnitude of the
+      non-saturated candidate's ``Qc`` directly, which is wrong: ``Tc`` is
+      physically bounded within ``[Tci, T]`` for any ``Qc >= 0`` (as
+      ``Qc -> inf``, ``Tc -> Tci``; as ``Qc -> 0``, ``Tc -> T``), so when the
+      non-saturated algebra implies a ``Tc`` *below* ``Tci`` (as happens for
+      Sc2: insufficient cooling capacity even at infinite flow), the correct
+      response is to saturate at ``Qc_max`` (the best available cooling),
+      NOT ``Qc_min`` -- picking ``Qc_min`` there is backwards and was
+      verified numerically to give the wrong, far-from-``Tsp`` answer
+      (``T=316.36`` vs. the correct ``T=312.87`` for Sc2's beta=0.7).
+      Instead, this function always evaluates ``T`` at both ``Qc_min`` and
+      ``Qc_max`` (cheap 1-D root-finds) and uses monotonicity of
+      ``T_ss(Qc)`` (more cooling flow -> lower ``T``, verified numerically
+      for this parameter regime) to decide: if ``Tsp`` lies between the two,
+      use the non-saturated closed form; otherwise saturate at whichever
+      bound's ``T_ss`` is the closer feasible point to ``Tsp``.
+
+    2026-11-08 JAX-differentiability fix (nb23): the implementation above was
+    originally written with plain Python ``float()`` and
+    ``scipy.optimize.brentq``, which eager-evaluate on concrete numbers but
+    cannot be traced by ``jax.grad``/``jax.jit`` -- fatal for NUTS's
+    ``matched_warm_start=True`` path, which needs HMC gradients through this
+    function (``jax.grad`` raised ``ConcretizationTypeError`` on the
+    ``float()`` call). This is now a JAX-native reimplementation: the 1-D
+    root-find is a fixed-iteration-count bisection via ``jax.lax.fori_loop``
+    (replacing ``scipy.optimize.brentq``), and the saturated-vs-non-saturated
+    branch selection uses ``jnp.where`` (replacing the Python ``if``) so both
+    branches are always evaluated and selected differentiably. The physics
+    (bracket bounds, monotonicity-based saturation-bound selection, the
+    anti-windup epsilon push) is unchanged from the derivation above -- only
+    *how* it is computed changed, not *what* it computes. Verified
+    numerically identical to the old scipy-based implementation to within
+    bisection tolerance at every closed-loop Sc0-7 point (see
+    ``results/23_correctness_check.csv``); differentiability confirmed via a
+    direct ``jax.grad`` probe and via ``run_mcmc_baseline(...,
+    matched_warm_start=True)`` no longer crashing at Sc4/Sc5 (see
+    ``notebooks/system_I/23_nuts_differentiable_warmstart_fix.ipynb``).
+
+    Works under both eager (concrete) and traced (``jax.grad``/``jax.jit``)
+    evaluation -- every call site in this codebase invokes it eagerly except
+    NUTS's differentiated likelihood, which is the one path this fix exists
+    for.
+    """
+    UA, k0, alpha, beta = params[0], params[1], params[2], params[3]
+    Ci, Ti, Tci = inlet[0], inlet[1], inlet[2]
+    Kp, tau_i, Tsp, Qc0, Qc_min, Qc_max = (
+        ctrl[0], ctrl[1], ctrl[2], ctrl[3], ctrl[4], ctrl[5],
+    )
+
+    UA_eff = beta * UA
+
+    def k_eff(T):
+        return alpha * k0 * jnp.exp(-E_A / (R_GAS * T))
+
+    def C_of_T(T):
+        return (Q / V) * Ci / (Q / V + k_eff(T))
+
+    def Tc_of_T(T, Qc):
+        return (Qc * RHO_C * C_PC * Tci + UA_eff * T) / (Qc * RHO_C * C_PC + UA_eff)
+
+    def dT_residual(T, Qc):
+        ke = k_eff(T)
+        C = C_of_T(T)
+        Tc = Tc_of_T(T, Qc)
+        return (
+            (Q / V) * (Ti - T)
+            - H_R * ke * C / (RHO * C_P)
+            - UA_eff * (T - Tc) / (RHO * C_P * V)
+        )
+
+    def solve_T_at(Qc, n_iter: int = 60):
+        # Fixed-iteration-count bisection on T in [250, 450] K, replacing
+        # scipy.optimize.brentq. 60 halvings of a 200 K bracket drives the
+        # bracket width to ~200/2**60 ~ 1.7e-16 K, far below the xtol=1e-12
+        # the old brentq call used -- the extra iterations are cheap (each
+        # is one exp() + a handful of flops) and are not spent chasing
+        # unneeded precision once the bracket is already below float64 eps
+        # at these T scales (~300 K * 2.2e-16 ~ 6.6e-14 K).
+        T_lo0 = jnp.asarray(250.0, dtype=UA.dtype)
+        T_hi0 = jnp.asarray(450.0, dtype=UA.dtype)
+
+        def body(_, state):
+            lo, hi = state
+            mid = 0.5 * (lo + hi)
+            f_lo = dT_residual(lo, Qc)
+            f_mid = dT_residual(mid, Qc)
+            same_sign = f_lo * f_mid > 0.0
+            lo_new = jnp.where(same_sign, mid, lo)
+            hi_new = jnp.where(same_sign, hi, mid)
+            return (lo_new, hi_new)
+
+        lo_f, hi_f = jax.lax.fori_loop(0, n_iter, body, (T_lo0, T_hi0))
+        return 0.5 * (lo_f + hi_f)
+
+    # Feasibility check: is Tsp reachable within the actuator's range?
+    # T_ss(Qc) is monotonically decreasing in Qc (more coolant flow -> lower
+    # T), so the reachable range at steady state is [T_ss(Qc_max), T_ss(Qc_min)].
+    T_at_Qmax = solve_T_at(Qc_max)
+    T_at_Qmin = solve_T_at(Qc_min)
+
+    not_saturated = (T_at_Qmax <= Tsp) & (Tsp <= T_at_Qmin)
+
+    # --- Non-saturated candidate: dI/dt = 0 (gate open) forces T = Tsp exactly.
+    ke_sp = k_eff(Tsp)
+    C_ns = C_of_T(Tsp)
+    rhs_no_cool = (Q / V) * (Ti - Tsp) - H_R * ke_sp * C_ns / (RHO * C_P)
+    Tc_ns = Tsp - rhs_no_cool * (RHO * C_P * V) / UA_eff
+    Qc_ns = -UA_eff * (Tsp - Tc_ns) / (RHO_C * C_PC * (Tci - Tc_ns))
+    I_ns = tau_i * (Qc_ns - Qc0) / Kp
+    result_ns = jnp.array([C_ns, Tsp, Tc_ns, I_ns])
+
+    # --- Saturated candidate: Tsp unreachable within [Qc_min, Qc_max]; pick
+    # whichever bound's steady state is the closer feasible point to Tsp.
+    # (jnp.where in place of the Python `if Tsp < T_at_Qmax` -- both bound
+    # choices are evaluated and selected differentiably.)
+    use_qmax = Tsp < T_at_Qmax
+    Qc_fixed = jnp.where(use_qmax, Qc_max, Qc_min)
+    T_star = jnp.where(use_qmax, T_at_Qmax, T_at_Qmin)
+    C_star = C_of_T(T_star)
+    Tc_star = Tc_of_T(T_star, Qc_fixed)
+    # Push `qc_unclamped` a hair past the active bound (not exactly onto it)
+    # so the gate's strict `<`/`>` comparison in `cstr_closed_loop_rhs` is
+    # robust to float32 rounding of `I` on the caller side -- verified
+    # (nb22 warm-start-fix audit) that landing exactly on the boundary can
+    # round the wrong way under float32 and spuriously re-open the gate,
+    # giving a small but nonzero `dI` at an otherwise-exact fixed point.
+    _qc_eps = 2e-2
+    _sat_sign = jnp.where(use_qmax, 1.0, -1.0)
+    I_star = tau_i * ((Qc_fixed - Qc0 + _sat_sign * _qc_eps) / Kp - (T_star - Tsp))
+    result_sat = jnp.array([C_star, T_star, Tc_star, I_star])
+
+    return jnp.where(not_saturated, result_ns, result_sat)
+
 
 def simulate_closed_loop_to_steady_state(
     params: jnp.ndarray,

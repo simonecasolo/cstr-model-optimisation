@@ -1,0 +1,15 @@
+subset,n_features,lda_cv_accuracy
+D0: all 29 base,29,0.9824999999999999
+D0: group per_channel,20,0.9724999999999999
+D0: group final_window,4,0.8299999999999998
+D0: group aggregates,3,0.54
+D0: group physics,2,0.715
+D0: group compact,12,0.9625
+D0: group means_only,4,0.95
+D0: top-5 MI,5,0.7725
+D0: top-10 MI,10,0.7875
+D0: top-15 MI,15,0.985
+D1: base 29,29,0.7033333333333334
+D1: base + 3 estimators,32,0.79
+D1: S1m (34),34,0.9233333333333335
+D1: estimators + measured temperatures only,5,0.8133333333333332

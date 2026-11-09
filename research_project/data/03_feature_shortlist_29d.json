@@ -1,15 +1,15 @@
 {
   "top_10_mi_29d": [
-    "k0_eff_proxy",
     "C_mean",
-    "C_min",
-    "C_final_mean",
+    "k0_eff_proxy",
     "C_max",
     "UA_eff_proxy",
+    "C_min",
+    "C_final_mean",
     "Qc_mean",
     "Qc_max",
     "Qc_min",
-    "Qc_final_mean"
+    "Tc_mean"
   ],
   "all_features_29d": [
     "C_mean",

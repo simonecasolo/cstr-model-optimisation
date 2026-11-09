@@ -1,0 +1,3 @@
+from_budget,to_budget,abs_delta_mean,converged
+10000,20000,0.11960562881001702,False
+20000,40000,0.1670993892563276,False

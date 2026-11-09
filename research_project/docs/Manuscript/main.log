@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.7)  26 AUG 2026 21:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.7)  30 SEP 2026 16:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**main
+**main.tex
 (./main.tex
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-02-24>
@@ -822,7 +822,6 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 20.
 LaTeX Info: Redefining \pageref on input line 20.
 LaTeX Info: Redefining \nameref on input line 20.
- (./main.out) (./main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
@@ -833,8 +832,7 @@ Class revtex4-2 Info: Taking \maketitle back from hyperref on input line 20.
 
 LaTeX Font Info:    Trying to load font information for U+msa on input line 82.
 
-
-(/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
+ (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 82.
@@ -848,7 +846,7 @@ Underfull \hbox (badness 1635) in paragraph at lines 84--87
 atis-
  []
 
-<PFD_Wu2003.png, id=152, 2742.245pt x 1541.76pt>
+<PFD_Wu2003.png, id=11, 2742.245pt x 1541.76pt>
 File: PFD_Wu2003.png Graphic file (type png)
 <use PFD_Wu2003.png>
 Package pdftex.def Info: PFD_Wu2003.png  used on input line 92.
@@ -859,7 +857,7 @@ Underfull \hbox (badness 4832) in paragraph at lines 101--128
  []
 
 [1{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-[2 <./PFD_Wu2003.png>]
+[2]
 Underfull \hbox (badness 10000) in paragraph at lines 223--226
 []\T1/cmr/m/n/10 The re-ac-tion is exother-mic, with $\OT1/cmr/m/n/10 ^^A\OML/c
 mm/m/it/10 H[] \OT1/cmr/m/n/10 =
@@ -872,14 +870,14 @@ he sign con-ven-tion of
  []
 
 [3] [4] [5]
-<../../figures//nb21_cl_vs_ol_masking_2x1.png, id=347, 350.5095pt x 264.7491pt>
+<../../figures//nb21_cl_vs_ol_masking_2x1.png, id=216, 350.5095pt x 264.7491pt>
 
 File: ../../figures//nb21_cl_vs_ol_masking_2x1.png Graphic file (type png)
 <use ../../figures//nb21_cl_vs_ol_masking_2x1.png>
 Package pdftex.def Info: ../../figures//nb21_cl_vs_ol_masking_2x1.png  used on 
 input line 560.
 (pdftex.def)             Requested size: 221.3985pt x 167.2291pt.
- [6 <../../figures//nb21_cl_vs_ol_masking_2x1.png>]
+ [6]
 Underfull \hbox (badness 3803) in paragraph at lines 619--624
 \T1/cmr/m/n/10 where the fresh-feed com-po-si-tion fault prop-a-gates
  []
@@ -903,125 +901,123 @@ cmr/m/n/10 , both as-
  []
 
 [9]
-<../../figures//03_physics_features_scatter.png, id=421, 250.7769pt x 237.0456p
+<../../figures//03_physics_features_scatter.png, id=291, 250.7769pt x 237.0456p
 t>
 File: ../../figures//03_physics_features_scatter.png Graphic file (type png)
 <use ../../figures//03_physics_features_scatter.png>
 Package pdftex.def Info: ../../figures//03_physics_features_scatter.png  used o
 n input line 855.
 (pdftex.def)             Requested size: 209.1015pt x 197.65927pt.
-<../../figures//06_joint_posterior_primary_merged.png, id=423, 418.2024pt x 410
+<../../figures//06_joint_posterior_primary_merged.png, id=293, 418.2024pt x 410
 .7345pt>
 File: ../../figures//06_joint_posterior_primary_merged.png Graphic file (type p
 ng)
 <use ../../figures//06_joint_posterior_primary_merged.png>
 Package pdftex.def Info: ../../figures//06_joint_posterior_primary_merged.png  
-used on input line 883.
+used on input line 889.
 (pdftex.def)             Requested size: 196.80075pt x 193.28966pt.
- [10 <../../figures//03_physics_features_scatter.png> <../../figures//06_joint_
-posterior_primary_merged.png>] [11]
-<../../figures//10_degradation_tracking.png, id=462, 315.8199pt x 254.3904pt>
+ [10] [11]
+<../../figures//10_degradation_tracking.png, id=331, 315.8199pt x 254.3904pt>
 File: ../../figures//10_degradation_tracking.png Graphic file (type png)
 <use ../../figures//10_degradation_tracking.png>
 Package pdftex.def Info: ../../figures//10_degradation_tracking.png  used on in
-put line 1119.
+put line 1125.
 (pdftex.def)             Requested size: 243.54135pt x 196.17233pt.
- [12 <../../figures//10_degradation_tracking.png>]
-Underfull \hbox (badness 1442) in paragraph at lines 1152--1167
+
+Underfull \hbox (badness 1442) in paragraph at lines 1158--1173
 []\T1/cmr/m/n/10 The SBI tracker achieves $[][] \OT1/cmr/m/n/10 = 0\OML/cmm/m/i
 t/10 :\OT1/cmr/m/n/10 0027$ \T1/cmr/m/n/10 and
  []
 
-[13]
-<../../figures//nb31_confusion_matrix.png, id=490, 282.8166pt x 225.0006pt>
+[12] [13]
+<../../figures//nb31_confusion_matrix.png, id=361, 441.20834pt x 384.11505pt>
 File: ../../figures//nb31_confusion_matrix.png Graphic file (type png)
 <use ../../figures//nb31_confusion_matrix.png>
 Package pdftex.def Info: ../../figures//nb31_confusion_matrix.png  used on inpu
-t line 1249.
-(pdftex.def)             Requested size: 221.3985pt x 176.13832pt.
-<../../figures//nb23_fim_heatmap_single.png, id=499, 282.5757pt x 227.6505pt>
+t line 1254.
+(pdftex.def)             Requested size: 221.3985pt x 192.74866pt.
+<../../figures//nb23_fim_heatmap_single.png, id=370, 282.5757pt x 227.6505pt>
 File: ../../figures//nb23_fim_heatmap_single.png Graphic file (type png)
 <use ../../figures//nb23_fim_heatmap_single.png>
 Package pdftex.def Info: ../../figures//nb23_fim_heatmap_single.png  used on in
-put line 1320.
+put line 1325.
 (pdftex.def)             Requested size: 238.6203pt x 192.24635pt.
 
-Underfull \hbox (badness 1902) in paragraph at lines 1333--1336
+Underfull \hbox (badness 1902) in paragraph at lines 1338--1341
 \T1/cmr/m/n/10 from Sys-tem I. Loop 1 masks reactor-temperature
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1333--1336
+Underfull \hbox (badness 10000) in paragraph at lines 1338--1341
 \T1/cmr/m/n/10 To dis-tin-guish plant-level non-identifiability from
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1333--1336
+Underfull \hbox (badness 10000) in paragraph at lines 1338--1341
 
  []
 
-[14 <../../figures//nb31_confusion_matrix.png> <../../figures//nb23_fim_heatmap
-_single.png>]
+[14]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 1339.
+(hyperref)                removing `subscript' on input line 1344.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 1354.
+(hyperref)                removing `subscript' on input line 1359.
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 1357--1361
+Underfull \hbox (badness 1852) in paragraph at lines 1362--1366
 \T1/cmr/m/n/10 side pair $\OML/cmm/m/it/10  \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it
 /10 ^^L[]$\T1/cmr/m/n/10 . At W11, the 66-D sum-mary
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1357--1361
+Underfull \hbox (badness 10000) in paragraph at lines 1362--1366
 
  []
 
 [15]
-Underfull \hbox (badness 5161) in paragraph at lines 1366--1381
+Underfull \hbox (badness 5161) in paragraph at lines 1371--1386
 []\T1/cmr/m/n/10 The feed-purity pa-ram-e-ter $\OML/cmm/m/it/10 z[]$ \T1/cmr/m/
 n/10 shows strong
  []
 
-<../../figures//nb27_sequential_tracking.png, id=518, 340.6326pt x 470.7186pt>
+<../../figures//nb27_sequential_tracking.png, id=392, 340.6326pt x 470.7186pt>
 File: ../../figures//nb27_sequential_tracking.png Graphic file (type png)
 <use ../../figures//nb27_sequential_tracking.png>
 Package pdftex.def Info: ../../figures//nb27_sequential_tracking.png  used on i
-nput line 1413.
+nput line 1418.
 (pdftex.def)             Requested size: 233.69925pt x 322.95026pt.
 [16]
 
-LaTeX Warning: A float is stuck (cannot be placed) on input line 1447.
+LaTeX Warning: A float is stuck (cannot be placed) on input line 1452.
 
 
-LaTeX Warning: A float is stuck (cannot be placed) on input line 1447.
+LaTeX Warning: A float is stuck (cannot be placed) on input line 1452.
 
 
 Class revtex4-2 Warning: Deferred float stuck during \clearpage processing.
 
-[17 <../../figures//nb27_sequential_tracking.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1543--1545
+[17]
+Underfull \hbox (badness 10000) in paragraph at lines 1548--1550
 
  []
 
 
-Underfull \hbox (badness 2189) in paragraph at lines 1548--1551
+Underfull \hbox (badness 2189) in paragraph at lines 1553--1556
 []\T1/cmr/bx/n/10 Simone Ca-solo\T1/cmr/m/n/10 : Writ-ing, method-ol-ogy, for-m
 al
  []
 
 
-Underfull \hbox (badness 1137) in paragraph at lines 1548--1551
+Underfull \hbox (badness 1137) in paragraph at lines 1553--1556
 \T1/cmr/bx/n/10 Riemer-Sørensen\T1/cmr/m/n/10 : Re-view $\OT1/cmr/m/n/10 &$ \T1
 /cmr/m/n/10 edit-ing, su-per-vi-sion,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1548--1551
+Underfull \hbox (badness 10000) in paragraph at lines 1553--1556
 
  []
 
@@ -1034,55 +1030,28 @@ Underfull \hbox (badness 1033) in paragraph at lines 94--99
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 621D8ECF33293118F656A6B9A4629B2B;8967.
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: A332709DC8F1FB8C333D90C957400A22;9319
+(rerunfilecheck)             After:  621D8ECF33293118F656A6B9A4629B2B;8967.
  ) 
 Here is how much of TeX's memory you used:
- 26218 strings out of 478268
- 494267 string characters out of 5846348
- 789106 words of memory out of 5000000
- 43842 multiletter control sequences out of 15000+600000
+ 26179 strings out of 478268
+ 493822 string characters out of 5846348
+ 788867 words of memory out of 5000000
+ 43807 multiletter control sequences out of 15000+600000
  490173 words of font info for 84 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,12n,89p,1098b,760s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
-</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><
-/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></u
-sr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></us
-r/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr
-/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/l
-ocal/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/loc
-al/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local
-/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/t
-exlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/t
-exlive/2022/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb></usr/loc
-al/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local
-/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/te
-xlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texli
-ve/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/
-2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/202
-2/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2022/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2022/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2022/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2022/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2022/texmf-d
-ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2022/tex
-mf-dist/fonts/type1/public/cm-super/sfbx0900.pfb></usr/local/texlive/2022/texmf
--dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2022/texmf-d
-ist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2022/texmf-dis
-t/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2022/texmf-dist/
-fonts/type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2022/texmf-dist/fo
-nts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2022/texmf-dist/font
-s/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/
-type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/ty
-pe1/public/cm-super/sfti0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type
-1/public/cm-super/sfti1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/
-public/cm-super/sftt0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/pu
-blic/cm-super/sftt1000.pfb>
-Output written on main.pdf (19 pages, 3305895 bytes).
+ 84i,12n,89p,926b,760s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+pdfTeX warning: \pdfdraftmode enabled, not changing output pdf
+
 PDF statistics:
- 789 PDF objects out of 1000 (max. 8388607)
- 667 compressed objects within 7 object streams
+ 497 PDF objects out of 1000 (max. 8388607)
  157 named destinations out of 1000 (max. 500000)
- 333 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 53 words of extra memory for PDF output out of 10000 (max. 10000000)
 

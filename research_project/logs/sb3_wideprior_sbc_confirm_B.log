@@ -1,0 +1,20 @@
+=== chunk worker 'sbc_confirm_B' started: out=sb3_sbc_set_n400_sb3_wideprior_stage1bfix_partB.npz, n_rows=270, seed=910302 ===
+[sbc_confirm_B] 50/270 rows, 128 attempts, 4318s elapsed, accept_rate=0.39, ETA=5.3h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_confirm_B] 100/270 rows, 254 attempts, 8622s elapsed, accept_rate=0.39, ETA=4.1h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_confirm_B] 150/270 rows, 398 attempts, 13145s elapsed, accept_rate=0.38, ETA=2.9h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_confirm_B] 200/270 rows, 537 attempts, 17288s elapsed, accept_rate=0.37, ETA=1.7h
+[sbc_confirm_B] 250/270 rows, 647 attempts, 20375s elapsed, accept_rate=0.39, ETA=0.5h
+[sbc_confirm_B] DONE: 270 rows, 706 attempts, final accept_rate=0.38, 22356s total
+=== chunk worker 'sbc_confirm_B' finished ===

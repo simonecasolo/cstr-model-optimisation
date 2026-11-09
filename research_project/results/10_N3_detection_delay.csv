@@ -1,0 +1,3 @@
+parameter,true_crossing_window,detected_window,delay_windows(h)
+alpha,480,681,201
+beta,210,271,61

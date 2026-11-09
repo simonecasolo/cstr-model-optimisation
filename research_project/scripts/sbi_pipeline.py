@@ -26,14 +26,16 @@ from scipy import stats as scipy_stats
 import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "src"))
 
+import diffrax
+
 from cstr_sbi.recycle.priors import box_uniform_5d
 from cstr_sbi.recycle.physics import (
     NOMINAL_CTRL_SB, NOMINAL_CTRL_SA, NOMINAL_INLET, NOMINAL_Y0_EXPLICIT, PARAM_NAMES,
     simulate_trajectory_explicit_jit, extract_observations_explicit,
-    simulate_to_steady_state_explicit,
+    simulate_to_steady_state_explicit, recycle_rhs_explicit, _diffrax_solve,
 )
 from cstr_sbi.recycle.summaries import (
-    compute_summaries, N_SUMMARIES_SB, N_SUMMARIES_SA, SB_INDICES, N_SB,
+    compute_summaries, N_SUMMARIES_SB, N_SUMMARIES_SA, N_SUMMARIES_SC, SB_INDICES, N_SB,
 )
 from cstr_sbi.recycle.simulator import nominal_warm_start
 
@@ -45,28 +47,186 @@ import jax
 # being generated (matching nb22's per-scenario evaluation-data protocol),
 # instead of a single fixed nominal warm-start reused for every prior draw.
 #
-# Cost note (measured 2026-08-13, see pending_manuscript_fixes.md Stage 3, Item
-# System-II): computing a steady state for an arbitrary 5-D prior draw (as
-# opposed to the 16 curated, physically-mild Wu2003 scenarios) is far more
-# expensive and occasionally far slower than the curated-scenario case --
-# ~3.5s/draw on average but with a long tail (some draws >50s) for parameter
-# combinations far from the nominal operating point. Loosened tolerances
-# (rtol=1e-4, atol=1e-6) and a shorter horizon (t_final=100) are used here
-# instead of nominal_warm_start's defaults (1e-6/1e-8, t_final=200) -- adequate
-# given 0.3% sensor noise dominates precision well above 1e-4 relative anyway
-# -- to keep this tractable at all; it is still ~10x the fixed-warm-start cost.
-_scenario_ss_jit = jax.jit(
-    lambda theta, ctrl: simulate_to_steady_state_explicit(
-        theta, NOMINAL_INLET, ctrl, NOMINAL_Y0_EXPLICIT,
-        t_final=100.0, rtol=1e-4, atol=1e-6, max_steps=100_000,
+# FIXED (2026-09-03, docs/Manuscript/system_ii_sbi_solidification_plan.md
+# Stage 1b): the original loosened-tolerance/short-horizon recipe below
+# (rtol=1e-4, atol=1e-6, t_final=100) was found to NOT actually converge for
+# essentially the whole prior, not just its tails -- a dedicated audit
+# (`scripts/stage1b_warmstart_convergence_audit.py`,
+# `results/44_sc_warmstart_convergence_audit.csv`, n=45) found 100% of tested
+# draws had a downstream-summary shift 1-66% (median ~20%) relative to a
+# tightly-resolved re-solve, 1-2 orders of magnitude above the 0.3% sensor
+# noise floor this whole pipeline assumes, including near-nominal draws. Root
+# cause (confirmed directly, not inferred): `diffrax.diffeqsolve(...,
+# throw=False)` returns a plausible-LOOKING but NOT-actually-converged state
+# when `max_steps` is exhausted before reaching `t_final` -- it does not
+# return NaN, so the un-checked `sol.ys[-1]` this code used to return was
+# silently treating an incomplete integration as a genuine steady state for
+# every theta the loose budget couldn't finish in time.
+#
+# Fix has two independent parts:
+#  (1) tighten to nominal_warm_start's own already-trusted tolerance/horizon
+#      (rtol=1e-6, atol=1e-8, t_final=200 -- the same recipe used everywhere
+#      else in this project for the *fixed* nominal/scenario warm starts);
+#  (2) actually CHECK convergence instead of trusting the fixed budget:
+#      `_scenario_ss_checked` returns `(y0, converged)`, where `converged`
+#      requires both diffrax's own solver-success flag AND a residual-norm
+#      check (`||recycle_rhs_explicit(0, y0, args)||` below
+#      `MATCHED_SS_RESIDUAL_TOL`) -- catching the case where the solver
+#      "succeeds" at reaching t_final but the system is still slowly relaxing
+#      (a converged integration is not automatically a converged steady
+#      state). `MATCHED_SS_RESIDUAL_TOL=0.05` is set relative to
+#      `nominal_warm_start`'s own empirically-measured residual (~0.0114 at
+#      nominal theta, t_final=200, same tolerance) -- i.e. "at least as good
+#      as the recipe this project has trusted for years elsewhere", with a
+#      ~4x safety margin, not an arbitrarily tight number. Revisit this
+#      threshold once Stage 1b's cheap-revalidation step (plan Stage "Immediate
+#      next action" item 2) reports the actual shift distribution under this
+#      fix.
+#  Non-convergent draws are now surfaced as `None` (see `_matched_y0` below)
+#  and flow into this module's EXISTING invalid-draw skip/resample path
+#  (every `generate_*_bank` loop already does `if s is None: continue`) --
+#  no new call-site changes needed, but expect a non-zero, previously-
+#  invisible rejection rate on any bank regenerated with this fix.
+#
+# max_steps kept at the SAME 100_000-per-chunk budget as before (not raised
+# without bound) -- tightening tolerance without raising the per-chunk step
+# budget keeps worst-case per-chunk wall-clock bounded to roughly the same
+# order as today; a chunk that needs more than 100_000 adaptive steps to
+# satisfy 1e-6/1e-8 over `SS_CHUNK_T` is correctly rejected rather than
+# accepted, instead of us discovering (as Stage 1b's first fix attempt did, at
+# 1e-7/1e-9/t_final=300 with a 400_000 cap) that some individual draws can
+# otherwise burn 1-4+ hours of wall-clock without ever actually converging.
+MATCHED_SS_RESIDUAL_TOL = 0.05  # diagnostic only now, see fix v2 note below -- NOT the acceptance gate.
+
+# FIX v2 (2026-09-03, same Stage 1b): fix v1 above (tighter tolerance +
+# residual-norm check) turned out to only be half right. A follow-up
+# cross-check (`scripts/stage1b_fix_validation_refcheck.py`) found that even
+# comparing two states that BOTH have small RHS residual (~0.006-0.037, same
+# ballpark as `nominal_warm_start`'s own trusted baseline), the downstream
+# S-C summary still shifts 3-32% between them (10/10 draws tested) -- 10-100x
+# the 0.3% sensor-noise floor. The raw RHS-residual norm, at ANY reasonable
+# tolerance, is simply not a reliable proxy for "the 2h downstream summary has
+# stabilized": two states can have a small instantaneous derivative while
+# still differing along some slow/near-null direction (plausibly an
+# integral-controller state, or a slowly-relaxing thermal mode) that the
+# summary IS sensitive to. Tightening `MATCHED_SS_RESIDUAL_TOL` further would
+# not have fixed this.
+#
+# Fix v2 replaces the acceptance criterion with a direct check on the thing
+# that actually matters: does the downstream summary itself stop changing as
+# we extend the integration? Integrates in `SS_CHUNK_T`-sized chunks
+# (chaining from where the previous chunk left off -- NOT restarting from
+# `NOMINAL_Y0_EXPLICIT` each time), recomputing a deterministic (noise-free)
+# S-B-representation summary probe after each chunk, and accepting only once
+# that probe stabilizes to within `SUMMARY_CONVERGENCE_TOL` (relative L2)
+# between successive chunks -- a margin below the 0.3% sensor floor.
+# Rejects (as `None`, same as fix v1) if `SS_MAX_CHUNKS` chunks are exhausted
+# without stabilizing. The probe always uses the "S-B" summary regardless of
+# the structure ultimately requested by the caller: the feed-analyzer channel
+# added for "S-C" is synthesized directly from `theta[4]` (see
+# `feed_analyzer_reading`), so it carries zero y0-sensitivity and would only
+# add noise to this specific check, not signal.
+#
+# CORRECTION (still 2026-09-03, same debugging session): the first fix-v2 cut
+# compared the FULL 66-D summary between chunks and found nominal theta --
+# the one case already known-converged (matches `nominal_warm_start` exactly)
+# -- FAILED its own check after all 8 chunks. Traced directly: the full-shift
+# number is dominated entirely by `_slope`/`_std`/`corr_*` features, which are
+# numerically sensitive on a near-flat signal (exactly the regime a
+# steady-state probe trajectory is in) -- the SAME pathology
+# `identifiability_scan.py`'s `robust_feature_subset` already exists to work
+# around elsewhere in this project. Checked directly: at nominal theta, the
+# "_mean"/"_q_mean"/physics-feature subset shows shift ~0.00000-0.00001
+# already after the FIRST chunk, while the full vector's shift bounces around
+# 0.05-0.29 across all 8 chunks purely from slope/corr noise on an already-
+# converged signal. Fixed by comparing only that robust subset, matching
+# `identifiability_scan.py::robust_feature_subset`'s exact definition
+# (duplicated here as a plain list-comprehension rather than importing that
+# module, to avoid this module depending on identifiability_scan.py's
+# heavier/CLI-oriented import surface for one five-line helper).
+SUMMARY_CONVERGENCE_TOL = 0.002
+SS_CHUNK_T = 200.0
+SS_MAX_CHUNKS = 8  # bounds worst-case cost: at most 8 chunks, ~cumulative t_final=1600
+
+_SB_SUMMARY_NAMES = None  # lazily resolved (needs cstr_sbi.recycle.summaries.summary_names)
+_ROBUST_SB_IDX = None
+
+
+def _robust_sb_idx():
+    global _SB_SUMMARY_NAMES, _ROBUST_SB_IDX
+    if _ROBUST_SB_IDX is None:
+        from cstr_sbi.recycle.summaries import summary_names
+        _SB_SUMMARY_NAMES = summary_names("S-B")
+        _ROBUST_SB_IDX = [
+            i for i, n in enumerate(_SB_SUMMARY_NAMES)
+            if n.endswith("_mean") or n.endswith("_q_mean")
+            or n in ("recycle_ratio", "col_recovery", "reb_per_boilup", "recycle_excess",
+                      "Vn_final", "Rn_final", "UA_proxy", "Tr_Tj_ratio")
+        ]
+    return _ROBUST_SB_IDX
+
+
+_ss_chunk_jit = jax.jit(
+    lambda y0, theta, ctrl: _diffrax_solve(
+        recycle_rhs_explicit, y0, (theta, NOMINAL_INLET, ctrl),
+        t_final=SS_CHUNK_T, rtol=1e-6, atol=1e-8, max_steps=100_000,
     )
 )
 
 
+def _chunk_summary_probe(theta_jnp, ctrl, y0):
+    """Deterministic (noise-free) S-B summary from `y0`, used ONLY to test
+    whether the steady-state solve has stabilized -- never returned as a
+    production summary. Returns `None` on a non-finite trajectory."""
+    ts, ys = simulate_trajectory_explicit_jit(
+        theta_jnp, NOMINAL_INLET, ctrl, y0, t_final=2.0, n_save=120, rtol=1e-3, atol=1e-5,
+    )
+    raw = np.asarray(extract_observations_explicit(ys, theta_jnp, ctrl))
+    if np.isnan(raw).any() or np.isinf(raw).any():
+        return None
+    return compute_summaries(raw, "S-B", np.asarray(ts))
+
+
+def _scenario_steady_state_checked(theta_jnp, ctrl):
+    """Per-draw steady-state solve with a downstream-summary convergence check.
+
+    Returns `(y0, converged)`. See the `SUMMARY_CONVERGENCE_TOL` module note
+    above for why this replaces the raw-residual check (fix v1): convergence
+    is judged by whether the S-B summary's ROBUST feature subset (means/
+    physics features, excluding numerically-sensitive slope/std/corr
+    features) has stabilized across successive integration extensions, not
+    by the RHS residual norm or the full summary vector.
+    """
+    robust_idx = _robust_sb_idx()
+    y = NOMINAL_Y0_EXPLICIT
+    prev_summary = None
+    for _ in range(SS_MAX_CHUNKS):
+        sol = _ss_chunk_jit(y, theta_jnp, ctrl)
+        y = sol.ys[-1]
+        if sol.result != diffrax.RESULTS.successful:
+            return y, False
+        cur_summary = _chunk_summary_probe(theta_jnp, ctrl, y)
+        if cur_summary is None:
+            return y, False
+        if prev_summary is not None:
+            cur_r, prev_r = cur_summary[robust_idx], prev_summary[robust_idx]
+            shift = np.linalg.norm(cur_r - prev_r) / max(np.linalg.norm(prev_r), 1e-12)
+            if shift < SUMMARY_CONVERGENCE_TOL:
+                return y, True
+        prev_summary = cur_summary
+    return y, False
+
+
 def _matched_y0(theta_np, ctrl):
-    """Per-draw scenario-specific steady-state warm start (matched protocol)."""
+    """Per-draw scenario-specific steady-state warm start (matched protocol).
+
+    Returns `None` if the steady-state solve does not actually converge
+    (see the fix note above `MATCHED_SS_RESIDUAL_TOL`) -- callers must treat
+    this the same as any other invalid draw (`_simulate_summary` does).
+    """
     theta_jnp = jnp.array(theta_np, dtype=jnp.float32)
-    return _scenario_ss_jit(theta_jnp, ctrl)
+    y0, converged = _scenario_steady_state_checked(theta_jnp, ctrl)
+    return np.asarray(y0) if converged else None
 
 DATA = pathlib.Path(__file__).resolve().parent.parent / "data"
 SBI_LOGS = pathlib.Path(__file__).resolve().parent.parent / "sbi-logs"
@@ -83,6 +243,13 @@ def _structure_config(structure: str):
         return NOMINAL_CTRL_SB, nominal_warm_start("S-B")
     if structure == "S-A":
         return NOMINAL_CTRL_SA, nominal_warm_start("S-A")
+    if structure in ("S-C", "S-C.2"):
+        # S-B's control structure + a feed-line composition analyzer, added for
+        # *observation* only -- no new control loop. See
+        # docs/Manuscript/system_ii_analyzer_rework_plan.md. "S-C.2" additionally
+        # appends 2 closed-form xi_reb-sharpening features (summaries.py) -- still
+        # observation-only, same control structure.
+        return NOMINAL_CTRL_SB, nominal_warm_start("S-B")
     raise ValueError(f"Unknown structure: {structure!r}")
 
 
@@ -96,6 +263,11 @@ def _simulate_summary(theta_np, ctrl, y0, structure, noise_pct, rng,
     """
     theta_jnp = jnp.array(theta_np, dtype=jnp.float32)
     y0_i = _matched_y0(theta_np, ctrl) if scenario_specific_warm_start else y0
+    if y0_i is None:
+        # Matched-protocol steady-state solve did not converge for this theta
+        # (see the fix note above `MATCHED_SS_RESIDUAL_TOL` in `_matched_y0`) --
+        # treat exactly like any other invalid draw: skip/resample upstream.
+        return None
     ts, ys = simulate_trajectory_explicit_jit(
         theta_jnp, NOMINAL_INLET, ctrl, y0_i,
         t_final=2.0, n_save=120, rtol=1e-3, atol=1e-5,
@@ -107,7 +279,9 @@ def _simulate_summary(theta_np, ctrl, y0, structure, noise_pct, rng,
         return None
     scale = np.maximum(np.max(np.abs(raw_np), axis=0), 1e-6)
     noise = rng.normal(0, noise_pct * scale, raw_np.shape)
-    s = compute_summaries(raw_np + noise, structure, t_np)
+    # theta_np/rng are only used when structure="S-C"/"S-C.2" (feed-analyzer reading
+    # is synthesized from theta directly, not extracted from raw_np); ignored otherwise.
+    s = compute_summaries(raw_np + noise, structure, t_np, theta=theta_np, rng=rng)
     if np.isnan(s).any():
         return None
     return s
@@ -211,10 +385,22 @@ def run_sbc(
     n_post: int = 200,
     seed: int = 12345,
     scenario_specific_warm_start: bool = False,
+    prior=None,
 ) -> dict:
-    """Run SBC for all 5 parameters using reject_outside_prior=False (nb29 fix)."""
+    """Run SBC for all 5 parameters using reject_outside_prior=False (nb29 fix).
+
+    prior : the distribution SBC test thetas are drawn from. Defaults to
+        `box_uniform_5d()` (this function's original, pre-nb37 behaviour) for
+        backwards compatibility with existing call sites. **Since nb37, the
+        project's actual training prior is a custom truncated-lognormal
+        distribution (defined inline in nb37/38/39, not in this module) — pass
+        that same prior object here when validating a lognormal-prior-trained
+        posterior.** Using the default uniform prior to SBC-check a
+        lognormal-trained posterior tests the wrong distribution (a train/test
+        prior mismatch) and is not a meaningful calibration check.
+    """
     ctrl, y0 = _structure_config(structure)
-    prior = box_uniform_5d()
+    prior = box_uniform_5d() if prior is None else prior
     rng = np.random.default_rng(seed)
 
     ranks = {name: [] for name in PARAM_NAMES}

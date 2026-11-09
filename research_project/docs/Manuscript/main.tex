@@ -58,7 +58,7 @@ observation windows.
 Identifiability is characterised via Fisher information
 analysis, validated with simulation-based calibration, and benchmarked
 against extended Kalman filter and Markov chain Monte Carlo baselines.
-For the CSTR, the matched closed-loop posterior accurately recovers catalyst decay
+For the CSTR, the closed-loop posterior accurately recovers catalyst decay
 and jacket fouling in non-saturating scenarios, while local sensitivity analysis
 shows that PI temperature control makes jacket conductance less well conditioned than
 catalyst activity. Severe fouling introduces actuator-saturation undercoverage, and
@@ -867,19 +867,25 @@ to be a simplified reaction-rate-sensitive proxy.
 
 Simulator coverage of the evaluation regime was confirmed through prior predictive
 checks over 500 parameter vectors drawn from the prior, spanning the observed data
-range for all 29 summary features across every closed-loop scenario ~\citep{Cranmer2020} 
-(Fig.~S1 of the Supporting
-Information). Posterior calibration with 500 test cases, drawn and evaluated under
-the matched (scenario-specific warm-start) protocol used throughout, does not reject
+range for all 29 summary features across five of the six closed-loop scenarios
+~\citep{Cranmer2020} (Fig.~S1 of the Supporting Information). The sixth, Sc\,7, has
+its temperature-related features (a minority of the 29) fall outside the
+prior-predictive envelope by construction: Sc\,7's $+2$~K sensor-drift offset
+$\delta_T$ is an additive bias applied after simulation, not a function of the 2-D
+$(\alpha,\beta)$ prior being checked here, so no prior draw can reproduce it
+regardless of sample size (verified directly: coverage is unchanged from
+$N_\mathrm{prior}=500$ to $2{,}000$). This is a scope statement about the present
+2-D check, not a simulator deficiency; see Supporting Information Section~S2 for the
+full per-scenario breakdown. Posterior calibration with 500 test cases, drawn and evaluated under
+scenario-specific warm-start protocol used throughout, does not reject
 rank uniformity at the 5\% level (Kolmogorov-Smirnov (KS) $p$-values of $0.21$ for
 $\alpha$ and $0.13$ for $\beta$; two-sample classifier scores of 0.53 and 0.52,
 close to the uninformative baseline of 0.5). Rank histograms, SBC implementation
-details, and the matched-protocol calibration interpretation are given in
+details, and the calibration details are given in
 Supporting Information Section~S6.
 %
 \begin{figure}[tb]
   \centering
-%\includegraphics[width=0.95\linewidth]{06_joint_posterior_primary.png}
 \includegraphics[width=0.8\linewidth]{06_joint_posterior_primary_merged}
   \caption{Joint posterior samples for the primary System I closed loop scenarios: Sc1 (normal operation,
   orange), Sc2 (fouling, green), Sc3 (catalyst decay, red), Sc4 (combined, purple). 
@@ -905,7 +911,7 @@ closed- and open-loop scenarios. Separately, mapping SBI posterior samples to th
 threshold-defined fault regions gave a closed-loop macro-F\textsubscript{1} of
 0.927 (Table~\ref{tab:scenario_results}).
 Coverage (90$\%$ of confidence interval) 
-is close to its nominal level for the non-saturating matched closed-loop scenarios,
+is close to its nominal level for the non-saturating closed-loop scenarios,
 but falls to 0.62 for Sc5. In this severe-fouling case, the coolant actuator is saturated for a
 substantial fraction of each window, reducing sensitivity to further changes in $\beta$ and 
 producing under-dispersed marginal intervals.
@@ -958,7 +964,7 @@ Sc\,7 & Fouling + sensor drift  & 1.00 & 0.85 & 0.97 & 0.89 & 0.52 & 0.67 \\
 The mode-mismatch experiment (Sc\,2 evaluated with a posterior trained on
 open-loop data) quantifies the inferential cost of ignoring the feedback
 structure.  The open-loop-trained posterior yields a Wasserstein-1 distance
-on $\beta$ of 0.580, compared with 0.018 for the matched closed-loop posterior,
+on $\beta$ of 0.580, compared with 0.018 for the closed-loop posterior,
 a $\sim$33-fold increase; the CRPS on $\beta$ increases by a similar
 $\sim$67-fold factor (0.579 vs.\ 0.009).  The open-loop-trained posterior,
 never having seen a controller respond to a fault, has no mechanism to
@@ -970,7 +976,7 @@ correctly-specified open-loop-trained posterior) to 0.04 as the closed-loop
 posterior assigns substantial mass above the $\beta = 0.90$
 threshold because it has learned to interpret constant $Q_c$ trajectories
 as evidence of healthy operation.  Neither direction of mismatch is
-correctable within the single-round amortised framework where matched training
+correctable within the single-round amortised framework where closed-loop training
 is a necessary condition.
 
 % --------------------------------------------------------------------------- 
@@ -1043,6 +1049,19 @@ $\beta=0.90$ classification boundary ($\hat{\beta}=0.89$), reducing the Sc\,7 fa
 $F_1$ score to 0.67 and the 90\% coverage for $\beta$ to 0.52. This is not a strict
 non-identifiability of $\beta$ in the clean measurement model; it is a practical confound introduced
 by an unmodelled sensor bias acting in the same closed-loop channels used to infer mild fouling.
+These results illustrate how the 
+PI control suppresses the steady-state sensitivity of the controlled reactor 
+temperature to jacket conductance and redistributes the remaining diagnostic information to
+the jacket-temperature and coolant-flow channels. This is a closed-loop 
+practical-identifiability effect.
+
+We finally notice that, when evaluated on already-degraded steady-state trajectories, 
+an amortised posterior trained on healthy plant steady-state trajectories and 
+evaluated on degraded steady-state trajectories can exhibit severe bias and 
+miscalibration. This is a protocol-induced distribution-shift effect, not a property of the plant. 
+Matching the simulator protocol to the intended monitoring regime removes most of the observed SBI
+bias while leaving the channel-sensitivity asymmetry as a separate phenomenon.
+
 
 
 % ---------------------------------------------------------------------------
@@ -1069,13 +1088,10 @@ not a claim that all four methods approximate an identical posterior object.
 Sc\,2 (jacket fouling, $\alpha^*=1.0$, $\beta^*=0.70$).
 SBI, EKF, and UKF metrics are aggregated over all 50 stochastic observation
 windows. NUTS is also fit independently on all 50 windows under the same
-matched protocol, but under a fixed 3-hour per-window compute budget: 32/50
+training protocol, but under a fixed 3-hour per-window compute budget: 32/50
 (64\%) converged within budget and are used for the reported statistics; the
-remaining 18/50 (36\%) did not complete within 3 hours and are excluded. This
-non-convergence rate is itself a finding, not merely a data-quality caveat:
-even after the protocol-artefact bias is corrected, NUTS's per-window
-computational reliability under the matched protocol is markedly worse than
-its already-documented raw speed disadvantage. ms/win for NUTS is the median
+remaining 18/50 (36\%) did not complete within 3 hours and are excluded; 
+ms/win for NUTS is the median
 wall time among the 32 converged windows; SBI/EKF/UKF's ms/win is a per-window
 mean, all measured under the compute environment described in Section~S8.
 }
@@ -1094,18 +1110,8 @@ approximately unbiased on Sc\,2, with $\hat\beta=0.6977$, bias $=-0.0023$, and M
 NUTS, aggregated over the 32/50 windows for which it converged within the 3-hour
 per-window compute budget, is likewise approximately unbiased ($\hat\beta=0.700$,
 bias $=-0.0002$, MAE $=0.011$), whereas the EKF and UKF underestimate $\beta$ by
-approximately $0.093$.
+approximately $0.093$. 
 
-These results separate two effects taking place. 
-First, PI control suppresses the steady-state sensitivity of the controlled reactor 
-temperature to jacket conductance and redistributes the remaining diagnostic information to
-the jacket-temperature and coolant-flow channels. This is a closed-loop 
-practical-identifiability effect.
-Second, an amortised posterior trained on healthy-start fault-onset trajectories and 
-evaluated on already-degraded steady-state trajectories can exhibit severe bias and 
-miscalibration. This is a protocol-induced distribution-shift effect, not a property of the plant. 
-Matching the simulator protocol to the intended monitoring regime removes most of the observed SBI
-bias while leaving the channel-sensitivity asymmetry as a separate phenomenon.
 
 % ---------------------------------------------------------------------------
 \subsection{30-Day Sequential Degradation Tracking}
@@ -1170,7 +1176,6 @@ fault side of their thresholds.
 \label{sec:results_system2}
 % =============================================================
 
-%Results for System~II (Wu et al.~\citeyearpar{Wu2003}) are presented belowfollowing the same structure as Section~\ref{sec:results_system1}: summarystatistics, structural identifiability, fault classification, and degradation tracking.  
 For System II, the central finding is that the 66-D summary representation 
 introduces apparent joint parameter couplings that are not plant-level non-
 identifiabilities under a raw-trajectory Fisher-information check. In contrast, 
@@ -1497,7 +1502,7 @@ well-tuned EKF with exact raw-model access outperforms the current per-window SB
 posterior. Recursive pooling of biased per-window SBI posteriors does not solve this 
 problem because it compounds systematic representation bias rather than averaging 
 independent noise. The relevant distinction is therefore not SBI versus EKF in 
-general, but amortised summary-based inference versus raw-trajectory model-based 
+general, but amortised summary-based inference versus raw-trajectory model-based
 estimation under each operating regime.
 
 % ===========================================================================

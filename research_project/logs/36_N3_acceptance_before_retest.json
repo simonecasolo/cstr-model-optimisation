@@ -1,0 +1,35 @@
+{
+  "n_violations": 4,
+  "violations": [
+    {
+      "condition": "nominal",
+      "scenario": "Sc2",
+      "cov90_b": 0.96,
+      "class_acc": 0.84,
+      "oracle_acc": 1.0
+    },
+    {
+      "condition": "Tci-0.5",
+      "scenario": "Sc2",
+      "cov90_b": 0.94,
+      "class_acc": 0.88,
+      "oracle_acc": 1.0
+    },
+    {
+      "condition": "Tci+0.5",
+      "scenario": "Sc2",
+      "cov90_b": 0.94,
+      "class_acc": 0.84,
+      "oracle_acc": 1.0
+    },
+    {
+      "condition": "Tci+0.5",
+      "scenario": "Sc4",
+      "cov90_b": 0.98,
+      "class_acc": 0.64,
+      "oracle_acc": 0.76
+    }
+  ],
+  "accepted": false,
+  "criteria": "nb35 deployability on the nb35 inlet grid; <= 1 violating cell and no v2.1 flag (fixed before running)"
+}

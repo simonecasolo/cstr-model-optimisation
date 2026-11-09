@@ -1,0 +1,4 @@
+tags OK: 29fx_N3 31_N3 03s_N3
+closed P1b  N3 injected sd = [0.0099 0.2004 0.2012 2.0052] (expected [0.01 0.2  0.2  2.  ]);  N0 injected sd / (0.5% of max) = [0.994 1.002 1.006 1.003] (expected 1)
+open loop   N3 injected sd = [0.0099 0.2004 0.2012 2.0052] (expected [0.01 0.2  0.2  2.  ]);  N0 injected sd / (0.5% of max) = [0.994 1.002 1.006 1.003] (expected 1)
+smoke test passed

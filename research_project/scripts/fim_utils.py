@@ -52,18 +52,46 @@ def compute_fim(feat_fn, theta_point, eps, n_reps_sigma=60, seed_offset=0):
 
 
 def offdiag_ratio(FIM, idx_a, idx_b):
-    """Normalised off-diagonal correlation coefficient and diagonal ratio for a reported
-    parameter pair, from a full FIM matrix (e.g. as returned by `compute_fim`).
+    """Normalised off-diagonal entry and diagonal ratio, from the RAW information matrix
+    (from a full FIM matrix, e.g. as returned by `compute_fim`).
 
     Returns `(FIM_norm[idx_a, idx_b], FIM[idx_a, idx_a] / FIM[idx_b, idx_b])` — identical
     convention to the original `compute_fim_offdiag`/`compute_fim_offdiag_pair` functions in
     nb29b/nb31, so migrating those notebooks to call this reproduces the same numbers.
+
+    **Warning (found 2026-09-01, notebooks 39/40):** the first return value is a normalised
+    entry of the raw *information* matrix, not a posterior *correlation* coefficient. For a
+    multi-parameter FIM these can and do have OPPOSITE SIGNS once the other parameters are
+    properly accounted for (confirmed numerically: raw off-diagonal `+0.40` vs. the actual
+    inverted-covariance correlation `-0.60` at one Wu2003 operating point, and the reverse at
+    another). This function is still useful for *representation-collapse* checks where you
+    only care whether the entry goes to ~0 (an artifact-vs-real test, as in `nb29b`), but do
+    **not** compare its sign or magnitude directly against an actual trained posterior's
+    empirical correlation -- use `cov_offdiag_corr` for that.
     """
     D = np.sqrt(np.diag(FIM))
     D_safe = np.where(D > 0, D, 1.0)
     FIM_norm = FIM / np.outer(D_safe, D_safe)
     ratio = FIM[idx_a, idx_a] / max(FIM[idx_b, idx_b], 1e-30)
     return FIM_norm[idx_a, idx_b], ratio
+
+
+def cov_offdiag_corr(FIM, idx_a, idx_b, ridge=1e-10):
+    """Marginal posterior correlation between parameters `idx_a`/`idx_b` implied by the
+    Laplace/Gaussian approximation at the point `FIM` was computed at -- i.e. from the
+    INVERTED FIM (posterior covariance), not the raw information matrix.
+
+    This is the quantity that is actually comparable to an SNPE posterior's empirical
+    sample correlation (`np.corrcoef`). `offdiag_ratio`'s raw, normalised information-matrix
+    entry is a different quantity and can have the opposite sign -- see its docstring.
+    Whenever cross-checking a FIM-based identifiability claim against a real trained
+    posterior (or reporting a "does this coupling survive representation X" result), use
+    this function.
+    """
+    n = FIM.shape[0]
+    cov = np.linalg.inv(FIM + ridge * np.eye(n))
+    d = np.sqrt(np.clip(np.diag(cov), 1e-300, None))
+    return float(cov[idx_a, idx_b] / (d[idx_a] * d[idx_b]))
 
 
 def crb_report(FIM, ridge=1e-10, names=None):

@@ -1,0 +1,170 @@
+{
+  "posterior": "production_S1_base_est_40k",
+  "robust": false,
+  "run_part_B": true,
+  "violations": [
+    {
+      "condition": "Ti-0.5",
+      "scenario": "Sc1",
+      "cov90_b": 0.64,
+      "class_acc": 1.0,
+      "acc_drop": 0.0,
+      "bias_b": 0.0241670832037925,
+      "z_bias_b": 1.2976973595378516
+    },
+    {
+      "condition": "Ti-0.5",
+      "scenario": "Sc2",
+      "cov90_b": 0.68,
+      "class_acc": 0.96,
+      "acc_drop": 0.020000000000000018,
+      "bias_b": 0.0177741590887308,
+      "z_bias_b": 1.1886680260620752
+    },
+    {
+      "condition": "Ti-0.5",
+      "scenario": "Sc3",
+      "cov90_b": 0.62,
+      "class_acc": 1.0,
+      "acc_drop": 0.0,
+      "bias_b": 0.0256603937596082,
+      "z_bias_b": 1.2987542674487549
+    },
+    {
+      "condition": "Ti-0.5",
+      "scenario": "Sc4",
+      "cov90_b": 0.72,
+      "class_acc": 0.86,
+      "acc_drop": 0.020000000000000018,
+      "bias_b": 0.0157653372734785,
+      "z_bias_b": 1.049494673572904
+    },
+    {
+      "condition": "Ti+0.5",
+      "scenario": "Sc1",
+      "cov90_b": 0.5,
+      "class_acc": 1.0,
+      "acc_drop": 0.0,
+      "bias_b": -0.0230944007635116,
+      "z_bias_b": -1.647897337026956
+    },
+    {
+      "condition": "Ti+0.5",
+      "scenario": "Sc2",
+      "cov90_b": 0.06,
+      "class_acc": 0.98,
+      "acc_drop": 0.0,
+      "bias_b": -0.0690230354666709,
+      "z_bias_b": -3.111763193864152
+    },
+    {
+      "condition": "Ti+0.5",
+      "scenario": "Sc3",
+      "cov90_b": 0.66,
+      "class_acc": 1.0,
+      "acc_drop": 0.0,
+      "bias_b": -0.0181316714733839,
+      "z_bias_b": -1.3384834264763876
+    },
+    {
+      "condition": "Ti+0.5",
+      "scenario": "Sc4",
+      "cov90_b": 0.0,
+      "class_acc": 0.86,
+      "acc_drop": 0.020000000000000018,
+      "bias_b": -0.0798461288213729,
+      "z_bias_b": -3.6054610284956063
+    },
+    {
+      "condition": "Tci-0.5",
+      "scenario": "Sc1",
+      "cov90_b": 0.0,
+      "class_acc": 0.1,
+      "acc_drop": 0.9,
+      "bias_b": -0.1302390843629837,
+      "z_bias_b": -8.568119703443376
+    },
+    {
+      "condition": "Tci-0.5",
+      "scenario": "Sc2",
+      "cov90_b": 0.0,
+      "class_acc": 0.88,
+      "acc_drop": 0.09999999999999998,
+      "bias_b": -0.1617229431867599,
+      "z_bias_b": -6.55908631256222
+    },
+    {
+      "condition": "Tci-0.5",
+      "scenario": "Sc3",
+      "cov90_b": 0.0,
+      "class_acc": 0.12,
+      "acc_drop": 0.88,
+      "bias_b": -0.120898313820362,
+      "z_bias_b": -7.794234046817433
+    },
+    {
+      "condition": "Tci-0.5",
+      "scenario": "Sc4",
+      "cov90_b": 0.0,
+      "class_acc": 0.98,
+      "acc_drop": -0.09999999999999998,
+      "bias_b": -0.1621409356594085,
+      "z_bias_b": -6.7266823611959525
+    },
+    {
+      "condition": "Tci+0.5",
+      "scenario": "Sc1",
+      "cov90_b": 0.0,
+      "class_acc": 1.0,
+      "acc_drop": 0.0,
+      "bias_b": 0.1603648364543914,
+      "z_bias_b": 10.941327461373126
+    },
+    {
+      "condition": "Tci+0.5",
+      "scenario": "Sc2",
+      "cov90_b": 0.0,
+      "class_acc": 0.0,
+      "acc_drop": 0.98,
+      "bias_b": 0.2886570394039154,
+      "z_bias_b": 16.969961052816814
+    },
+    {
+      "condition": "Tci+0.5",
+      "scenario": "Sc3",
+      "cov90_b": 0.0,
+      "class_acc": 1.0,
+      "acc_drop": 0.0,
+      "bias_b": 0.1471192389726638,
+      "z_bias_b": 8.912413890377726
+    },
+    {
+      "condition": "Tci+0.5",
+      "scenario": "Sc4",
+      "cov90_b": 0.0,
+      "class_acc": 0.0,
+      "acc_drop": 0.88,
+      "bias_b": 0.2681992053985595,
+      "z_bias_b": 15.027755796747355
+    },
+    {
+      "condition": "Ci+1%",
+      "scenario": "Sc2",
+      "cov90_b": 0.48,
+      "class_acc": 0.98,
+      "acc_drop": 0.0,
+      "bias_b": -0.0255047846585512,
+      "z_bias_b": -1.4559490357436895
+    },
+    {
+      "condition": "Ci+1%",
+      "scenario": "Sc4",
+      "cov90_b": 0.6,
+      "class_acc": 0.9,
+      "acc_drop": -0.020000000000000018,
+      "bias_b": -0.0251117926090955,
+      "z_bias_b": -1.4977299851591122
+    }
+  ],
+  "rule": "see docstring of scripts/nb34_inlet_uncertainty.py (fixed before running)"
+}

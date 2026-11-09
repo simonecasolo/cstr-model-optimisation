@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.7)  15 JUL 2026 15:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.7)  30 SEP 2026 16:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**supporting_information
+**supporting_information.tex
 (./supporting_information.tex
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-02-24>
@@ -886,242 +886,296 @@ Underfull \hbox (badness 1199) in paragraph at lines 54--65
 in-dows are
  []
 
-<../../figures//02_scenarios_overview.png, id=103, 939.51pt x 867.24pt>
+<../../figures//02_scenarios_overview.png, id=59, 939.51pt x 867.24pt>
 File: ../../figures//02_scenarios_overview.png Graphic file (type png)
 <use ../../figures//02_scenarios_overview.png>
 Package pdftex.def Info: ../../figures//02_scenarios_overview.png  used on inpu
 t line 112.
 (pdftex.def)             Requested size: 510.0pt x 470.76398pt.
+<../../figures//02_headline_summary.png, id=61, 794.97pt x 289.08pt>
+File: ../../figures//02_headline_summary.png Graphic file (type png)
+<use ../../figures//02_headline_summary.png>
+Package pdftex.def Info: ../../figures//02_headline_summary.png  used on input 
+line 132.
+(pdftex.def)             Requested size: 458.99689pt x 166.91223pt.
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 130.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 130.
-
-<../../figures//04_simulator_sanity.png, id=106, 1164.65884pt x 514.22885pt>
-File: ../../figures//04_simulator_sanity.png Graphic file (type png)
-<use ../../figures//04_simulator_sanity.png>
-Package pdftex.def Info: ../../figures//04_simulator_sanity.png  used on input 
-line 155.
-(pdftex.def)             Requested size: 494.70062pt x 218.42274pt.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 171.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 150.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 171.
+(hyperref)                removed on input line 150.
 
 [1{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 [2 <../../figures//02_scenarios_overview.png>]
-<../../figures//04_sensitivity_scatter.png, id=142, 1020.11885pt x 514.22885pt>
+<../../figures//04_simulator_sanity.png, id=98, 1164.65884pt x 514.22885pt>
+File: ../../figures//04_simulator_sanity.png Graphic file (type png)
+<use ../../figures//04_simulator_sanity.png>
+Package pdftex.def Info: ../../figures//04_simulator_sanity.png  used on input 
+line 209.
+(pdftex.def)             Requested size: 494.70062pt x 218.42274pt.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\leavevmode@ifvmode' on input line 225.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                \kern 2.77626pt
+(hyperref)                removed on input line 225.
+
+<../../figures//04_sensitivity_scatter.png, id=100, 1020.11885pt x 514.22885pt>
 
 File: ../../figures//04_sensitivity_scatter.png Graphic file (type png)
 <use ../../figures//04_sensitivity_scatter.png>
 Package pdftex.def Info: ../../figures//04_sensitivity_scatter.png  used on inp
-ut line 196.
+ut line 262.
 (pdftex.def)             Requested size: 484.49844pt x 244.22984pt.
+
+Underfull \hbox (badness 3333) in paragraph at lines 280--286
+\T1/cmr/m/it/10 tures).[] \T1/cmr/m/n/10 For each of the four ob-serv-able chan
+-nels
+ []
+
+[3 <../../figures//02_headline_summary.png>] [4 <../../figures//04_simulator_sa
+nity.png> <../../figures//04_sensitivity_scatter.png>]
+Underfull \hbox (badness 2884) in paragraph at lines 297--300
+ []\T1/cmr/m/it/10 c. Group 3 --- Con-trol ag-gre-gates (3 fea-tures).[]
+ []
+
+
+LaTeX Warning: Reference `fig:physics_scatter' on page 5 undefined on input lin
+e 338.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 209.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 343.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 209.
+(hyperref)                removed on input line 343.
 
-<../../figures//03_pca.png, id=144, 947.76942pt x 369.60944pt>
+
+Underfull \hbox (badness 4193) in paragraph at lines 347--361
+\T1/cmr/m/n/10 density-estimator depth, and op-ti-miser/architecture
+ []
+
+
+Underfull \hbox (badness 3250) in paragraph at lines 347--361
+\T1/cmr/m/n/10 choices be var-ied and jus-ti-fied rather than fixed
+ []
+
+
+Underfull \hbox (badness 1939) in paragraph at lines 347--361
+\T1/cmr/m/n/10 with-out com-ment. This sec-tion re-ports that ab-
+ []
+
+
+Underfull \hbox (badness 3209) in paragraph at lines 347--361
+\T1/cmr/m/n/10 la-tion for Sys-tem I, across three axes: train-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--361
+\T1/cmr/m/n/10 bud-get ($\OML/cmm/m/it/10 n[] \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/
+10 500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1[]000\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
+10 2[]500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5[]000\OML/cmm/m/it/10 ; \OT1/cmr/m
+/n/10 10[]000\OMS/cmsy/m/n/10 g$\T1/cmr/m/n/10 ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--361
+\T1/cmr/m/n/10 Neu-ral Spline Flow (NSF) ar-chi-tec-ture width
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--361
+\T1/cmr/m/n/10 and depth (hid-den fea-tures $\OMS/cmsy/m/n/10 ^^B$ \T1/cmr/m/n/
+10 trans-forms
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--361
+\OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 (64\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 3)\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 (128\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5) [[]]\
+OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (256\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML
+/cmm/m/it/10 ; \OT1/cmr/m/n/10 (128\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 8)\OMS/cm
+sy/m/n/10 g$\T1/cmr/m/n/10 ),
+ []
+
+
+Underfull \hbox (badness 1092) in paragraph at lines 347--361
+\T1/cmr/m/n/10 (so the bud-get axis tests gen-uinely nested sub-sets,
+ []
+
+<../../figures//18_ablation_study.png, id=118, 1092.38884pt x 311.87285pt>
+File: ../../figures//18_ablation_study.png Graphic file (type png)
+<use ../../figures//18_ablation_study.png>
+Package pdftex.def Info: ../../figures//18_ablation_study.png  used on input li
+ne 391.
+(pdftex.def)             Requested size: 484.49844pt x 138.32375pt.
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 4
+15.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+) [5]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\leavevmode@ifvmode' on input line 436.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                \kern 2.77626pt
+(hyperref)                removed on input line 436.
+
+<../../figures//03_pca.png, id=133, 947.76942pt x 369.60944pt>
 File: ../../figures//03_pca.png Graphic file (type png)
 <use ../../figures//03_pca.png>
-Package pdftex.def Info: ../../figures//03_pca.png  used on input line 233.
+Package pdftex.def Info: ../../figures//03_pca.png  used on input line 460.
 (pdftex.def)             Requested size: 469.19907pt x 182.97696pt.
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 245.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 472.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 245.
+(hyperref)                removed on input line 472.
 
+[6 <../../figures//18_ablation_study.png>]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 325.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 552.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 325.
+(hyperref)                removed on input line 552.
 
 
-Package natbib Warning: Citation `Talts2018' on page 3 undefined on input line 
-331.
+Package natbib Warning: Citation `LopezPaz2017' on page 7 undefined on input li
+ne 574.
 
-[3 <../../figures//04_simulator_sanity.png>] [4 <../../figures//04_sensitivity_
-scatter.png> <../../figures//03_pca.png>]
+[7 <../../figures//03_pca.png>]
+Underfull \hbox (badness 2486) in paragraph at lines 600--615
+[]\T1/cmr/m/it/10 Correction rel-a-tive to an ear-lier ver-sion of this
+ []
 
-LaTeX Warning: A float is stuck (cannot be placed); try class option [floatfix]
- on input line 337.
 
+Underfull \hbox (badness 1584) in paragraph at lines 600--615
+\T1/cmr/m/it/10 doc-u-ment. \T1/cmr/m/n/10 An ear-lier, pre-matched-protocol tr
+ain-
+ []
 
-Package natbib Warning: Citation `LopezPaz2017' on page 5 undefined on input li
-ne 347.
-
-<../../figures//04_sbc_ranks.png, id=172, 731.03885pt x 297.41885pt>
+<../../figures//04_sbc_ranks.png, id=166, 731.03885pt x 297.41885pt>
 File: ../../figures//04_sbc_ranks.png Graphic file (type png)
 <use ../../figures//04_sbc_ranks.png>
-Package pdftex.def Info: ../../figures//04_sbc_ranks.png  used on input line 38
+Package pdftex.def Info: ../../figures//04_sbc_ranks.png  used on input line 63
 0.
 (pdftex.def)             Requested size: 238.6203pt x 97.0775pt.
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 394.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 648.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 394.
+(hyperref)                removed on input line 648.
 
-[5 <../../figures//04_sbc_ranks.png>]
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 4
-17.
-
-(/usr/local/texlive/2022/texmf-dist/tex/latex/base/t1cmtt.fd
-File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-)
-
-Package natbib Warning: Citation `BoeltsDeistler_sbi_2025' on page 6 undefined 
-on input line 419.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 442.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 442.
-
-
-Package natbib Warning: Citation `Hoffman2014' on page 6 undefined on input lin
-e 450.
-
-
-Package natbib Warning: Citation `Phan2019' on page 6 undefined on input line 4
-51.
-
-<../../figures//15_analytical_bias_derivation.png, id=189, 1020.11885pt x 748.2
-7246pt>
-File: ../../figures//15_analytical_bias_derivation.png Graphic file (type png)
-<use ../../figures//15_analytical_bias_derivation.png>
-Package pdftex.def Info: ../../figures//15_analytical_bias_derivation.png  used
- on input line 471.
-(pdftex.def)             Requested size: 458.99689pt x 336.68524pt.
-<../../figures//16_baseline_dashboard.png, id=190, 1084.05pt x 361.35pt>
-File: ../../figures//16_baseline_dashboard.png Graphic file (type png)
-<use ../../figures//16_baseline_dashboard.png>
-Package pdftex.def Info: ../../figures//16_baseline_dashboard.png  used on inpu
-t line 496.
-(pdftex.def)             Requested size: 494.70062pt x 164.89972pt.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 510.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 510.
-
-<../../figures//nb24_sbc_ranks_sb.png, id=192, 1146.684pt x 214.8828pt>
-File: ../../figures//nb24_sbc_ranks_sb.png Graphic file (type png)
-<use ../../figures//nb24_sbc_ranks_sb.png>
-Package pdftex.def Info: ../../figures//nb24_sbc_ranks_sb.png  used on input li
-ne 565.
-(pdftex.def)             Requested size: 238.6203pt x 44.71358pt.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 577.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                \kern 2.77626pt
-(hyperref)                removed on input line 577.
-
-[6] [7 <../../figures//15_analytical_bias_derivation.png> <../../figures//16_ba
-seline_dashboard.png>]
-
-LaTeX Warning: A float is stuck (cannot be placed); try class option [floatfix]
- on input line 583.
-
-
-Overfull \hbox (24.63245pt too wide) in paragraph at lines 621--631
+[8 <../../figures//04_sbc_ranks.png>]
+Overfull \hbox (116.66808pt too wide) in paragraph at lines 666--705
  []$[]$ 
  []
 
-<../../figures//32_cnn_30day_tracking.png, id=211, 1003.5894pt x 568.524pt>
-File: ../../figures//32_cnn_30day_tracking.png Graphic file (type png)
-<use ../../figures//32_cnn_30day_tracking.png>
-Package pdftex.def Info: ../../figures//32_cnn_30day_tracking.png  used on inpu
-t line 688.
-(pdftex.def)             Requested size: 484.49844pt x 274.46725pt.
-[8 <../../figures//nb24_sbc_ranks_sb.png>] (./supporting_information.bbl)
+
+Underfull \hbox (badness 2435) in paragraph at lines 718--719
+\T1/cmr/m/n/9 Au-tore-gres-sive Flow (MAF) used
+ []
+
+
+Underfull \hbox (badness 2181) in paragraph at lines 718--719
+\T1/cmr/m/n/9 only for the Sec-tion S3 budget-
+ []
+
+
+Overfull \hbox (143.73935pt too wide) in paragraph at lines 712--730
+ []$[]$ 
+ []
+
+(./supporting_information.bbl
+Underfull \hbox (badness 2205) in paragraph at lines 67--76
+ []\T1/cmr/m/n/9 S. Talts, M. Be-tan-court, D. Simp-son, A. Ve-htari,
+ []
+
+
+Underfull \hbox (badness 4752) in paragraph at lines 67--76
+ \T1/cmr/m/n/9 and A. Gel-man, Val-i-dat-ing bayesian in-fer-ence al-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 67--76
+ \T1/cmr/m/n/9 go-rithms with simulation-based cal-i-bra-tion, arXiv
+ []
+
+)
 
 Package natbib Warning: There were undefined citations.
 
-[9 <../../figures//32_cnn_30day_tracking.png>] (./supporting_information.aux)
+[9] [10] (./supporting_information.aux)
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `supporting_information.out' has not changed.
 
-(rerunfilecheck)             Checksum: 51AB0ACD5FBE7B5BBFD5E58A5FF08AE0;6564.
+(rerunfilecheck)             Checksum: 5553B87A6E25112EC3A273E0FA8C9AD0;3536.
  ) 
 Here is how much of TeX's memory you used:
- 27911 strings out of 478268
- 537552 string characters out of 5846348
- 819566 words of memory out of 5000000
- 45627 multiletter control sequences out of 15000+600000
- 487896 words of font info for 78 fonts, out of 8000000 for 9000
+ 27880 strings out of 478268
+ 536460 string characters out of 5846348
+ 822248 words of memory out of 5000000
+ 45599 multiletter control sequences out of 15000+600000
+ 488997 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,10n,89p,1215b,758s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,11n,89p,1061b,758s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
-</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><
-/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
-usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.pfb
-></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
-</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></
-usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
-r/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
-local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/lo
-cal/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/lo
-cal/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loca
-l/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/t
-exlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texl
-ive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive
-/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/20
-22/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/202
-2/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2022/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2022/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2022/texm
-f-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2022/
-texmf-dist/fonts/type1/public/cm-super/sfbx0900.pfb></usr/local/texlive/2022/te
-xmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2022/texm
-f-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2022/texmf-
-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2022/texmf-di
-st/fonts/type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2022/texmf-dist
-/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2022/texmf-dist/f
-onts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2022/texmf-dist/fon
-ts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2022/texmf-dist/fonts
-/type1/public/cm-super/sfti0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/t
-ype1/public/cm-super/sfti1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/typ
-e1/public/cm-super/sftt0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1
-/public/cm-super/sftt1000.pfb>
-Output written on supporting_information.pdf (9 pages, 2726972 bytes).
+{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}<
+/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></
+usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></u
+sr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.pfb>
+</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
+/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></u
+sr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr
+/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/l
+ocal/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/loc
+al/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/loc
+al/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local
+/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/te
+xlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texli
+ve/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/
+2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/202
+2/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2022
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2022/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2022/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2022/texmf
+-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2022/t
+exmf-dist/fonts/type1/public/cm-super/sfbx0900.pfb></usr/local/texlive/2022/tex
+mf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2022/texmf
+-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2022/texmf-d
+ist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2022/texmf-dis
+t/fonts/type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2022/texmf-dist/
+fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2022/texmf-dist/fo
+nts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2022/texmf-dist/font
+s/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/
+type1/public/cm-super/sfti0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/ty
+pe1/public/cm-super/sfti1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/type
+1/public/cm-super/sftt0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/
+public/cm-super/sftt1000.pfb>
+Output written on supporting_information.pdf (10 pages, 2300811 bytes).
 PDF statistics:
- 378 PDF objects out of 1000 (max. 8388607)
- 283 compressed objects within 3 object streams
- 56 named destinations out of 1000 (max. 500000)
- 234 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 338 PDF objects out of 1000 (max. 8388607)
+ 245 compressed objects within 3 object streams
+ 51 named destinations out of 1000 (max. 500000)
+ 136 words of extra memory for PDF output out of 10000 (max. 10000000)
 

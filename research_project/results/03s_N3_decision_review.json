@@ -1,0 +1,10 @@
+{
+  "choice": "S1_base_est",
+  "approved": true,
+  "by": "user (Simone Casolo), 2026-11-09, in conversation with Claude",
+  "reason": "Pre-set nb03 section-10 rule under N3 + P2 (20k budget, 3-seed means) selects S1_base_est by clause (b): S0_base29 is not calibration-eligible (TARP KS p 0.0056 < 0.01; interior marginal KS p alpha 0.128, beta 0.111), S1 is (interior KS p alpha 0.652, beta 0.762; TARP KS p 0.048), RMSE 0.0370 +- 0.0001 vs 0.0385 +- 0.0002, eff 0.867 +- 0.010 vs 0.880 +- 0.014 (efficiency tied: difference 0.013 < combined SE 0.017), macro-F1 0.867 vs 0.864; S1's Cramer-Rao bound for beta is 7-10% tighter, alpha identical. The margin is marginal (3 seeds, TARP p near the 0.01 gate); rule followed rather than overridden, as with P2 over P1b. N0 production stays S0_base29.",
+  "report_side_by_side": [
+    "S0_base29",
+    "S1_base_est"
+  ]
+}

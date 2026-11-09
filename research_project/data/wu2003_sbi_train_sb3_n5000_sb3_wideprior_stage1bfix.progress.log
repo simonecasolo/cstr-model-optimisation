@@ -1,0 +1,152 @@
+=== (re)started at 2026-10-14 10:00:11, pid=56386 === tail -f /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/data/wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix.progress.log to follow progress
+[train] 50/5000 rows, 167 attempts, 4747s elapsed, accept_rate=0.30, ETA=130.6h
+[train] 100/5000 rows, 305 attempts, 8090s elapsed, accept_rate=0.33, ETA=110.1h
+[train] 150/5000 rows, 458 attempts, 12707s elapsed, accept_rate=0.33, ETA=114.1h
+[train] 200/5000 rows, 586 attempts, 16125s elapsed, accept_rate=0.34, ETA=107.5h
+[train] 250/5000 rows, 725 attempts, 20116s elapsed, accept_rate=0.34, ETA=106.2h
+[train] 300/5000 rows, 843 attempts, 23174s elapsed, accept_rate=0.36, ETA=100.9h
+[train] 350/5000 rows, 997 attempts, 27375s elapsed, accept_rate=0.35, ETA=101.0h
+[train] 400/5000 rows, 1128 attempts, 30789s elapsed, accept_rate=0.35, ETA=98.4h
+[train] 450/5000 rows, 1265 attempts, 34931s elapsed, accept_rate=0.36, ETA=98.1h
+[train] 500/5000 rows, 1383 attempts, 38199s elapsed, accept_rate=0.36, ETA=95.5h
+[train] 550/5000 rows, 1536 attempts, 47387s elapsed, accept_rate=0.36, ETA=106.5h
+[train] 600/5000 rows, 1678 attempts, 51037s elapsed, accept_rate=0.36, ETA=104.0h
+[train] 650/5000 rows, 1805 attempts, 54256s elapsed, accept_rate=0.36, ETA=100.9h
+[train] 700/5000 rows, 1938 attempts, 57868s elapsed, accept_rate=0.36, ETA=98.7h
+[train] 750/5000 rows, 2069 attempts, 61474s elapsed, accept_rate=0.36, ETA=96.8h
+[train] 800/5000 rows, 2218 attempts, 65940s elapsed, accept_rate=0.36, ETA=96.2h
+[train] 850/5000 rows, 2347 attempts, 69235s elapsed, accept_rate=0.36, ETA=93.9h
+[train] 900/5000 rows, 2462 attempts, 72090s elapsed, accept_rate=0.37, ETA=91.2h
+[train] 950/5000 rows, 2594 attempts, 75961s elapsed, accept_rate=0.37, ETA=90.0h
+[train] 1000/5000 rows, 2702 attempts, 78921s elapsed, accept_rate=0.37, ETA=87.7h
+[train] 1050/5000 rows, 2841 attempts, 82713s elapsed, accept_rate=0.37, ETA=86.4h
+[train] 1100/5000 rows, 2995 attempts, 87302s elapsed, accept_rate=0.37, ETA=86.0h
+[train] 1150/5000 rows, 3145 attempts, 92042s elapsed, accept_rate=0.37, ETA=85.6h
+=== (re)started at 2026-10-15 19:30:19, pid=1546 === tail -f /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/data/wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix.progress.log to follow progress
+[train] resuming from partial: 1150/5000 rows, 3145 attempts
+[train] 1200/5000 rows, 3263 attempts, 3042s elapsed, accept_rate=0.37, ETA=2.7h
+[train] 1250/5000 rows, 3405 attempts, 6977s elapsed, accept_rate=0.37, ETA=5.8h
+[train] 1300/5000 rows, 3541 attempts, 10741s elapsed, accept_rate=0.37, ETA=8.5h
+[train] 1350/5000 rows, 3663 attempts, 13695s elapsed, accept_rate=0.37, ETA=10.3h
+[train] 1400/5000 rows, 3770 attempts, 16364s elapsed, accept_rate=0.37, ETA=11.7h
+[train] 1450/5000 rows, 3895 attempts, 19548s elapsed, accept_rate=0.37, ETA=13.3h
+[train] 1500/5000 rows, 4025 attempts, 22916s elapsed, accept_rate=0.37, ETA=14.9h
+[train] 1550/5000 rows, 4150 attempts, 26023s elapsed, accept_rate=0.37, ETA=16.1h
+[train] 1600/5000 rows, 4263 attempts, 29011s elapsed, accept_rate=0.38, ETA=17.1h
+[train] 1650/5000 rows, 4378 attempts, 31720s elapsed, accept_rate=0.38, ETA=17.9h
+[train] 1700/5000 rows, 4515 attempts, 35443s elapsed, accept_rate=0.38, ETA=19.1h
+[train] 1750/5000 rows, 4661 attempts, 39597s elapsed, accept_rate=0.38, ETA=20.4h
+[train] 1800/5000 rows, 4763 attempts, 42287s elapsed, accept_rate=0.38, ETA=20.9h
+[train] 1850/5000 rows, 4896 attempts, 45983s elapsed, accept_rate=0.38, ETA=21.7h
+[train] 1900/5000 rows, 5031 attempts, 49896s elapsed, accept_rate=0.38, ETA=22.6h
+[train] 1950/5000 rows, 5161 attempts, 53770s elapsed, accept_rate=0.38, ETA=23.4h
+[train] 2000/5000 rows, 5265 attempts, 56377s elapsed, accept_rate=0.38, ETA=23.5h
+[train] 2050/5000 rows, 5393 attempts, 60290s elapsed, accept_rate=0.38, ETA=24.1h
+[train] 2100/5000 rows, 5532 attempts, 64304s elapsed, accept_rate=0.38, ETA=24.7h
+[train] 2150/5000 rows, 5656 attempts, 68037s elapsed, accept_rate=0.38, ETA=25.1h
+[train] 2200/5000 rows, 5781 attempts, 71671s elapsed, accept_rate=0.38, ETA=25.3h
+[train] 2250/5000 rows, 5932 attempts, 76073s elapsed, accept_rate=0.38, ETA=25.8h
+[train] 2300/5000 rows, 6058 attempts, 79501s elapsed, accept_rate=0.38, ETA=25.9h
+[train] 2350/5000 rows, 6194 attempts, 82801s elapsed, accept_rate=0.38, ETA=25.9h
+[train] 2400/5000 rows, 6313 attempts, 85809s elapsed, accept_rate=0.38, ETA=25.8h
+[train] 2450/5000 rows, 6430 attempts, 89079s elapsed, accept_rate=0.38, ETA=25.8h
+[train] 2500/5000 rows, 6549 attempts, 92628s elapsed, accept_rate=0.38, ETA=25.7h
+[train] 2550/5000 rows, 6670 attempts, 95680s elapsed, accept_rate=0.38, ETA=25.5h
+[train] 2600/5000 rows, 6801 attempts, 99230s elapsed, accept_rate=0.38, ETA=25.4h
+[train] 2650/5000 rows, 6916 attempts, 102523s elapsed, accept_rate=0.38, ETA=25.3h
+[train] 2700/5000 rows, 7059 attempts, 106784s elapsed, accept_rate=0.38, ETA=25.3h
+[train] 2750/5000 rows, 7181 attempts, 110268s elapsed, accept_rate=0.38, ETA=25.1h
+[train] 2800/5000 rows, 7292 attempts, 113385s elapsed, accept_rate=0.38, ETA=24.7h
+[train] 2850/5000 rows, 7395 attempts, 115901s elapsed, accept_rate=0.39, ETA=24.3h
+[train] 2900/5000 rows, 7506 attempts, 118764s elapsed, accept_rate=0.39, ETA=23.9h
+[train] 2950/5000 rows, 7628 attempts, 122044s elapsed, accept_rate=0.39, ETA=23.6h
+[train] 3000/5000 rows, 7758 attempts, 125571s elapsed, accept_rate=0.39, ETA=23.3h
+[train] 3050/5000 rows, 7889 attempts, 129316s elapsed, accept_rate=0.39, ETA=23.0h
+[train] 3100/5000 rows, 8031 attempts, 133184s elapsed, accept_rate=0.39, ETA=22.7h
+[train] 3150/5000 rows, 8154 attempts, 136655s elapsed, accept_rate=0.39, ETA=22.3h
+[train] 3200/5000 rows, 8290 attempts, 140730s elapsed, accept_rate=0.39, ETA=22.0h
+=== chunk worker 'train_chunk6' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk6.npz, n_rows=280, seed=910106 ===
+=== chunk worker 'train_chunk5' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk5.npz, n_rows=280, seed=910105 ===
+=== chunk worker 'sbc_confirm_B' started: out=sb3_sbc_set_n400_sb3_wideprior_stage1bfix_partB.npz, n_rows=270, seed=910302 ===
+=== chunk worker 'train_chunk4' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk4.npz, n_rows=280, seed=910104 ===
+=== chunk worker 'sbc_reduced' started: out=sb3_sbc_set_n120_sb3_wideprior_stage1bfix.npz, n_rows=120, seed=9102 ===
+=== chunk worker 'train_chunk2' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk2.npz, n_rows=280, seed=910102 ===
+=== chunk worker 'train_chunk3' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk3.npz, n_rows=280, seed=910103 ===
+=== chunk worker 'train_chunk1' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk1.npz, n_rows=280, seed=910101 ===
+[train] 3250/5000 rows, 8430 attempts, 144699s elapsed, accept_rate=0.39, ETA=21.6h
+[train_chunk5] 50/280 rows, 100 attempts, 2954s elapsed, accept_rate=0.50, ETA=3.8h
+[train_chunk3] 50/280 rows, 113 attempts, 3584s elapsed, accept_rate=0.44, ETA=4.6h
+[train] 3300/5000 rows, 8538 attempts, 147940s elapsed, accept_rate=0.39, ETA=21.2h
+[sbc_confirm_B] 50/270 rows, 128 attempts, 4318s elapsed, accept_rate=0.39, ETA=5.3h
+[train_chunk2] 50/280 rows, 138 attempts, 4422s elapsed, accept_rate=0.36, ETA=5.7h
+[train_chunk4] 50/280 rows, 135 attempts, 4435s elapsed, accept_rate=0.37, ETA=5.7h
+[train_chunk1] 50/280 rows, 141 attempts, 4820s elapsed, accept_rate=0.35, ETA=6.2h
+[sbc_reduced] 50/120 rows, 141 attempts, 4833s elapsed, accept_rate=0.35, ETA=1.9h
+[train_chunk6] 50/280 rows, 138 attempts, 4923s elapsed, accept_rate=0.36, ETA=6.3h
+[train] 3350/5000 rows, 8659 attempts, 151720s elapsed, accept_rate=0.39, ETA=20.8h
+[train_chunk5] 100/280 rows, 248 attempts, 8204s elapsed, accept_rate=0.40, ETA=4.1h
+[train_chunk3] 100/280 rows, 255 attempts, 8513s elapsed, accept_rate=0.39, ETA=4.3h
+[sbc_confirm_B] 100/270 rows, 254 attempts, 8622s elapsed, accept_rate=0.39, ETA=4.1h
+[train_chunk4] 100/280 rows, 269 attempts, 8828s elapsed, accept_rate=0.37, ETA=4.4h
+[train_chunk2] 100/280 rows, 281 attempts, 9487s elapsed, accept_rate=0.36, ETA=4.7h
+[train_chunk6] 100/280 rows, 271 attempts, 9605s elapsed, accept_rate=0.37, ETA=4.8h
+[train] 3400/5000 rows, 8768 attempts, 154996s elapsed, accept_rate=0.39, ETA=20.3h
+[train_chunk5] 150/280 rows, 372 attempts, 12003s elapsed, accept_rate=0.40, ETA=2.9h
+[train_chunk3] 150/280 rows, 383 attempts, 12479s elapsed, accept_rate=0.39, ETA=3.0h
+[sbc_confirm_B] 150/270 rows, 398 attempts, 13145s elapsed, accept_rate=0.38, ETA=2.9h
+[train_chunk2] 150/280 rows, 412 attempts, 13299s elapsed, accept_rate=0.36, ETA=3.2h
+[train_chunk6] 150/280 rows, 394 attempts, 13445s elapsed, accept_rate=0.38, ETA=3.2h
+[train_chunk5] 200/280 rows, 495 attempts, 15700s elapsed, accept_rate=0.40, ETA=1.7h
+[train_chunk3] 200/280 rows, 512 attempts, 16140s elapsed, accept_rate=0.39, ETA=1.8h
+[train] 3450/5000 rows, 8932 attempts, 160268s elapsed, accept_rate=0.39, ETA=20.0h
+[train_chunk2] 200/280 rows, 542 attempts, 17083s elapsed, accept_rate=0.37, ETA=1.9h
+[sbc_confirm_B] 200/270 rows, 537 attempts, 17288s elapsed, accept_rate=0.37, ETA=1.7h
+[train_chunk6] 200/280 rows, 532 attempts, 18213s elapsed, accept_rate=0.38, ETA=2.0h
+[train_chunk5] 250/280 rows, 627 attempts, 19727s elapsed, accept_rate=0.40, ETA=0.7h
+[train_chunk2] 250/280 rows, 660 attempts, 20210s elapsed, accept_rate=0.38, ETA=0.7h
+[sbc_confirm_B] 250/270 rows, 647 attempts, 20375s elapsed, accept_rate=0.39, ETA=0.5h
+[train_chunk5] DONE: 280 rows, 689 attempts, final accept_rate=0.41, 21613s total
+=== chunk worker 'train_chunk5' finished ===
+[train_chunk6] 250/280 rows, 656 attempts, 21814s elapsed, accept_rate=0.38, ETA=0.7h
+[sbc_confirm_B] DONE: 270 rows, 706 attempts, final accept_rate=0.38, 22356s total
+=== chunk worker 'sbc_confirm_B' finished ===
+=== chunk worker 'train_chunk4' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk4.npz, n_rows=140, seed=910104 ===
+=== chunk worker 'train_chunk8' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk8.npz, n_rows=120, seed=910108 ===
+[train_chunk4] resuming from partial: 50/140 rows, 135 attempts
+=== chunk worker 'train_chunk1' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk1.npz, n_rows=140, seed=910101 ===
+[train_chunk1] resuming from partial: 50/140 rows, 141 attempts
+=== chunk worker 'train_chunk3' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk3.npz, n_rows=280, seed=910103 ===
+[train_chunk3] resuming from partial: 150/280 rows, 383 attempts
+=== chunk worker 'sbc_confirm_A' started: out=sb3_sbc_set_n400_sb3_wideprior_stage1bfix_partA.npz, n_rows=130, seed=910301 ===
+=== chunk worker 'train_chunk7' started: out=wu2003_sbi_train_sb3_n5000_sb3_wideprior_stage1bfix_chunk7.npz, n_rows=120, seed=910107 ===
+=== chunk worker 'sbc_reduced' started: out=sb3_sbc_set_n120_sb3_wideprior_stage1bfix.npz, n_rows=120, seed=9102 ===
+[sbc_reduced] resuming from partial: 50/120 rows, 141 attempts
+[train_chunk2] DONE: 280 rows, 763 attempts, final accept_rate=0.37, 23068s total
+=== chunk worker 'train_chunk2' finished ===
+[train_chunk6] DONE: 280 rows, 727 attempts, final accept_rate=0.39, 23774s total
+=== chunk worker 'train_chunk6' finished ===
+[sbc_reduced] 100/120 rows, 250 attempts, 3077s elapsed, accept_rate=0.40, ETA=0.2h
+[train_chunk8] 50/120 rows, 114 attempts, 3258s elapsed, accept_rate=0.44, ETA=1.3h
+[train_chunk3] 200/280 rows, 502 attempts, 3390s elapsed, accept_rate=0.40, ETA=0.4h
+[sbc_confirm_A] 50/130 rows, 131 attempts, 3658s elapsed, accept_rate=0.38, ETA=1.6h
+[train_chunk4] 100/140 rows, 266 attempts, 3717s elapsed, accept_rate=0.38, ETA=0.4h
+[train_chunk7] 50/120 rows, 143 attempts, 4448s elapsed, accept_rate=0.35, ETA=1.7h
+[train_chunk1] 100/140 rows, 285 attempts, 4538s elapsed, accept_rate=0.35, ETA=0.5h
+[sbc_reduced] DONE: 120 rows, 297 attempts, final accept_rate=0.40, 4546s total
+=== chunk worker 'sbc_reduced' finished ===
+[train_chunk4] DONE: 140 rows, 363 attempts, final accept_rate=0.39, 6390s total
+=== chunk worker 'train_chunk4' finished ===
+[sbc_confirm_A] 100/130 rows, 255 attempts, 7022s elapsed, accept_rate=0.39, ETA=0.6h
+[train_chunk3] 250/280 rows, 637 attempts, 7288s elapsed, accept_rate=0.39, ETA=0.2h
+[train_chunk1] DONE: 140 rows, 381 attempts, final accept_rate=0.37, 7326s total
+=== chunk worker 'train_chunk1' finished ===
+[train_chunk8] 100/120 rows, 254 attempts, 7465s elapsed, accept_rate=0.39, ETA=0.4h
+[train_chunk7] 100/120 rows, 279 attempts, 8563s elapsed, accept_rate=0.36, ETA=0.5h
+[train_chunk8] DONE: 120 rows, 299 attempts, final accept_rate=0.40, 8618s total
+=== chunk worker 'train_chunk8' finished ===
+[sbc_confirm_A] DONE: 130 rows, 313 attempts, final accept_rate=0.42, 8693s total
+=== chunk worker 'sbc_confirm_A' finished ===
+[train_chunk3] DONE: 280 rows, 718 attempts, final accept_rate=0.39, 9692s total
+=== chunk worker 'train_chunk3' finished ===
+[train_chunk7] DONE: 120 rows, 328 attempts, final accept_rate=0.37, 9917s total
+=== chunk worker 'train_chunk7' finished ===

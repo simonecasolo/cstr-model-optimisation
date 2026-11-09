@@ -1,0 +1,6 @@
+tags OK: 29fx_N3 31_N3 03s_N3
+closed P1b  N0 sd/(0.5% max) = [1.97 0.99 1.   8.33]   N3 sd = [0.01   0.207  0.2346 7.981 ] (expected [0.01 0.2  0.2  2.  ])
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/smoke_N3.py", line 53, in <module>
+    assert 0.85 < sd3[j] / expect[j] < 3.0, f"{name}: {ch} noise {sd3[j]:.4g} vs {expect[j]}"
+AssertionError: closed P1b: Qc noise 7.981 vs 2.0

@@ -1,0 +1,224 @@
+{
+  "protocol": "P1b",
+  "production_budget": 160000,
+  "use_ensemble": true,
+  "members": [
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n160000_s0.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n160000_s1.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n160000_s2.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n160000_s3.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n160000_s4.pkl"
+  ],
+  "flag": null,
+  "selection": "no persistently converged step (precision still improving): largest budget passing calibration (d)",
+  "rule_v1": {
+    "protocol": "P1b",
+    "production_budget": 20000,
+    "use_ensemble": true,
+    "members": [
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n20000_s0.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n20000_s1.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n20000_s2.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n20000_s3.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget/post_P1b_n20000_s4.pkl"
+    ],
+    "flag": null,
+    "steps": [
+      {
+        "from": 5000,
+        "to": 10000,
+        "max_dcorr": 0.0502449805053263,
+        "dcorr": {
+          "Sc1": 0.006257634637756899,
+          "Sc2": 0.0502449805053263,
+          "Sc3": 0.043265896806091095,
+          "Sc4": 0.0473719966662166,
+          "Sc7": 0.011652398065773784
+        },
+        "a_corr": false,
+        "b_cov": true,
+        "c_tarp": false,
+        "d_calib": false,
+        "ks_a_full": 0.0048535289781643,
+        "ks_b_full": 0.6148439612572029,
+        "ks_a_interior": 0.0052717136065447,
+        "ks_b_interior": 0.3705854575268349,
+        "converged": false
+      },
+      {
+        "from": 10000,
+        "to": 20000,
+        "max_dcorr": 0.0306490507895706,
+        "dcorr": {
+          "Sc1": 0.0023349375568562005,
+          "Sc2": 0.0035404960511866007,
+          "Sc3": 0.0107084516900815,
+          "Sc4": 0.0306490507895706,
+          "Sc7": 0.029775558870448415
+        },
+        "a_corr": true,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.0069444324547924,
+        "ks_b_full": 0.7502907497113545,
+        "ks_a_interior": 0.0108014291904546,
+        "ks_b_interior": 0.327690815785766,
+        "converged": true
+      },
+      {
+        "from": 20000,
+        "to": 40000,
+        "max_dcorr": 0.0321387230487859,
+        "dcorr": {
+          "Sc1": 0.028195903165091803,
+          "Sc2": 0.016302714209269098,
+          "Sc3": 0.0140952433567536,
+          "Sc4": 0.0321387230487859,
+          "Sc7": 0.025843792241780406
+        },
+        "a_corr": true,
+        "b_cov": true,
+        "c_tarp": false,
+        "d_calib": true,
+        "ks_a_full": 0.0085541680429447,
+        "ks_b_full": 0.1818564071844424,
+        "ks_a_interior": 0.011582541758465,
+        "ks_b_interior": 0.8136838138243045,
+        "converged": false
+      },
+      {
+        "from": 40000,
+        "to": 80000,
+        "max_dcorr": 0.25207439830571926,
+        "dcorr": {
+          "Sc1": 0.0372289404335919,
+          "Sc2": 0.011434222336163999,
+          "Sc3": 0.039335407988116904,
+          "Sc4": 0.0022414249837034994,
+          "Sc7": 0.25207439830571926
+        },
+        "a_corr": false,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.0756297473552048,
+        "ks_b_full": 0.1028256980599356,
+        "ks_a_interior": 0.0363388253723244,
+        "ks_b_interior": 0.5676809947574892,
+        "converged": false
+      },
+      {
+        "from": 80000,
+        "to": 160000,
+        "max_dcorr": 0.13067803190185479,
+        "dcorr": {
+          "Sc1": 0.010783655132758606,
+          "Sc2": 0.0190453258407805,
+          "Sc3": 0.003630353222024499,
+          "Sc4": 0.002544689923365099,
+          "Sc7": 0.13067803190185479
+        },
+        "a_corr": false,
+        "b_cov": true,
+        "c_tarp": false,
+        "d_calib": true,
+        "ks_a_full": 0.0369477329469219,
+        "ks_b_full": 0.77043856803598,
+        "ks_a_interior": 0.0239184527389607,
+        "ks_b_interior": 0.83706746379764,
+        "converged": false
+      }
+    ],
+    "rule": "see docstring of scripts/nb31_budget_convergence.py (fixed before results)"
+  },
+  "rule_v1_choice": 20000,
+  "rule_v2_steps": [
+    {
+      "from": 5000,
+      "to": 10000,
+      "a_corr": false,
+      "b_cov": true,
+      "c_tarp": false,
+      "d_calib": false,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.0502449805053263,
+      "max_rel_dsd": 0.5527694596707069,
+      "worst_sd": "a_Sc2"
+    },
+    {
+      "from": 10000,
+      "to": 20000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.0306490507895706,
+      "max_rel_dsd": 0.2639885910508881,
+      "worst_sd": "a_Sc3"
+    },
+    {
+      "from": 20000,
+      "to": 40000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": false,
+      "d_calib": true,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.0321387230487859,
+      "max_rel_dsd": 0.4531521911280404,
+      "worst_sd": "a_Sc1"
+    },
+    {
+      "from": 40000,
+      "to": 80000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.039335407988116904,
+      "max_rel_dsd": 0.3681133470944403,
+      "worst_sd": "a_Sc3"
+    },
+    {
+      "from": 80000,
+      "to": 160000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": false,
+      "d_calib": true,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.0190453258407805,
+      "max_rel_dsd": 0.2957415244436702,
+      "worst_sd": "a_Sc1"
+    }
+  ],
+  "efficiency_vs_summary_crb": {
+    "Sc1": {
+      "sd_a_over_crb": 1.2676319924926656,
+      "sd_b_over_crb": 0.991982605932179
+    },
+    "Sc3": {
+      "sd_a_over_crb": 1.1943170964211882,
+      "sd_b_over_crb": 1.0103810839550742
+    },
+    "Sc4": {
+      "sd_a_over_crb": 1.1753725068418102,
+      "sd_b_over_crb": 0.972931863479098
+    }
+  },
+  "rule": "v2, amended after results (see scripts/nb31_budget_convergence.py, 'AMENDED RULE')",
+  "approval": {
+    "approved": true,
+    "by": "user (Simone Casolo), in conversation with Claude",
+    "time": "Sun Nov  8 20:51:08 2026",
+    "reason": "User approved 2026-11-08: v1 rule selected 20k but was flawed (no persistence, gated on the misspecified Sc7, no precision criterion); 160k 5-seed ensemble is calibrated and brings alpha within ~1.2x of its summary-statistic Cramer-Rao bound (beta at the bound). Headline results checked to be insensitive to 20k vs 160k."
+  }
+}

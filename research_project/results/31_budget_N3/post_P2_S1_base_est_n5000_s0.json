@@ -1,0 +1,15 @@
+{
+  "n_train": 5000,
+  "n_invalid_dropped": 0,
+  "seed": 0,
+  "train_s": 19.16146421432495,
+  "epochs": 58.0,
+  "best_val_loss": -4.759103775024414,
+  "hidden_features": 128,
+  "num_transforms": 5,
+  "training_batch_size": 256,
+  "max_num_epochs": 200,
+  "protocol": "P2",
+  "budget": 5000,
+  "summary_set": "S1_base_est"
+}

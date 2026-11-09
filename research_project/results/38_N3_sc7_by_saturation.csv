@@ -1,0 +1,3 @@
+group,n,cov90_b,bias_b,sd_b
+Sc7 unsaturated (flagged -> drift-aware),31,0.8387096774193549,-0.0024262416747308545,0.03399541229009628
+Sc7 saturated (unflagged -> production),19,0.0,-0.3978519314213803,0.030654145404696465

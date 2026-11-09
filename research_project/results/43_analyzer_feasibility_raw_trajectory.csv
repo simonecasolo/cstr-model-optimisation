@@ -1,0 +1,15 @@
+point,pair,representation,corr_mean
+Nominal,eta_col/z_A0_eff,S-B raw trajectory (9 ch),0.5281729251527857
+Nominal,eta_col/z_A0_eff,S-C raw trajectory (9+z_A),0.4524533800939543
+Nominal,alpha/eta_col,S-B raw trajectory (9 ch),-0.48578882515608357
+Nominal,alpha/eta_col,S-C raw trajectory (9+z_A),-0.41849972778999406
+"nb39/41 degraded (xi_reb=0.70, z_A0_eff=0.80)",alpha/z_A0_eff,S-B raw trajectory (9 ch),-0.4221427034991079
+"nb39/41 degraded (xi_reb=0.70, z_A0_eff=0.80)",alpha/z_A0_eff,S-C raw trajectory (9+z_A),-0.262050021202518
+W2 (alpha=0.85),alpha/z_A0_eff,S-B raw trajectory (9 ch),0.5800174724455877
+W2 (alpha=0.85),alpha/z_A0_eff,S-C raw trajectory (9+z_A),0.5883873921393393
+nb40 P4 (random prior draw),alpha/z_A0_eff,S-B raw trajectory (9 ch),0.45339046082401097
+nb40 P4 (random prior draw),alpha/z_A0_eff,S-C raw trajectory (9+z_A),0.4681095835935534
+nb40 P4 (random prior draw),eta_col/z_A0_eff,S-B raw trajectory (9 ch),0.4036561925166649
+nb40 P4 (random prior draw),eta_col/z_A0_eff,S-C raw trajectory (9+z_A),0.38897927200870824
+"nb41 interior eta_col=0.85, z_A0_eff=0.80",eta_col/z_A0_eff,S-B raw trajectory (9 ch),0.5203084317506529
+"nb41 interior eta_col=0.85, z_A0_eff=0.80",eta_col/z_A0_eff,S-C raw trajectory (9+z_A),0.43160801254556236

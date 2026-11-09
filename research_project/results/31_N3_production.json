@@ -1,0 +1,254 @@
+{
+  "protocol": "P2",
+  "sensor_model": "N3",
+  "sensor_noise": "N3: sigma_C=0.01 mol/L, sigma_T=0.2 K, sigma_Tc=0.2 K, sigma_Qc=2.0 L/min",
+  "summary_set": "S1_base_est",
+  "production_budget": 40000,
+  "use_ensemble": true,
+  "members": [
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n40000_s0.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n40000_s1.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n40000_s2.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n40000_s3.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n40000_s4.pkl"
+  ],
+  "flag": null,
+  "selection": "first persistently converged step 20000->40000",
+  "rule_v1": {
+    "protocol": "P2",
+    "production_budget": 10000,
+    "use_ensemble": true,
+    "members": [
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n10000_s0.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n10000_s1.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n10000_s2.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n10000_s3.pkl",
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n10000_s4.pkl"
+    ],
+    "flag": null,
+    "steps": [
+      {
+        "from": 5000,
+        "to": 10000,
+        "max_dcorr": 0.039856895958757896,
+        "dcorr": {
+          "Sc1": 0.009347303536711801,
+          "Sc2": 0.020335421790825495,
+          "Sc3": 0.039856895958757896,
+          "Sc4": 0.020110146567972595,
+          "Sc7": 0.0160300842338401
+        },
+        "a_corr": true,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.7275769930339235,
+        "ks_b_full": 0.4819281692636782,
+        "ks_a_interior": 0.4757444164057105,
+        "ks_b_interior": 0.6947040349521653,
+        "converged": true
+      },
+      {
+        "from": 10000,
+        "to": 20000,
+        "max_dcorr": 0.028064814140113498,
+        "dcorr": {
+          "Sc1": 0.0206773472888315,
+          "Sc2": 0.015323589088155995,
+          "Sc3": 0.028064814140113498,
+          "Sc4": 0.021798462540157604,
+          "Sc7": 0.0059298309896164
+        },
+        "a_corr": true,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.8641981829129177,
+        "ks_b_full": 0.9560777667987014,
+        "ks_a_interior": 0.485766220957188,
+        "ks_b_interior": 0.3133209360127633,
+        "converged": true
+      },
+      {
+        "from": 20000,
+        "to": 40000,
+        "max_dcorr": 0.045074690038609797,
+        "dcorr": {
+          "Sc1": 0.012196718299172703,
+          "Sc2": 0.019676221257852095,
+          "Sc3": 0.004387230823657801,
+          "Sc4": 0.017263218334966107,
+          "Sc7": 0.045074690038609797
+        },
+        "a_corr": true,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.9443643603801938,
+        "ks_b_full": 0.4074933329570035,
+        "ks_a_interior": 0.8792274876596649,
+        "ks_b_interior": 0.0803528077618962,
+        "converged": true
+      },
+      {
+        "from": 40000,
+        "to": 80000,
+        "max_dcorr": 0.063738384476566,
+        "dcorr": {
+          "Sc1": 0.0032147650989777996,
+          "Sc2": 0.008342776809853597,
+          "Sc3": 0.006797660110104298,
+          "Sc4": 0.008846695644131,
+          "Sc7": 0.063738384476566
+        },
+        "a_corr": false,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.8731989076114097,
+        "ks_b_full": 0.2723919967807194,
+        "ks_a_interior": 0.6361694932119251,
+        "ks_b_interior": 0.812718494734586,
+        "converged": false
+      },
+      {
+        "from": 80000,
+        "to": 160000,
+        "max_dcorr": 0.1169422229597158,
+        "dcorr": {
+          "Sc1": 0.008487409294063102,
+          "Sc2": 0.016420729212893004,
+          "Sc3": 0.004729566665585799,
+          "Sc4": 0.005408713620915398,
+          "Sc7": 0.1169422229597158
+        },
+        "a_corr": false,
+        "b_cov": true,
+        "c_tarp": true,
+        "d_calib": true,
+        "ks_a_full": 0.4194137642348857,
+        "ks_b_full": 0.758862861014471,
+        "ks_a_interior": 0.2158730541190273,
+        "ks_b_interior": 0.1883610806787335,
+        "converged": false
+      }
+    ],
+    "rule": "see docstring of scripts/nb31_budget_convergence.py (fixed before results)",
+    "sensor_model": "N3",
+    "summary_set": "S1_base_est"
+  },
+  "rule_v1_choice": 10000,
+  "rule_v2_steps": [
+    {
+      "from": 5000,
+      "to": 10000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.039856895958757896,
+      "max_rel_dsd": 0.13863797665678101,
+      "worst_sd": "b_Sc3"
+    },
+    {
+      "from": 10000,
+      "to": 20000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": false,
+      "converged": false,
+      "max_dcorr": 0.028064814140113498,
+      "max_rel_dsd": 0.12591411878684788,
+      "worst_sd": "b_Sc1"
+    },
+    {
+      "from": 20000,
+      "to": 40000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.019676221257852095,
+      "max_rel_dsd": 0.07395317556879122,
+      "worst_sd": "a_Sc3"
+    },
+    {
+      "from": 40000,
+      "to": 80000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.008846695644131,
+      "max_rel_dsd": 0.022971695111562385,
+      "worst_sd": "a_Sc2"
+    },
+    {
+      "from": 80000,
+      "to": 160000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.016420729212893004,
+      "max_rel_dsd": 0.06759908671441861,
+      "worst_sd": "b_Sc1"
+    }
+  ],
+  "efficiency_vs_summary_crb": {
+    "Sc1": {
+      "sd_a_over_crb": 1.030171496780021,
+      "sd_b_over_crb": 0.9510514607051074
+    },
+    "Sc3": {
+      "sd_a_over_crb": 1.0437117539231502,
+      "sd_b_over_crb": 0.9322735953506887
+    },
+    "Sc4": {
+      "sd_a_over_crb": 1.0641557722858452,
+      "sd_b_over_crb": 0.8261016628750105
+    }
+  },
+  "rule": "v2.1 (v2 amended 2026-11-09 after results; see scripts/nb31_budget_convergence.py, 'AMENDED RULE v2.1')",
+  "rule_v2_choice": {
+    "production_budget": 40000,
+    "use_ensemble": false,
+    "members": [
+      "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/31_budget_N3/post_P2_S1_base_est_n40000_s3.pkl"
+    ],
+    "description": "single seed 3"
+  },
+  "rule_v2_1": {
+    "amendment": "v2.1",
+    "date": "2026-11-09",
+    "after_results": true,
+    "approved_by": "user (Simone Casolo), 2026-11-09, in conversation with Claude",
+    "reason": "the deployed single member (40k, seed 3) failed the rule's own calibration criterion (d): interior beta KS p = 0.0001; the single-vs-ensemble tie-break (ensemble 0.020 vs median member 0.020) is far below the TARP-deviation sampling noise (~0.043) and selected on noise; the ensemble passes (d) at the same precision",
+    "principle": "the deployed posterior must itself pass the calibration test (d); use the ensemble whenever it does",
+    "changes_choice": true,
+    "member_calibration_d": {
+      "0": false,
+      "1": true,
+      "2": true,
+      "3": false,
+      "4": true
+    },
+    "ensemble_calibration_d": true
+  },
+  "approval": {
+    "approved": true,
+    "by": "user (Simone Casolo), 2026-11-09 (rule v2.1 amendment)",
+    "time": "Mon Nov  9 12:46:48 2026",
+    "reason": "v2.1: the deployed posterior must itself pass calibration (d); the v2 single member (40k seed 3) failed it (interior beta KS p = 0.0001) and the single-vs-ensemble tie-break (0.020 vs 0.020) was below the TARP-deviation sampling noise (~0.043); the 40k ensemble passes (d) at the same precision"
+  }
+}

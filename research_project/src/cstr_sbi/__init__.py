@@ -14,8 +14,15 @@ Package layout (see cstr_sbi_execution_plan.md):
 
 __version__ = "0.0.1"
 
-from cstr_sbi import physics   # propylene oxide system
+# NOTE (2026-09-04): the top-level `physics`/`plotting`/`simulator` modules
+# ("propylene oxide system") referenced in the docstring above were removed in
+# an earlier, uncommitted legacy-code cleanup (see `git status` -- most of
+# `legacy_code/`, old notebooks 00-03/13, and their data/figures went with
+# them) but this import was never updated to match, leaving a dead reference
+# that broke every `import cstr_sbi` in a fresh interpreter. The project has
+# moved on to the `luyben`/`recycle` subpackages below; nothing currently
+# imports the old top-level `physics` module.
 from cstr_sbi import luyben    # Luyben recycle plant extension
 from cstr_sbi import recycle   # Wu 2003 CSTR-column-recycle extension
 
-__all__ = ["physics", "luyben", "recycle", "__version__"]
+__all__ = ["luyben", "recycle", "__version__"]

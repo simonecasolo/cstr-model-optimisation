@@ -1,0 +1,13 @@
+[2026-09-07 19:36:51] [train] resuming from partial: 250/1000 rows, 630 attempts
+[2026-09-07 20:21:24] [train] accepted=300/1000, attempts=734 (accept_rate=0.409), elapsed=2674s, ~8.91s/draw, ETA=104.0min
+[2026-09-07 22:14:58] [train] accepted=400/1000, attempts=979 (accept_rate=0.409), elapsed=9487s, ~23.72s/draw, ETA=237.2min
+[2026-09-08 10:40:40] [train] accepted=500/1000, attempts=1260 (accept_rate=0.397), elapsed=54229s, ~108.46s/draw, ETA=903.8min
+[2026-09-08 10:40:40] [train] checkpoint saved: /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/data/wu2003_sbi_train_sc2_true_n1000_wideprior_stage1bfix.partial.npz (500/1000)
+[2026-09-08 12:39:48] [train] accepted=600/1000, attempts=1513 (accept_rate=0.397), elapsed=61377s, ~102.30s/draw, ETA=682.0min
+[2026-09-08 14:12:55] [train] accepted=700/1000, attempts=1728 (accept_rate=0.405), elapsed=66964s, ~95.66s/draw, ETA=478.3min
+[2026-09-08 15:02:30] [train] checkpoint saved: /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/data/wu2003_sbi_train_sc2_true_n1000_wideprior_stage1bfix.partial.npz (750/1000)
+[2026-09-08 16:02:05] [train] accepted=800/1000, attempts=1968 (accept_rate=0.407), elapsed=73514s, ~91.89s/draw, ETA=306.3min
+[2026-09-08 18:40:57] [train] accepted=900/1000, attempts=2221 (accept_rate=0.405), elapsed=83046s, ~92.27s/draw, ETA=153.8min
+[2026-09-08 20:42:16] [train] accepted=1000/1000, attempts=2481 (accept_rate=0.403), elapsed=90325s, ~90.33s/draw, ETA=0.0min
+[2026-09-08 20:42:16] [train] checkpoint saved: /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/data/wu2003_sbi_train_sc2_true_n1000_wideprior_stage1bfix.partial.npz (1000/1000)
+[2026-09-08 20:42:16] [train] saved: /Users/simo/inso-po-RD/cstr-model-optimisation/research_project/data/wu2003_sbi_train_sc2_true_n1000_wideprior_stage1bfix.npz, theta=(1000, 5), summaries=(1000, 74), wall_s=90325, accept_rate=0.403

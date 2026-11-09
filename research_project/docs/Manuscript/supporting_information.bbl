@@ -50,6 +50,25 @@
 \providecommand \BibitemShut  [1]{\csname bibitem#1\endcsname}%
 \let\auto@bib@innerbib\@empty
 %</preamble>
+\bibitem [{\citenamefont {Zhou}(2021)}]{Zhou2021}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Z.-H.}\ \bibnamefont
+  {Zhou}},\ }\href@noop {} {\emph {\bibinfo {title} {Machine Learning}}}\
+  (\bibinfo  {publisher} {Springer},\ \bibinfo {address} {Singapore},\ \bibinfo
+  {year} {2021})\ pp.\ \bibinfo {pages} {57--77}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Talts}\ \emph {et~al.}(2018)\citenamefont {Talts},
+  \citenamefont {Betancourt}, \citenamefont {Simpson}, \citenamefont
+  {Vehtari},\ and\ \citenamefont {Gelman}}]{Talts2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {S.}~\bibnamefont
+  {Talts}}, \bibinfo {author} {\bibfnamefont {M.}~\bibnamefont {Betancourt}},
+  \bibinfo {author} {\bibfnamefont {D.}~\bibnamefont {Simpson}}, \bibinfo
+  {author} {\bibfnamefont {A.}~\bibnamefont {Vehtari}},\ and\ \bibinfo {author}
+  {\bibfnamefont {A.}~\bibnamefont {Gelman}},\ }\bibfield  {title} {\bibinfo
+  {title} {Validating bayesian inference algorithms with simulation-based
+  calibration},\ }\bibfield  {journal} {\bibinfo  {journal} {arXiv}\ }\href
+  {https://doi.org/10.48550/arxiv.1804.06788} {10.48550/arxiv.1804.06788}
+  (\bibinfo {year} {2018})\BibitemShut {NoStop}%
 \bibitem [{\citenamefont {Tejero-Cantero}\ \emph {et~al.}(2020)\citenamefont
   {Tejero-Cantero}, \citenamefont {Boelts}, \citenamefont {Deistler},
   \citenamefont {Lueckmann}, \citenamefont {Durkan}, \citenamefont
@@ -70,29 +89,4 @@
   {journal} {Journal of Open Source Software}\ }\textbf {\bibinfo {volume}
   {5}},\ \bibinfo {pages} {2505} (\bibinfo {year} {2020})}\BibitemShut
   {NoStop}%
-\bibitem [{\citenamefont {Wu}\ \emph {et~al.}(2003)\citenamefont {Wu},
-  \citenamefont {Yu}, \citenamefont {Luyben},\ and\ \citenamefont
-  {Skogestad}}]{Wu2003}%
-  \BibitemOpen
-  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {K.-L.}\ \bibnamefont
-  {Wu}}, \bibinfo {author} {\bibfnamefont {C.-C.}\ \bibnamefont {Yu}}, \bibinfo
-  {author} {\bibfnamefont {W.~L.}\ \bibnamefont {Luyben}},\ and\ \bibinfo
-  {author} {\bibfnamefont {S.}~\bibnamefont {Skogestad}},\ }\bibfield  {title}
-  {\bibinfo {title} {Reactor/separator processes with recycle --- 2. design for
-  composition control},\ }\href {https://doi.org/10.1016/S0098-1354(02)00218-1}
-  {\bibfield  {journal} {\bibinfo  {journal} {Computers \& Chemical
-  Engineering}\ }\textbf {\bibinfo {volume} {27}},\ \bibinfo {pages} {401}
-  (\bibinfo {year} {2003})}\BibitemShut {NoStop}%
-\bibitem [{\citenamefont {Cranmer}\ \emph {et~al.}(2020)\citenamefont
-  {Cranmer}, \citenamefont {Brehmer},\ and\ \citenamefont
-  {Louppe}}]{Cranmer2020}%
-  \BibitemOpen
-  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {K.}~\bibnamefont
-  {Cranmer}}, \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont {Brehmer}},\
-  and\ \bibinfo {author} {\bibfnamefont {G.}~\bibnamefont {Louppe}},\
-  }\bibfield  {title} {\bibinfo {title} {The frontier of simulation-based
-  inference},\ }\href {https://doi.org/10.1073/pnas.1912789117} {\bibfield
-  {journal} {\bibinfo  {journal} {Proceedings of the National Academy of
-  Sciences}\ }\textbf {\bibinfo {volume} {117}},\ \bibinfo {pages} {30055}
-  (\bibinfo {year} {2020})}\BibitemShut {NoStop}%
 \end{thebibliography}%

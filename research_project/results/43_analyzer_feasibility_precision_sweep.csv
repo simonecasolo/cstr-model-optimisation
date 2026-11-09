@@ -1,0 +1,36 @@
+case,pair,feed_noise_pct,corr
+degraded point,alpha/z_A0_eff,0.003,-0.2618647187706902
+degraded point,alpha/z_A0_eff,0.001,-0.095950284489457
+degraded point,alpha/z_A0_eff,0.0003,-0.029480744848629097
+degraded point,alpha/z_A0_eff,0.0001,-0.010296727906770886
+degraded point,alpha/z_A0_eff,3e-05,-0.004407737472082686
+nominal,eta_col/z_A0_eff,0.003,0.48625208605879566
+nominal,eta_col/z_A0_eff,0.001,0.20533482484049703
+nominal,eta_col/z_A0_eff,0.0003,0.06723057861504869
+nominal,eta_col/z_A0_eff,0.0001,0.025972381036497124
+nominal,eta_col/z_A0_eff,3e-05,0.011765058372444528
+interior eta_col=0.85,eta_col/z_A0_eff,0.003,0.3650015869684712
+interior eta_col=0.85,eta_col/z_A0_eff,0.001,0.14328215157479948
+interior eta_col=0.85,eta_col/z_A0_eff,0.0003,0.04786279648890129
+interior eta_col=0.85,eta_col/z_A0_eff,0.0001,0.019977253951025706
+interior eta_col=0.85,eta_col/z_A0_eff,3e-05,0.01057429995432616
+W2 / nb40 P2-like (alpha=0.85),alpha/z_A0_eff,0.003,0.7088291648136907
+W2 / nb40 P2-like (alpha=0.85),alpha/z_A0_eff,0.001,0.43447514696976514
+W2 / nb40 P2-like (alpha=0.85),alpha/z_A0_eff,0.0003,0.14928859534603778
+W2 / nb40 P2-like (alpha=0.85),alpha/z_A0_eff,0.0001,0.04731709497912218
+W2 / nb40 P2-like (alpha=0.85),alpha/z_A0_eff,3e-05,0.01121333028061297
+nb40 P3 (joint mild),alpha/z_A0_eff,0.003,0.2781792809325072
+nb40 P3 (joint mild),alpha/z_A0_eff,0.001,0.11968676332585333
+nb40 P3 (joint mild),alpha/z_A0_eff,0.0003,0.0344535160938679
+nb40 P3 (joint mild),alpha/z_A0_eff,0.0001,0.008670540426751376
+nb40 P3 (joint mild),alpha/z_A0_eff,3e-05,-0.0004744999481890033
+nb40 P4 (random prior draw),alpha/z_A0_eff,0.003,0.5457386885966383
+nb40 P4 (random prior draw),alpha/z_A0_eff,0.001,0.2942562821801049
+nb40 P4 (random prior draw),alpha/z_A0_eff,0.0003,0.09751030568130511
+nb40 P4 (random prior draw),alpha/z_A0_eff,0.0001,0.03278387232740724
+nb40 P4 (random prior draw),alpha/z_A0_eff,3e-05,0.010117314313385457
+nb40 P4 (random prior draw),eta_col/z_A0_eff,0.003,0.21879981633065318
+nb40 P4 (random prior draw),eta_col/z_A0_eff,0.001,0.10844221139354976
+nb40 P4 (random prior draw),eta_col/z_A0_eff,0.0003,0.03812257683459782
+nb40 P4 (random prior draw),eta_col/z_A0_eff,0.0001,0.01603471266292498
+nb40 P4 (random prior draw),eta_col/z_A0_eff,3e-05,0.008215824021649594

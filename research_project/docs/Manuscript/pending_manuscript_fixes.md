@@ -1399,6 +1399,69 @@ points to summary scaling/heavy tails plus support handling, not simply insuffic
 training budget. Next experiment should compare reduced-budget preprocessing/support fixes
 before another 15k x 8-seed run.
 
+**Strict-rejection size-sweep notebook executed (2026-08-27):** added and ran
+`notebooks/36_wu2003_strict_rejection_sbc_size_sweep.ipynb` under `caffeinate`; executed
+copy is `notebooks/36_wu2003_strict_rejection_sbc_size_sweep.executed.ipynb`. The sweep
+reused the existing matched full bank, trained seed 3 on shuffled prefixes of 5k, 10k,
+and 15k samples, and evaluated a strict-rejection canary SBC with
+`reject_outside_prior=True` (`N_SBC=20`, `N_POST=50`). Results are in
+`results/36_sysII_strict_rejection_size_sweep.csv/json`, with the trend figure in
+`figures/36_sysII_strict_rejection_size_sweep.png`. Strict rejection itself did not hang
+in the canary (`sample_seconds_mean` about 0.01--0.04 s), but it did not cleanly solve
+calibration either: min KS values were 0.298 (5k), 0.019 (10k), and 0.070 (15k). Because
+`N_SBC=20` is deliberately small, interpret this only as evidence that hard prior
+rejection is computationally viable and insufficient by itself; it is not a production
+calibration pass. The next experiment should target preprocessing/support-aware training,
+especially the `V_norm*` and `Q_j*` heavy-tailed summaries.
+
+**Lognormal-prior diagnostic executed (2026-08-27):** added and ran
+`notebooks/37_wu2003_lognormal_prior_sbc.ipynb` under `caffeinate`; executed copy is
+`notebooks/37_wu2003_lognormal_prior_sbc.executed.ipynb`. The notebook defines a
+truncated lognormal prior centered at nominal operation
+`[1, 1, 1, 1, 0.90]` with log-space standard deviations
+`[0.16, 0.16, 0.10, 0.16, 0.055]`, truncated to the existing physical support. To avoid
+another full simulator-bank generation, it importance-resampled the existing 15k matched
+flat-prior bank into a 5k approximate lognormal-prior bank
+(`data/wu2003_sbi_train_sb_lognormal_resampled_n5000.npz`), trained four seeds, and ran
+matched SBC on one shared lognormal validation set (`N_SBC=120`, `N_POST=120`) with
+`reject_outside_prior=True`. Results are in `results/37_sysII_lognormal_prior_sbc.csv/json`.
+**Result: the lognormal prior did not improve calibration or seed stability in this
+resampled-bank diagnostic.** Per-seed min KS values were seed 0 $1.55\times10^{-9}$,
+seed 1 $3.38\times10^{-11}$, seed 2 $5.04\times10^{-8}$, and seed 3
+$1.50\times10^{-7}$; 0/4 seeds pass. Strict rejection was fast (`sample_seconds_mean`
+about 0.012--0.015 s), so the failure is not a rejection-sampling hang. Interpretation:
+flat priors may still be scientifically undesirable, but simply concentrating the prior
+near nominal operation by resampling the existing flat bank is not enough; the next fix
+should combine prior design with true simulator-generated banks and the previously flagged
+summary preprocessing/support-aware parameterisation.
+
+**True simulator-generated lognormal bank appended/executed (2026-08-27):** appended
+Section 8 to `notebooks/37_wu2003_lognormal_prior_sbc.ipynb` and reran it under
+`caffeinate`. The appended section generated a real matched-protocol lognormal bank
+(`data/wu2003_sbi_train_sb_lognormal_true_n1000.npz`, 1,000 valid simulations), trained
+four `zuko_nsf` 60/3 seed variants, and reused the shared lognormal validation set
+(`N_SBC=120`, `N_POST=120`, `reject_outside_prior=True`). Results are in
+`results/37_sysII_lognormal_true_bank_n1000_sbc.csv/json`; the trend figure is
+`figures/37_sysII_lognormal_true_bank_n1000_sbc_seed_stability.png`. **Result: still no
+seed passes SBC.** Per-seed min KS values were seed 0 $1.10\times10^{-4}$, seed 1
+$5.30\times10^{-4}$, seed 2 $2.21\times10^{-3}$, and seed 3 $3.15\times10^{-6}$.
+Strict rejection remained fast (`sample_seconds_mean` about 0.013--0.015 s). The true
+lognormal bank improves over the catastrophic resampled-bank p-values for some seeds but
+does not provide stable calibration; failures are especially visible in `xi_reb` and
+`z_A0_eff`. Next fix should move to summary preprocessing/support-aware parameterisation,
+not just prior narrowing.
+
+**Repair-experiment notebook prepared (2026-08-27):** created
+`notebooks/38_wu2003_sbc_repair_experiments.ipynb` as a standalone follow-up notebook,
+instead of continuing to append exploratory repair code to nb37. It contains a concise
+plan and runnable cells for three next moves: (i) matched true-lognormal 5k summary
+preprocessing sweep (`identity`, `robust_clip_scale`, `signed_log_robust`,
+`drop_heavy_tail`), (ii) fixed-nominal warm-start ablation, and (iii) a scaffold for
+training in unconstrained logit parameter space. The user intends to run this notebook
+manually. Use the resulting `results/38_*.csv/json` outputs to decide whether the next
+full run should use preprocessing, warm-start/domain changes, or support-aware parameter
+training.
+
 ### Item 8, System I posterior promotion executed (2026-08-17) — Table VI/SBC fixed, but surfaced a NEW blocking finding: the fault-classification threshold is stale
 
 **Trigger**: user asked to start executing `HANDOFF.md`'s TOP PRIORITY plan (promote the
@@ -2098,6 +2161,87 @@ confirmation that all System I claims are represented in `main.tex`. Found and f
    load a trained posterior at all, only the simulator. Reworded to state plainly that
    this is an independently-applied instance of the same warm-start protocol choice, not
    a shared artifact or dependency.
+
+
+Other minor fixes:
+
+Here is the complete review and action plan formatted as a Markdown (`.md`) file:
+
+```markdown
+# Review & Revision Guide for *Computers & Chemical Engineering*
+
+**Paper Title:** Simulation-Based Inference for Plant-Wide Fault Diagnosis and Artefactual Non-Identifiability Under Closed-Loop Control[cite: 1]  
+**Authors:** Simone Casolo, Alexander Johannes Stasik, Signe Riemer-Sørensen[cite: 1]  
+**Target Journal:** *Computers & Chemical Engineering* (Elsevier)
+
+---
+
+## 1. Critical Mathematical & Physical Modeling Errors
+
+### A. Unit Inconsistency in System I Energy Balance (Table 1 vs. Eq. 1b & 1c)
+In Section 2.1[cite: 1], the reactor energy balance is given as:
+$$ \frac{dT}{dt} = \frac{Q}{V}\bigl(T_i - T\bigr) - \frac{\Delta H_r}{\rho C_p}\,k(T)\,C - \frac{U\!A}{\rho C_p V}\bigl(T - T_c\bigr) $$[cite: 1]
+
+Table 1 lists the following parameter units[cite: 1]:
+* **$\Delta H_r$**: $-84{,}666\text{ J mol}^{-1}$[cite: 1]
+* **$C_p$**: $1.0\text{ cal (g K)}^{-1}$[cite: 1]
+* **$U\!A$**: $12{,}500\text{ cal (min K)}^{-1}$[cite: 1]
+* **$\rho$**: $1{,}000\text{ g L}^{-1}$[cite: 1]
+
+The reaction heat generation term $-\frac{\Delta H_r}{\rho C_p} k(T)C$ evaluates to units of $\frac{\text{J}}{\text{cal}}\cdot\text{K min}^{-1}$ because $\Delta H_r$ is in Joules while $C_p$ uses calories[cite: 1]:
+$$ \frac{[\Delta H_r] \cdot [k] \cdot [C]}{[\rho] \cdot [C_p]} = \frac{(\text{J mol}^{-1}) \cdot (\text{min}^{-1}) \cdot (\text{mol L}^{-1})}{(\text{g L}^{-1}) \cdot (\text{cal g}^{-1}\text{K}^{-1})} = \frac{\text{J}}{\text{cal}} \cdot \frac{\text{K}}{\text{min}} $$
+
+In contrast, the heat transfer term $\frac{U\!A}{\rho C_p V}(T - T_c)$ evaluates cleanly to $\text{K min}^{-1}$ using calories[cite: 1]. Without an explicit unit conversion factor ($1\text{ cal} = 4.184\text{ J}$), the reaction heat generation term in Eq. (1b) is oversized by a factor of $4.184$ relative to the cooling term[cite: 1].
+
+* **Fix:** Standardize all thermal quantities in Table 1 and Section 2 to either pure SI ($\text{J}$, $\text{W}$, $\text{J g}^{-1}\text{K}^{-1}$) or pure caloric units ($\text{cal}$)[cite: 1]. If using SI, convert $U\!A$ to $\text{J (min K)}^{-1}$ ($12{,}500 \times 4.184 = 52{,}300\text{ J min}^{-1}\text{K}^{-1}$)[cite: 1].
+
+---
+
+### B. Dimensional Mismatch in PI Control Law (Eq. 2 & Eq. 3)
+The anti-windup integrator and parallel PI control law are defined as[cite: 1]:
+$$ \frac{dI}{dt} = \bigl(T - T_\mathrm{sp}\bigr)\cdot \mathbf{1}\!\left\{Q_{c,\min} < Q_c < Q_{c,\max}\right\} $$[cite: 1]
+$$ Q_c = \mathrm{clip}\!\left( Q_{c0} + K_p\bigl(T - T_\mathrm{sp}\bigr) + \frac{I}{\tau_i},\; Q_{c,\min},\; Q_{c,\max} \right) $$[cite: 1]
+
+Checking the dimensional consistency of each additive term in Eq. (3)[cite: 1]:
+* **$Q_{c0}$**: $\text{L min}^{-1}$[cite: 1]
+* **$K_p (T - T_\mathrm{sp})$**: $[(\text{L min}^{-1})\text{ K}^{-1}] \cdot [\text{K}] = \text{L min}^{-1}$[cite: 1]
+* **Integrator state $I$**: $\int (T - T_\mathrm{sp}) dt \in \text{K min}$[cite: 1]
+* **Integral term $\frac{I}{\tau_i}$**: $\frac{\text{K min}}{\text{min}} = \text{K}$[cite: 1]
+
+Adding Kelvin ($\text{K}$) directly to volumetric flow rate ($\text{L min}^{-1}$) is a dimensional error[cite: 1].
+
+* **Fix:** Re-formulate Eq. (3) using standard parallel PI syntax by multiplying the integral term by $K_p$[cite: 1]:
+  $$ Q_c = \mathrm{clip}\!\left( Q_{c0} + K_p\left( T - T_\mathrm{sp} + \frac{I}{\tau_i} \right),\; Q_{c,\min},\; Q_{c,\max} \right) $$[cite: 1]
+  Alternatively, redefine the integrator state differential as $\frac{dI}{dt} = K_p (T - T_\mathrm{sp})$[cite: 1].
+
+---
+
+### C. Mixed Unit Systems and Missing Parameters in System II
+Section 3 mixes SI units ($\text{kJ mol}^{-1}$, $\text{K}$) and US Customary units ($\text{lbmol}$, $\text{Btu h}^{-1}$)[cite: 1]. 
+* Table 2 lists kinetic and column parameters but omits physical values for $U\!A_r$, $\rho$, $C_p$, $V_r$, $M_j$, $C_{pj}$, and $Q_{\mathrm{reb,nom}}$[cite: 1].
+* In Eq. (5c), $Q_j$ is introduced in $\text{Btu h}^{-1}$ while temperatures are given in Kelvin[cite: 1].
+
+* **Fix:** Add a dedicated parameter table for the thermal extension in System II, and explicitly state unit conversion factors used in the JAX dynamic engine[cite: 1].
+
+---
+
+## 2. Methodological & Technical Clarity Points
+
+### A. Diagnostic Terminology: Sensitivity vs. Fisher Information
+Eq. (10) defines a local covariance-weighted sensitivity matrix[cite: 1]:
+$$ \widetilde{\mathbf{I}}(\boldsymbol{\theta}) = \mathbf{J}^{\mathsf{T}} \boldsymbol{\Sigma}^{-1} \mathbf{J} $$[cite: 1]
+The text acknowledges that $\widetilde{\mathbf{I}}$ is a local proxy due to non-Gaussian summary distributions and potential heteroscedasticity[cite: 1]. However, calling this a "raw-trajectory Fisher-information check" in the Abstract, Introduction, and Section 3 can draw criticism from statistical reviewers[cite: 1].
+* **Recommendation:** Consistently refer to $\widetilde{\mathbf{I}}$ as a *local empirical sensitivity diagnostic* or *linearized information proxy* throughout the text to prevent pushback[cite: 1].
+
+### B. Clarifying the "Matched Protocol" Definition
+In Section 5.1, Section 5.3, and Table 4, the text emphasizes a "matched closed-loop posterior" versus an "unmatched open-loop posterior"[cite: 1].
+* **Recommendation:** Ensure Section 4 explicitly defines what "matched" entails (i.e., whether training trajectories originate from the closed-loop steady state vs. open-loop dynamic transients) and clarify how initial conditions for simulator runs are sampled during SNPE-C offline training[cite: 1].
+
+### C. Outlier Exclusion Reporting in Baseline Comparison (Table 4)
+Table 4 reports that NUTS MCMC failed to converge within 3 hours on 18 out of 50 windows (36% failure rate)[cite: 1].
+* **Recommendation:** Frame this failure rate prominently in the main text of Section 5.3[cite: 1]. For real-time fault diagnosis in continuous chemical processes, an offline algorithm failure rate of 36% under fixed time constraints is a major operational limitation that highlights the practical advantage of amortized neural inference[cite: 1].
+---
+
 
 **Confirmed correct on re-check (no change needed):** `eq:fim_ratio`'s 236× value
 (963,652/4,085 = 235.9, rounds to 236 — arithmetic verified); the Sc\,2 12× value and

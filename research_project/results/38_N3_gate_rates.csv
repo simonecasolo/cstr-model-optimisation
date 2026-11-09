@@ -1,0 +1,7 @@
+scenario,n,n_unsaturated,flag_rate_all_windows,flag_rate_unsaturated,flag_rate_no_guard_all,role
+Sc1,50,35,0.02,0.02857142857142857,0.32,false-alarm rate
+Sc2,50,29,0.0,0.0,0.42,false-alarm rate
+Sc3,50,46,0.02,0.021739130434782608,0.1,false-alarm rate
+Sc4,50,34,0.0,0.0,0.3,false-alarm rate
+Sc5,50,13,0.02,0.07692307692307693,0.76,false-alarm rate
+Sc7,50,31,0.62,1.0,1.0,detection rate (drift present)

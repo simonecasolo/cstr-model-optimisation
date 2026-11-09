@@ -75,8 +75,15 @@ SCENARIO_CONFIGS: dict[str, ScenarioConfig] = {
     ),
     "Sc2_closed_fouling": ScenarioConfig(
         id=2, name="Sc2_closed_fouling",
-        alpha=1.0, beta=0.7, mode="closed_loop", drift_T=0.0,
-        description="Jacket fouling (beta=0.7) -- primary fault scenario.",
+        alpha=1.0, beta=0.85, mode="closed_loop", drift_T=0.0,
+        # 2026-11-08 (user decision): beta 0.70 -> 0.85. Placement rule: the MIDPOINT of the
+        # fouling range in which the controller stays unsaturated. At alpha=1 the fouling class
+        # is beta < 0.90 (classification threshold) and the coolant valve saturates below
+        # beta~0.795 (Qc_max = 400 L/min; the jacket cannot hold Tsp at all below beta~0.775),
+        # so the band is ~0.80-0.90 and its midpoint is 0.85 (Qc_ss ~110 L/min).
+        # Interim value 0.80 was rejected: 9.1% of samples at Qc_max and beta 90% coverage
+        # 0.68-0.80 (nb02 / nb03 section 10). Sc7 is now exactly Sc2 + 2 K T-sensor drift.
+        description="Jacket fouling (beta=0.85) -- midpoint of the unsaturated fouling band.",
     ),
     "Sc3_closed_decay": ScenarioConfig(
         id=3, name="Sc3_closed_decay",
@@ -90,14 +97,18 @@ SCENARIO_CONFIGS: dict[str, ScenarioConfig] = {
     ),
     "Sc5_closed_saturated": ScenarioConfig(
         id=5, name="Sc5_closed_saturated",
-        alpha=1.0, beta=0.4, mode="closed_loop", drift_T=0.0,
-        description="Severe fouling -- controller saturates at Qc_max.",
+        alpha=1.0, beta=0.5, mode="closed_loop", drift_T=0.0,
+        # 2026-11-08: beta 0.40 -> 0.50. 0.40 was exactly the prior's lower edge, so the
+        # posterior was truncated at the truth and its 90% coverage was 0 by construction
+        # (nb29). 0.50 is still deep in saturation (onset at beta~0.795).
+        description="Severe fouling (beta=0.5) -- controller saturates at Qc_max.",
     ),
     "Sc6_open_with_fault": ScenarioConfig(
         id=6, name="Sc6_open_with_fault",
-        alpha=1.0, beta=0.7, mode="open_loop", drift_T=0.0,
+        alpha=1.0, beta=0.85, mode="open_loop", drift_T=0.0,
+        # 2026-11-08: beta 0.70 -> 0.85, kept equal to Sc2 (open-loop twin of Sc2).
         description=(
-            "Open-loop simulator applied to a fault -- the failure baseline "
+            "Open-loop simulator applied to a fault (open-loop twin of Sc2) -- the failure baseline "
             "(SBI trained on this is what the paper refutes)."
         ),
     ),

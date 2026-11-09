@@ -1,0 +1,437 @@
+{
+  "variants": {
+    "oracle": {
+      "calibrated": false,
+      "n_violations": 0,
+      "deployable": false,
+      "violations": [],
+      "sd_b_median_sbc": 0.0270052962005138,
+      "sd_a_median_sbc": 0.0338411852717399
+    },
+    "eps0.05": {
+      "calibrated": true,
+      "n_violations": 1,
+      "deployable": false,
+      "violations": [
+        {
+          "condition": "Tci+1.0",
+          "scenario": "Sc1",
+          "cov90_b": 0.78,
+          "class_acc": 1.0,
+          "oracle_acc": 1.0,
+          "z_bias_b": -0.2059120553722949
+        }
+      ],
+      "sd_b_median_sbc": 0.0350197851657867,
+      "sd_a_median_sbc": 0.0361471585929393
+    },
+    "eps0.1": {
+      "calibrated": true,
+      "n_violations": 1,
+      "deployable": false,
+      "violations": [
+        {
+          "condition": "Tci+0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.98,
+          "class_acc": 0.86,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.0459940513835451
+        }
+      ],
+      "sd_b_median_sbc": 0.0405871383845806,
+      "sd_a_median_sbc": 0.0354314595460891
+    },
+    "eps0.2": {
+      "calibrated": true,
+      "n_violations": 17,
+      "deployable": false,
+      "violations": [
+        {
+          "condition": "nominal",
+          "scenario": "Sc2",
+          "cov90_b": 0.96,
+          "class_acc": 0.74,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.1652203086923267
+        },
+        {
+          "condition": "nominal",
+          "scenario": "Sc4",
+          "cov90_b": 0.96,
+          "class_acc": 0.56,
+          "oracle_acc": 0.76,
+          "z_bias_b": 0.1282875207637265
+        },
+        {
+          "condition": "Tci-0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.88,
+          "class_acc": 0.7,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.2228120666852228
+        },
+        {
+          "condition": "Tci-0.5",
+          "scenario": "Sc4",
+          "cov90_b": 0.96,
+          "class_acc": 0.58,
+          "oracle_acc": 0.8,
+          "z_bias_b": 0.1844247240045693
+        },
+        {
+          "condition": "Ti-0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.88,
+          "class_acc": 0.84,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.0580108556664684
+        },
+        {
+          "condition": "Ti-0.5",
+          "scenario": "Sc4",
+          "cov90_b": 0.92,
+          "class_acc": 0.66,
+          "oracle_acc": 0.78,
+          "z_bias_b": 0.1417744097746163
+        },
+        {
+          "condition": "Tci+0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.96,
+          "class_acc": 0.72,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.09605719897128
+        },
+        {
+          "condition": "Tci+0.5",
+          "scenario": "Sc4",
+          "cov90_b": 0.96,
+          "class_acc": 0.56,
+          "oracle_acc": 0.76,
+          "z_bias_b": 0.0954543634277075
+        },
+        {
+          "condition": "Tci-1.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.9,
+          "class_acc": 0.74,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.196221673725171
+        },
+        {
+          "condition": "Tci-1.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.96,
+          "class_acc": 0.64,
+          "oracle_acc": 0.78,
+          "z_bias_b": 0.2305729671217067
+        },
+        {
+          "condition": "Ti-1.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.9,
+          "class_acc": 0.86,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.037587910874557
+        },
+        {
+          "condition": "Ti-1.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.94,
+          "class_acc": 0.7,
+          "oracle_acc": 0.8,
+          "z_bias_b": 0.052831056719727
+        },
+        {
+          "condition": "Tci+1.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.92,
+          "class_acc": 0.76,
+          "oracle_acc": 0.94,
+          "z_bias_b": -0.0742171885139222
+        },
+        {
+          "condition": "Tci+1.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.98,
+          "class_acc": 0.64,
+          "oracle_acc": 0.76,
+          "z_bias_b": 0.0198584130526776
+        },
+        {
+          "condition": "Ti+1.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.9,
+          "class_acc": 0.8,
+          "oracle_acc": 0.92,
+          "z_bias_b": 0.0706660849455971
+        },
+        {
+          "condition": "Ti-2.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.88,
+          "class_acc": 0.78,
+          "oracle_acc": 0.94,
+          "z_bias_b": 0.2357662186093634
+        },
+        {
+          "condition": "Tci+2.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.9,
+          "class_acc": 0.8,
+          "oracle_acc": 0.92,
+          "z_bias_b": -0.0722734614590544
+        }
+      ],
+      "sd_b_median_sbc": 0.0505107603967189,
+      "sd_a_median_sbc": 0.035628892481327
+    },
+    "marginal": {
+      "calibrated": true,
+      "n_violations": 29,
+      "deployable": false,
+      "violations": [
+        {
+          "condition": "nominal",
+          "scenario": "Sc2",
+          "cov90_b": 0.92,
+          "class_acc": 0.3,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.545274893762305
+        },
+        {
+          "condition": "nominal",
+          "scenario": "Sc4",
+          "cov90_b": 0.96,
+          "class_acc": 0.4,
+          "oracle_acc": 0.76,
+          "z_bias_b": 0.4218879454270058
+        },
+        {
+          "condition": "Tci-0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.92,
+          "class_acc": 0.28,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.7253474505998233
+        },
+        {
+          "condition": "Tci-0.5",
+          "scenario": "Sc4",
+          "cov90_b": 0.92,
+          "class_acc": 0.4,
+          "oracle_acc": 0.8,
+          "z_bias_b": 0.4470765099044339
+        },
+        {
+          "condition": "Ti-0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.88,
+          "class_acc": 0.54,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.3290018353514554
+        },
+        {
+          "condition": "Ti-0.5",
+          "scenario": "Sc4",
+          "cov90_b": 0.92,
+          "class_acc": 0.54,
+          "oracle_acc": 0.78,
+          "z_bias_b": 0.3018693651064927
+        },
+        {
+          "condition": "Tci+0.5",
+          "scenario": "Sc2",
+          "cov90_b": 0.98,
+          "class_acc": 0.42,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.3287578701609925
+        },
+        {
+          "condition": "Tci+0.5",
+          "scenario": "Sc3",
+          "cov90_b": 0.92,
+          "class_acc": 0.84,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.1726477386033164
+        },
+        {
+          "condition": "Tci+0.5",
+          "scenario": "Sc4",
+          "cov90_b": 1.0,
+          "class_acc": 0.26,
+          "oracle_acc": 0.76,
+          "z_bias_b": 0.4173487386958591
+        },
+        {
+          "condition": "Ti+0.5",
+          "scenario": "Sc3",
+          "cov90_b": 0.92,
+          "class_acc": 0.88,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.1753901425052125
+        },
+        {
+          "condition": "Tci-1.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.88,
+          "class_acc": 0.42,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.5736430712282036
+        },
+        {
+          "condition": "Tci-1.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.94,
+          "class_acc": 0.4,
+          "oracle_acc": 0.78,
+          "z_bias_b": 0.4146219403421086
+        },
+        {
+          "condition": "Ti-1.0",
+          "scenario": "Sc1",
+          "cov90_b": 0.98,
+          "class_acc": 0.88,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.1284187930909133
+        },
+        {
+          "condition": "Ti-1.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.96,
+          "class_acc": 0.52,
+          "oracle_acc": 1.0,
+          "z_bias_b": 0.3529132182644244
+        },
+        {
+          "condition": "Ti-1.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.9,
+          "class_acc": 0.42,
+          "oracle_acc": 0.8,
+          "z_bias_b": 0.2220198518153355
+        },
+        {
+          "condition": "Tci+1.0",
+          "scenario": "Sc2",
+          "cov90_b": 1.0,
+          "class_acc": 0.5,
+          "oracle_acc": 0.94,
+          "z_bias_b": 0.1794194474797095
+        },
+        {
+          "condition": "Tci+1.0",
+          "scenario": "Sc4",
+          "cov90_b": 1.0,
+          "class_acc": 0.2,
+          "oracle_acc": 0.76,
+          "z_bias_b": 0.3338411145861343
+        },
+        {
+          "condition": "Ti+1.0",
+          "scenario": "Sc1",
+          "cov90_b": 1.0,
+          "class_acc": 0.28,
+          "oracle_acc": 1.0,
+          "z_bias_b": -0.7206515758566963
+        },
+        {
+          "condition": "Ti+1.0",
+          "scenario": "Sc3",
+          "cov90_b": 1.0,
+          "class_acc": 0.62,
+          "oracle_acc": 1.0,
+          "z_bias_b": -0.4962952239728937
+        },
+        {
+          "condition": "Tci-2.0",
+          "scenario": "Sc1",
+          "cov90_b": 0.9,
+          "class_acc": 0.84,
+          "oracle_acc": 1.0,
+          "z_bias_b": -0.6182266996455419
+        },
+        {
+          "condition": "Tci-2.0",
+          "scenario": "Sc3",
+          "cov90_b": 0.84,
+          "class_acc": 0.72,
+          "oracle_acc": 1.0,
+          "z_bias_b": -0.8798750241170018
+        },
+        {
+          "condition": "Ti-2.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.96,
+          "class_acc": 0.32,
+          "oracle_acc": 0.94,
+          "z_bias_b": 0.7829055803043379
+        },
+        {
+          "condition": "Ti-2.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.96,
+          "class_acc": 0.28,
+          "oracle_acc": 0.7,
+          "z_bias_b": 0.7784585626848186
+        },
+        {
+          "condition": "Tci+2.0",
+          "scenario": "Sc2",
+          "cov90_b": 1.0,
+          "class_acc": 0.24,
+          "oracle_acc": 0.92,
+          "z_bias_b": 0.1772015754572063
+        },
+        {
+          "condition": "Tci+2.0",
+          "scenario": "Sc4",
+          "cov90_b": 1.0,
+          "class_acc": 0.14,
+          "oracle_acc": 0.74,
+          "z_bias_b": 0.2308843678145444
+        },
+        {
+          "condition": "Ti+2.0",
+          "scenario": "Sc1",
+          "cov90_b": 0.34,
+          "class_acc": 0.0,
+          "oracle_acc": 1.0,
+          "z_bias_b": -1.638891078973374
+        },
+        {
+          "condition": "Ti+2.0",
+          "scenario": "Sc2",
+          "cov90_b": 0.36,
+          "class_acc": 1.0,
+          "oracle_acc": 0.92,
+          "z_bias_b": -1.6547768062049495
+        },
+        {
+          "condition": "Ti+2.0",
+          "scenario": "Sc3",
+          "cov90_b": 0.42,
+          "class_acc": 0.0,
+          "oracle_acc": 1.0,
+          "z_bias_b": -1.5623755700783062
+        },
+        {
+          "condition": "Ti+2.0",
+          "scenario": "Sc4",
+          "cov90_b": 0.42,
+          "class_acc": 0.76,
+          "oracle_acc": 0.74,
+          "z_bias_b": -1.5646249648481596
+        }
+      ],
+      "sd_b_median_sbc": 0.1013329476118087,
+      "sd_a_median_sbc": 0.0352110937237739
+    }
+  },
+  "instrument_requirement": null,
+  "requirement_eps_K": null,
+  "recommended_for_production": "marginal",
+  "decision": "USER (this notebook does not change production)",
+  "rule": "see docstring of scripts/nb35_measured_inlet.py (fixed before running)"
+}

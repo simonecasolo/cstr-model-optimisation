@@ -1,0 +1,6 @@
+item,value
+"single window: features + 1,000 draws (median of 50), ms",52.88816639222205
+"single window (5th-95th percentile), ms",26-61
+"720-window batch: features, ms per window",0.002111805628778206
+"720-window batch: 1,000 draws, ms per window",9.778485186204003
+torch threads,8

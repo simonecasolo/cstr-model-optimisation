@@ -1,0 +1,5 @@
+=== chunk worker 'sbc_reduced' started: out=sb3_sbc_set_n120_sb3_wideprior_stage1bfix.npz, n_rows=120, seed=9102 ===
+[sbc_reduced] resuming from partial: 50/120 rows, 141 attempts
+[sbc_reduced] 100/120 rows, 250 attempts, 3077s elapsed, accept_rate=0.40, ETA=0.2h
+[sbc_reduced] DONE: 120 rows, 297 attempts, final accept_rate=0.40, 4546s total
+=== chunk worker 'sbc_reduced' finished ===

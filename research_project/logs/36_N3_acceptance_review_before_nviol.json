@@ -1,0 +1,116 @@
+{
+  "approved": true,
+  "by": "user (Simone Casolo), 2026-11-09, in conversation with Claude",
+  "decision": "nb36 production posterior ACCEPTED with a documented exception; the acceptance criterion and stage_accept are NOT amended",
+  "exception": "4 of 52 cells on the nb35 inlet grid miss the class-accuracy criterion (accuracy >= nb35 oracle - 0.10): Sc2 nominal, Sc2 Tci-0.5 K, Sc2 Tci+0.5 K, Sc4 Tci+0.5 K (class accuracy only; beta 90% coverage 0.94-0.98 in those cells; calibration passes)",
+  "reason": "the shortfall is the real accuracy cost of eps = 0.1 K inlet sensors near the class threshold, not noise: the scenarios concerned have beta = 0.85, 0.05 below the 0.90 class threshold, and the cause is posterior width (beta sd ~0.045 at eps = 0.1 K against 0.017 for the oracle and ~0.03 at eps = 0.05 K); on ~1,000 fresh windows per cell the nb36 ensemble is 0.07-0.13 below the oracle in class accuracy at Sc2 and 0.07 at Sc4 (Sc2 nominal 0.877 vs oracle 0.987; Tci-0.5 0.921 vs 0.994; Tci+0.5 0.857 vs 0.985; Sc4 Tci+0.5 0.803 vs 0.877), eps = 0.05 K recovers most of it (0.951, 0.976, 0.935, 0.846)",
+  "followup_script": "logs/36_N3_acceptance_followup.py",
+  "followup_results": "results/36_N3_acceptance_followup.csv (1,000 fresh windows per cell, identical windows for all four posteriors)",
+  "followup_failing_cells": {
+    "Sc2 nominal": {
+      "nb36 production (eps 0.1, 20k x5)": {
+        "class_acc": 0.877,
+        "se": 0.01,
+        "sd_b": 0.045,
+        "cov90_b": 0.958
+      },
+      "nb35 oracle": {
+        "class_acc": 0.987,
+        "se": 0.004,
+        "sd_b": 0.017,
+        "cov90_b": 0.91
+      },
+      "nb35 eps0.05": {
+        "class_acc": 0.951,
+        "se": 0.007,
+        "sd_b": 0.032,
+        "cov90_b": 0.933
+      },
+      "nb35 eps0.1": {
+        "class_acc": 0.891,
+        "se": 0.01,
+        "sd_b": 0.044,
+        "cov90_b": 0.956
+      }
+    },
+    "Sc2 Tci-0.5": {
+      "nb36 production (eps 0.1, 20k x5)": {
+        "class_acc": 0.921,
+        "se": 0.009,
+        "sd_b": 0.04,
+        "cov90_b": 0.94
+      },
+      "nb35 oracle": {
+        "class_acc": 0.994,
+        "se": 0.002,
+        "sd_b": 0.015,
+        "cov90_b": 0.929
+      },
+      "nb35 eps0.05": {
+        "class_acc": 0.976,
+        "se": 0.005,
+        "sd_b": 0.027,
+        "cov90_b": 0.91
+      },
+      "nb35 eps0.1": {
+        "class_acc": 0.915,
+        "se": 0.009,
+        "sd_b": 0.039,
+        "cov90_b": 0.928
+      }
+    },
+    "Sc2 Tci+0.5": {
+      "nb36 production (eps 0.1, 20k x5)": {
+        "class_acc": 0.857,
+        "se": 0.011,
+        "sd_b": 0.051,
+        "cov90_b": 0.956
+      },
+      "nb35 oracle": {
+        "class_acc": 0.985,
+        "se": 0.004,
+        "sd_b": 0.022,
+        "cov90_b": 0.918
+      },
+      "nb35 eps0.05": {
+        "class_acc": 0.935,
+        "se": 0.008,
+        "sd_b": 0.039,
+        "cov90_b": 0.946
+      },
+      "nb35 eps0.1": {
+        "class_acc": 0.898,
+        "se": 0.01,
+        "sd_b": 0.05,
+        "cov90_b": 0.966
+      }
+    },
+    "Sc4 Tci+0.5": {
+      "nb36 production (eps 0.1, 20k x5)": {
+        "class_acc": 0.803,
+        "se": 0.013,
+        "sd_b": 0.05,
+        "cov90_b": 0.95
+      },
+      "nb35 oracle": {
+        "class_acc": 0.877,
+        "se": 0.01,
+        "sd_b": 0.019,
+        "cov90_b": 0.929
+      },
+      "nb35 eps0.05": {
+        "class_acc": 0.846,
+        "se": 0.011,
+        "sd_b": 0.036,
+        "cov90_b": 0.94
+      },
+      "nb35 eps0.1": {
+        "class_acc": 0.813,
+        "se": 0.012,
+        "sd_b": 0.048,
+        "cov90_b": 0.967
+      }
+    }
+  },
+  "rule_and_stage_accept_changed": false
+}

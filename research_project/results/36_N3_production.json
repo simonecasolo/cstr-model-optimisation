@@ -1,0 +1,98 @@
+{
+  "protocol": "P2",
+  "sensor_model": "N3",
+  "sensor_noise": "N3: sigma_C=0.01 mol/L, sigma_T=0.2 K, sigma_Tc=0.2 K, sigma_Qc=2.0 L/min",
+  "summary_set": "S1m_measured_inlet",
+  "inlet_model": {
+    "mode": "measured",
+    "eps_K": 0.1,
+    "white_sd_K": 0.018257418583505537,
+    "inlet_range_K": 2.0,
+    "Ci_rel_sd": 0.01
+  },
+  "production_budget": 20000,
+  "use_ensemble": true,
+  "members": [
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/36_N3/post_n20000_s0.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/36_N3/post_n20000_s1.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/36_N3/post_n20000_s2.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/36_N3/post_n20000_s3.pkl",
+    "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/results/36_N3/post_n20000_s4.pkl"
+  ],
+  "flag": null,
+  "selection": "first persistently converged step 10000->20000",
+  "steps": [
+    {
+      "from": 5000,
+      "to": 10000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": false,
+      "e_precision": true,
+      "converged": false,
+      "max_dcorr": 0.0148600635603372,
+      "max_rel_dsd": 0.07800775115907443,
+      "worst_sd": "b_Sc3"
+    },
+    {
+      "from": 10000,
+      "to": 20000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.0178833447476954,
+      "max_rel_dsd": 0.058043608237986044,
+      "worst_sd": "a_Sc4"
+    },
+    {
+      "from": 20000,
+      "to": 40000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.021667020268148415,
+      "max_rel_dsd": 0.05762786849120416,
+      "worst_sd": "b_Sc3"
+    },
+    {
+      "from": 40000,
+      "to": 80000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.018417906793306307,
+      "max_rel_dsd": 0.022761783916925737,
+      "worst_sd": "b_Sc3"
+    },
+    {
+      "from": 80000,
+      "to": 160000,
+      "a_corr": true,
+      "b_cov": true,
+      "c_tarp": true,
+      "d_calib": true,
+      "e_precision": true,
+      "converged": true,
+      "max_dcorr": 0.007012935756441102,
+      "max_rel_dsd": 0.026204139313305563,
+      "worst_sd": "b_Sc2"
+    }
+  ],
+  "rule": "nb31 v2.1 (unchanged; fixed before running)",
+  "design_decision": {
+    "design": "measured inlet temperatures, eps = 0.1 K (class-AA RTD)",
+    "date": "2026-11-09",
+    "approved_by": "user (Simone Casolo), 2026-11-09, in conversation with Claude",
+    "basis": "nb35: removes the nb34 silent failure; eps <= 0.1 K is the instrument requirement; 0.05 and 0.2 K reported as sensitivity"
+  }
+}

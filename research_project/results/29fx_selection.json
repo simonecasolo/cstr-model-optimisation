@@ -1,0 +1,80 @@
+{
+  "criterion": "see docstring of scripts/nb29_ws_study.py (fixed before results)",
+  "choice": "P1b",
+  "flag": "NO PROTOCOL PASSES CALIBRATION ON THE P2 COLUMN -- chosen by lowest TARP deviation. Do NOT start nb31 until the user has reviewed results/29fx_e3_matrix.csv.",
+  "log": [
+    "NO PROTOCOL PASSES CALIBRATION ON THE P2 COLUMN -- chosen by lowest TARP deviation. Do NOT start nb31 until the user has reviewed results/29fx_e3_matrix.csv."
+  ],
+  "table_P2_column": [
+    {
+      "train": "P0",
+      "min_ks_med": 3.432673096472839e-137,
+      "tarp_ks_med": 3.35303632024916e-32,
+      "tarp_dev": 0.26599999999999996,
+      "rmse": 0.07705758752136253,
+      "rmse_se": 0.003058206738860533,
+      "f1": 0.9822993268706132,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.26266666666666666,
+      "P0col_tarp_dev": 0.036,
+      "P0col_rmse": 0.032179555852625163,
+      "eligible": false
+    },
+    {
+      "train": "P1",
+      "min_ks_med": 1.4815971820294497e-08,
+      "tarp_ks_med": 0.0011486012327333,
+      "tarp_dev": 0.0926666666666666,
+      "rmse": 0.03745265801595177,
+      "rmse_se": 0.00022349547893903702,
+      "f1": 0.9671638758890774,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.09399999999999993,
+      "P0col_tarp_dev": 0.3239999999999999,
+      "P0col_rmse": 0.13590200130526187,
+      "eligible": false
+    },
+    {
+      "train": "P1b",
+      "min_ks_med": 0.0001496800282632,
+      "tarp_ks_med": 0.8172815627702061,
+      "tarp_dev": 0.026666666666666634,
+      "rmse": 0.03565813592397734,
+      "rmse_se": 0.00022177376157151235,
+      "f1": 0.9805223105966623,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.0406666666666666,
+      "P0col_tarp_dev": 0.29666666666666663,
+      "P0col_rmse": 0.1175383304505397,
+      "eligible": false
+    },
+    {
+      "train": "P2",
+      "min_ks_med": 1.105692639326028e-10,
+      "tarp_ks_med": 0.1162621677433788,
+      "tarp_dev": 0.052,
+      "rmse": 0.03578728445807177,
+      "rmse_se": 0.00022708561939820013,
+      "f1": 0.9769039886714825,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.04533333333333326,
+      "P0col_tarp_dev": 0.2913333333333333,
+      "P0col_rmse": 0.11860529707852567,
+      "eligible": false
+    },
+    {
+      "train": "P3",
+      "min_ks_med": 7.722470340453989e-07,
+      "tarp_ks_med": 0.1932216211230802,
+      "tarp_dev": 0.047999999999999966,
+      "rmse": 0.03624877061419416,
+      "rmse_se": 7.759319388984129e-05,
+      "f1": 0.9832190168751674,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.05333333333333334,
+      "P0col_tarp_dev": 0.3119999999999999,
+      "P0col_rmse": 0.0982681579885863,
+      "eligible": false
+    }
+  ]
+}

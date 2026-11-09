@@ -1,0 +1,5 @@
+scenario,model,frac_outside_prior,alpha_mean_raw,beta_mean_raw,n_windows_with_50_inside,beta_mean_inprior,beta_cov90_inprior,fault_acc_inprior,class_counts_raw
+Sc2,CL-SBI,9.99999999995449e-06,1.0000613927841187,0.8607978820800781,50,0.8607984185218811,0.94,0.96,"{'fouling_dominant': 48, 'healthy': 2}"
+Sc2,OL-SBI,0.94,1.3747609853744507,1.007648229598999,3,0.7201998233795166,0.0,0.3333333333333333,"{'healthy': 32, 'fouling_dominant': 14, 'combined': 4}"
+Sc6,CL-SBI,2.0000000000020002e-05,1.0025346279144287,0.9148707985877991,50,0.9148820638656616,0.5,0.38,"{'healthy': 31, 'fouling_dominant': 19}"
+Sc6,OL-SBI,0.00017000000000000348,1.0003458261489868,0.8563132286071777,50,0.8563116192817688,0.94,0.88,"{'fouling_dominant': 44, 'healthy': 6}"

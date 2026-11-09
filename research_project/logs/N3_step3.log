@@ -1,0 +1,55 @@
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_29.py", line 367, in <module>
+    print(build(execute="--execute" in sys.argv, sensor=_sensor))
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/build_nb_system_I_29.py", line 358, in build
+    client.execute()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/Users/simo/.pyenv/versions/3.10.11/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+sel = json.loads((R / f"{S.TAG}_selection.json").read_text())
+m = load(f"{S.TAG}_e3_matrix.csv")
+diag_alpha_fails = all(m[(m.train == p) & (m.test == p)].ks_p_a.median() < 0.01 for p in P)
+p1b = m[(m.train == "P1b") & (m.test == "P2")]
+p1b_ok = (p1b.ks_p_b.median() >= 0.01) and (p1b.tarp_ks_p.median() >= 0.01)
+print("choice", sel["choice"], "| flagged", bool(sel["flag"]), "| alpha fails on every matched pair", diag_alpha_fails,
+      "| P1b passes beta and TARP on P2", p1b_ok)
+if sel["choice"] != "P1b":
+    raise RuntimeError("STOP: under this sensor model the rule selects " + sel["choice"] + ", not P1b -- user review needed")
+if sel["flag"]:
+    if not (diag_alpha_fails and p1b_ok):
+        raise RuntimeError("STOP: selection flagged for a different reason than under N0 -- user review needed")
+    (R / f"{S.TAG}_selection_review.json").write_text(json.dumps({
+        "choice": "P1b", "approved": True, "time": time.ctime(),
+        "by": "pre-approval conditions proposed 2026-11-09 (runbook docs/Manuscript/system_i_N3_runbook.md); all three met",
+        "reason": "flag caused by full-set alpha SBC failing on every matched pair (budget limit), as under N0"}, indent=2))
+    print("pre-approved: P1b (review file written)")
+else:
+    print("not flagged: P1b selected directly")
+------------------
+
+----- stdout -----
+choice P2 | flagged False | alpha fails on every matched pair False | P1b passes beta and TARP on P2 True
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[10], line 9[0m
+[1;32m      6[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mchoice[39m[38;5;124m"[39m, sel[[38;5;124m"[39m[38;5;124mchoice[39m[38;5;124m"[39m], [38;5;124m"[39m[38;5;124m| flagged[39m[38;5;124m"[39m, [38;5;28mbool[39m(sel[[38;5;124m"[39m[38;5;124mflag[39m[38;5;124m"[39m]), [38;5;124m"[39m[38;5;124m| alpha fails on every matched pair[39m[38;5;124m"[39m, diag_alpha_fails,
+[1;32m      7[0m       [38;5;124m"[39m[38;5;124m| P1b passes beta and TARP on P2[39m[38;5;124m"[39m, p1b_ok)
+[1;32m      8[0m [38;5;28;01mif[39;00m sel[[38;5;124m"[39m[38;5;124mchoice[39m[38;5;124m"[39m] [38;5;241m!=[39m [38;5;124m"[39m[38;5;124mP1b[39m[38;5;124m"[39m:
+[0;32m----> 9[0m     [38;5;28;01mraise[39;00m [38;5;167;01mRuntimeError[39;00m([38;5;124m"[39m[38;5;124mSTOP: under this sensor model the rule selects [39m[38;5;124m"[39m [38;5;241m+[39m sel[[38;5;124m"[39m[38;5;124mchoice[39m[38;5;124m"[39m] [38;5;241m+[39m [38;5;124m"[39m[38;5;124m, not P1b -- user review needed[39m[38;5;124m"[39m)
+[1;32m     10[0m [38;5;28;01mif[39;00m sel[[38;5;124m"[39m[38;5;124mflag[39m[38;5;124m"[39m]:
+[1;32m     11[0m     [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m (diag_alpha_fails [38;5;129;01mand[39;00m p1b_ok):
+
+[0;31mRuntimeError[0m: STOP: under this sensor model the rule selects P2, not P1b -- user review needed
+
+EXIT_STATUS=1

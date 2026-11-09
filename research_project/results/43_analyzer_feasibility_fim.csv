@@ -1,0 +1,15 @@
+point,pair,representation,corr_mean
+Nominal,eta_col/z_A0_eff,S-B (no analyzer),0.7905840358307749
+Nominal,eta_col/z_A0_eff,S-C (+z_A analyzer),0.6312410672881651
+Nominal,alpha/eta_col,S-B (no analyzer),-0.70575141492028
+Nominal,alpha/eta_col,S-C (+z_A analyzer),-0.5348666583827136
+"nb39/41 degraded (xi_reb=0.70, z_A0_eff=0.80)",alpha/z_A0_eff,S-B (no analyzer),-0.655701850920501
+"nb39/41 degraded (xi_reb=0.70, z_A0_eff=0.80)",alpha/z_A0_eff,S-C (+z_A analyzer),-0.34164912996838687
+W2 (alpha=0.85),alpha/z_A0_eff,S-B (no analyzer),0.7425503393507302
+W2 (alpha=0.85),alpha/z_A0_eff,S-C (+z_A analyzer),0.7506700362062032
+nb40 P4 (random prior draw),alpha/z_A0_eff,S-B (no analyzer),0.5871233805970261
+nb40 P4 (random prior draw),alpha/z_A0_eff,S-C (+z_A analyzer),0.6012500394144359
+nb40 P4 (random prior draw),eta_col/z_A0_eff,S-B (no analyzer),0.3169139627588691
+nb40 P4 (random prior draw),eta_col/z_A0_eff,S-C (+z_A analyzer),0.3031808979926609
+"nb41 interior eta_col=0.85, z_A0_eff=0.80",eta_col/z_A0_eff,S-B (no analyzer),0.7317301581997513
+"nb41 interior eta_col=0.85, z_A0_eff=0.80",eta_col/z_A0_eff,S-C (+z_A analyzer),0.554920484648633

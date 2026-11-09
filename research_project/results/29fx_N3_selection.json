@@ -1,0 +1,82 @@
+{
+  "criterion": "see docstring of scripts/nb29_ws_study.py (fixed before results)",
+  "sensor_model": "N3",
+  "choice": "P2",
+  "flag": null,
+  "log": [
+    "eligible: ['P2']; best RMSE P2; tied within 1 SE: ['P2']",
+    "after robustness tie-break (<=0.01 of best worst-case TARP dev): ['P2']"
+  ],
+  "table_P2_column": [
+    {
+      "train": "P0",
+      "min_ks_med": 4.268923411664849e-109,
+      "tarp_ks_med": 5.084052233779587e-28,
+      "tarp_dev": 0.2713333333333333,
+      "rmse": 0.19133302187868495,
+      "rmse_se": 0.03908772897678373,
+      "f1": 0.8931313596926799,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.27533333333333326,
+      "P0col_tarp_dev": 0.04466666666666663,
+      "P0col_rmse": 0.04112732877769233,
+      "eligible": false
+    },
+    {
+      "train": "P1",
+      "min_ks_med": 1.837044507957243e-08,
+      "tarp_ks_med": 5.552936604984935e-05,
+      "tarp_dev": 0.09133333333333334,
+      "rmse": 0.044338142105456335,
+      "rmse_se": 0.0007705493206746916,
+      "f1": 0.8865003294003714,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.08866666666666663,
+      "P0col_tarp_dev": 0.25066666666666665,
+      "P0col_rmse": 0.09777169836384857,
+      "eligible": false
+    },
+    {
+      "train": "P1b",
+      "min_ks_med": 0.006878298644972,
+      "tarp_ks_med": 0.1932216211230802,
+      "tarp_dev": 0.0406666666666666,
+      "rmse": 0.04021682151050197,
+      "rmse_se": 0.00046604294301372614,
+      "f1": 0.8965872989020965,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.0453333333333333,
+      "P0col_tarp_dev": 0.2379999999999999,
+      "P0col_rmse": 0.09023176784949045,
+      "eligible": false
+    },
+    {
+      "train": "P2",
+      "min_ks_med": 0.0214544864162594,
+      "tarp_ks_med": 0.0162959326947645,
+      "tarp_dev": 0.055999999999999966,
+      "rmse": 0.04020038178561527,
+      "rmse_se": 0.00015613712442166678,
+      "f1": 0.9122793346678789,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.05066666666666656,
+      "P0col_tarp_dev": 0.2253333333333333,
+      "P0col_rmse": 0.0825350277697517,
+      "eligible": true
+    },
+    {
+      "train": "P3",
+      "min_ks_med": 7.671014689800835e-07,
+      "tarp_ks_med": 0.083652967911058,
+      "tarp_dev": 0.058666666666666666,
+      "rmse": 0.04145597066414577,
+      "rmse_se": 0.0001427596103011854,
+      "f1": 0.8898465731009261,
+      "n_seeds": 3,
+      "worst_offcol_tarp_dev": 0.05799999999999997,
+      "P0col_tarp_dev": 0.19733333333333336,
+      "P0col_rmse": 0.06082961051762247,
+      "eligible": false
+    }
+  ]
+}

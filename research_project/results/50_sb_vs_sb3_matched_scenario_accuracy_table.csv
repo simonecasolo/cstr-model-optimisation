@@ -1,0 +1,10 @@
+scenario,true_unit,"S-B  (5-D, full-uniform bank)","S-B3 (4-D, full-uniform bank)",diff (S-B3 minus S-B)
+W12_snowball_compound,multi,1.0,1.0,0.0
+W15_snowball_threshold,reactor,0.35,0.52,-0.17
+W1_healthy,healthy,1.0,1.0,0.0
+W2_cat_mild,reactor,1.0,1.0,0.0
+W4_cat_threshold,reactor,0.99,1.0,-0.01
+W5_jacket_mild,reactor,1.0,1.0,0.0
+W6_jacket_severe,reactor,1.0,1.0,0.0
+W7_col_eff_mild,column,1.0,1.0,0.0
+W9_reb_fouling,column,1.0,1.0,0.0

@@ -1,0 +1,23 @@
+=== chunk worker 'sbc_reduced' started: out=sb3_sbc_set_n120_sb3_wideprior_stage1bfix.npz, n_rows=120, seed=9102 ===
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_reduced] 50/120 rows, 141 attempts, 4833s elapsed, accept_rate=0.35, ETA=1.9h
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2922: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/.venv/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:2923: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+[sbc_reduced] 100/120 rows, 274 attempts, 8961s elapsed, accept_rate=0.36, ETA=0.5h
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/generate_sb3_wideprior_chunk.py", line 33, in <module>
+    generate_bank(args.out, args.n_rows, seed=args.seed, label=args.label)
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/generate_sb3_wideprior_bank.py", line 96, in generate_bank
+    log(f"[{label}] {len(theta_rows)}/{n_rows} rows, {attempts} attempts, "
+  File "/Users/simo/inso-po-RD/cstr-model-optimisation/research_project/scripts/generate_sb3_wideprior_bank.py", line 60, in log
+    with open(LOG_PATH, "a") as f:
+OSError: [Errno 28] No space left on device

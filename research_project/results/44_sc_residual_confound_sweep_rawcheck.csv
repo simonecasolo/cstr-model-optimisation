@@ -1,0 +1,7 @@
+point,pair,corr_summary_72d,corr_raw_traj,survives_gate_a
+nominal,alpha/eta_col,-0.5172772015615177,-0.4219191772468209,False
+alpha_displaced,alpha/eta_col,-0.6411852526161331,-0.6041458790164219,True
+eta_col_interior,alpha/beta_r,0.4221169640276901,0.11724699713358272,False
+eta_col_interior,alpha/eta_col,-0.6623213759979266,-0.5648877779046608,True
+eta_col_interior,xi_reb/eta_col,0.41282415642447906,0.4790144192180892,False
+W2_like,alpha/eta_col,-0.6624733248242463,-0.5986084519951891,True
