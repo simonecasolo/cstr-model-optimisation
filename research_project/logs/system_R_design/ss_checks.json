@@ -1,0 +1,194 @@
+{
+ "R0_SystemI": {
+  "n_points": 4913,
+  "n_multiple": 0,
+  "example_multiple": "None",
+  "Tmax_all_ss": 316.6,
+  "frac_sat_high": 0.469,
+  "lowsat_alpha04": false,
+  "beta_sat_nominal": 0.794,
+  "beta_sat_worst_inlet": 1.338,
+  "sens": {
+   "Tci+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.1548,
+    "dln_beta_rx": 0.0
+   },
+   "Ti+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.125
+   },
+   "Ci+1%": {
+    "dln_alpha": -0.0101,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.051
+   },
+   "Q+0.5%": {
+    "dln_alpha": -0.005,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.005
+   }
+  }
+ },
+ "R1_fogler_UA1.0": {
+  "n_points": 4913,
+  "n_multiple": 155,
+  "example_multiple": "(np.float64(0.65), np.float64(0.65), {'Ti': 299.0, 'Tci': 291.0, 'Ci': 2.9610600000000002, 'Q': 210.28199999999998}, [307.6, 317.8, 337.5])",
+  "Tmax_all_ss": 352.6,
+  "frac_sat_high": 0.306,
+  "lowsat_alpha04": false,
+  "beta_sat_nominal": 0.688,
+  "beta_sat_worst_inlet": 0.87,
+  "sens": {
+   "Tci+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0256,
+    "dln_beta_rx": 0.0
+   },
+   "Ti+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0248
+   },
+   "Ci+1%": {
+    "dln_alpha": -0.0118,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0353
+   },
+   "Q+0.5%": {
+    "dln_alpha": -0.005,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.005
+   }
+  }
+ },
+ "R2_fogler_UA1.5": {
+  "n_points": 4913,
+  "n_multiple": 21,
+  "example_multiple": "(np.float64(0.65), np.float64(0.45), {'Ti': 299.0, 'Tci': 291.0, 'Ci': 2.9610600000000002, 'Q': 210.28199999999998}, [308.7, 315.8, 338.9])",
+  "Tmax_all_ss": 347.4,
+  "frac_sat_high": 0.095,
+  "lowsat_alpha04": false,
+  "beta_sat_nominal": 0.498,
+  "beta_sat_worst_inlet": 0.645,
+  "sens": {
+   "Tci+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0173,
+    "dln_beta_rx": 0.0
+   },
+   "Ti+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0248
+   },
+   "Ci+1%": {
+    "dln_alpha": -0.0118,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0353
+   },
+   "Q+0.5%": {
+    "dln_alpha": -0.005,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.005
+   }
+  }
+ },
+ "R3_fogler_UA2.0": {
+  "n_points": 4913,
+  "n_multiple": 0,
+  "example_multiple": "None",
+  "Tmax_all_ss": 343.3,
+  "frac_sat_high": 0.023,
+  "lowsat_alpha04": false,
+  "beta_sat_nominal": 0.391,
+  "beta_sat_worst_inlet": 0.513,
+  "sens": {
+   "Tci+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0149,
+    "dln_beta_rx": 0.0
+   },
+   "Ti+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0248
+   },
+   "Ci+1%": {
+    "dln_alpha": -0.0118,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.0353
+   },
+   "Q+0.5%": {
+    "dln_alpha": -0.005,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.005
+   }
+  }
+ },
+ "R4_fogler_UA2.0_Ti310": {
+  "n_points": 4913,
+  "n_multiple": 0,
+  "example_multiple": "None",
+  "Tmax_all_ss": 351.5,
+  "frac_sat_high": 0.182,
+  "lowsat_alpha04": false,
+  "beta_sat_nominal": 0.593,
+  "beta_sat_worst_inlet": 0.708,
+  "sens": {
+   "Tci+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0205,
+    "dln_beta_rx": 0.0
+   },
+   "Ti+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0151
+   },
+   "Ci+1%": {
+    "dln_alpha": -0.0118,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.0215
+   },
+   "Q+0.5%": {
+    "dln_alpha": -0.005,
+    "dln_beta_jac": 0.0,
+    "dln_beta_rx": -0.005
+   }
+  }
+ },
+ "R5_fogler_UA2.5": {
+  "n_points": 4913,
+  "n_multiple": 0,
+  "example_multiple": "None",
+  "Tmax_all_ss": 340.0,
+  "frac_sat_high": 0.004,
+  "lowsat_alpha04": false,
+  "beta_sat_nominal": 0.321,
+  "beta_sat_worst_inlet": 0.426,
+  "sens": {
+   "Tci+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": 0.0137,
+    "dln_beta_rx": 0.0
+   },
+   "Ti+0.5": {
+    "dln_alpha": 0.0,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.0248
+   },
+   "Ci+1%": {
+    "dln_alpha": -0.0118,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.0353
+   },
+   "Q+0.5%": {
+    "dln_alpha": -0.005,
+    "dln_beta_jac": -0.0,
+    "dln_beta_rx": -0.005
+   }
+  }
+ }
+}

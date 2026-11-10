@@ -1,0 +1,49 @@
+{
+ "R0_SystemI": {
+  "sd_alpha": 0.05192647597996107,
+  "sd_beta": 0.03209308089789599,
+  "corr_ab": 0.11206542683812361,
+  "sd_alpha_oracle": 0.051233546159406895,
+  "sd_beta_oracle": 0.014389087612627888,
+  "cond_cov": 22590056853.18485,
+  "n_dropped_constant": 1,
+  "dropped": [
+   "Qc_sat_high"
+  ],
+  "proxy_sd_alpha": 0.05354357621544809,
+  "proxy_sd_beta": 0.06531211105785048,
+  "seconds": 42
+ },
+ "R3_fogler_UA2.0": {
+  "sd_alpha": 0.007290351683098563,
+  "sd_beta": 0.003968706654212278,
+  "corr_ab": 0.1701915869243599,
+  "sd_alpha_oracle": 0.006078920638832113,
+  "sd_beta_oracle": 0.0025942207195049495,
+  "cond_cov": 14681302476.768536,
+  "n_dropped_constant": 2,
+  "dropped": [
+   "Qc_sat_low",
+   "Qc_sat_high"
+  ],
+  "proxy_sd_alpha": 0.014774512481965823,
+  "proxy_sd_beta": 0.00421748304350842,
+  "seconds": 44
+ },
+ "R5_fogler_UA2.5": {
+  "sd_alpha": 0.007283351813789528,
+  "sd_beta": 0.0039069187478452125,
+  "corr_ab": 0.1595771556735419,
+  "sd_alpha_oracle": 0.006068501587030238,
+  "sd_beta_oracle": 0.0027393934334153753,
+  "cond_cov": 13701542623.95046,
+  "n_dropped_constant": 2,
+  "dropped": [
+   "Qc_sat_low",
+   "Qc_sat_high"
+  ],
+  "proxy_sd_alpha": 0.014774248710752716,
+  "proxy_sd_beta": 0.004249325849345003,
+  "seconds": 42
+ }
+}

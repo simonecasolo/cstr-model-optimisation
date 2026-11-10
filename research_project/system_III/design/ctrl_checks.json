@@ -1,0 +1,56 @@
+{
+ "R3_fogler_UA2.0_lam0.5": {
+  "n_unsat": 1415,
+  "max_real_eig": 0.008497933998946806,
+  "slowest_tau_min": 4705.074038963659,
+  "worst_1_minus_damping": 1.032036961265078,
+  "lam_frac": 0.5,
+  "Kp": 9.507684730591928,
+  "taui": 5.627911174364288
+ },
+ "R3_fogler_UA2.0_lam1.0": {
+  "n_unsat": 1415,
+  "max_real_eig": 0.018836246283757834,
+  "slowest_tau_min": 10113.016221044109,
+  "worst_1_minus_damping": 1.0991705146343609,
+  "lam_frac": 1.0,
+  "Kp": 4.753842365295964,
+  "taui": 5.627911174364288
+ },
+ "R3_fogler_UA2.0_lam2.0": {
+  "n_unsat": 1415,
+  "max_real_eig": 0.022590992031578175,
+  "slowest_tau_min": 32252.25545219882,
+  "worst_1_minus_damping": 1.1587472248400126,
+  "lam_frac": 2.0,
+  "Kp": 2.376921182647982,
+  "taui": 5.627911174364288
+ },
+ "R5_fogler_UA2.5_lam0.5": {
+  "n_unsat": 1441,
+  "max_real_eig": 0.0018020046337893537,
+  "slowest_tau_min": 2172.58973049539,
+  "worst_1_minus_damping": 1.0069131502554056,
+  "lam_frac": 0.5,
+  "Kp": 8.10030766035745,
+  "taui": 5.575257726461301
+ },
+ "R5_fogler_UA2.5_lam1.0": {
+  "n_unsat": 1441,
+  "max_real_eig": 0.015201229200146004,
+  "slowest_tau_min": 7910.707099348721,
+  "worst_1_minus_damping": 1.0814679389649655,
+  "lam_frac": 1.0,
+  "Kp": 4.050153830178725,
+  "taui": 5.575257726461301
+ },
+ "R5_fogler_UA2.5_lam2.0": {
+  "n_unsat": 1441,
+  "max_real_eig": 0.020150997059500683,
+  "slowest_tau_min": 19619.793309419394,
+  "worst_1_minus_damping": 1.1451146878641731,
+  "lam_frac": 2.0,
+  "Kp": 2.0250769150893624,
+  "taui": 5.575257726461301
+ }
+}

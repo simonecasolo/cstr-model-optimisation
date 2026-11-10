@@ -1,0 +1,52 @@
+[
+ {
+  "Kp": 50,
+  "taui": 8,
+  "tw": 0.001,
+  "pv_filter": 0.2,
+  "n_unsat": 1415,
+  "max_real_eig": -0.03772858770028932,
+  "slowest_tau_min": 26.505100268895873,
+  "min_damping": 0.053089749506567724
+ },
+ {
+  "Kp": 50,
+  "taui": 8,
+  "tw": 0.5,
+  "pv_filter": 0.2,
+  "n_unsat": 1415,
+  "max_real_eig": 0.0784729464048187,
+  "slowest_tau_min": 40706.70564121892,
+  "min_damping": -0.11773821073124265
+ },
+ {
+  "Kp": 35,
+  "taui": 10,
+  "tw": 0.5,
+  "pv_filter": 0.1,
+  "n_unsat": 1415,
+  "max_real_eig": 0.017297442830828222,
+  "slowest_tau_min": 2741.402068586117,
+  "min_damping": -0.03103250947550541
+ },
+ {
+  "Kp": 25,
+  "taui": 10,
+  "tw": 0.5,
+  "pv_filter": 0.1,
+  "n_unsat": 1415,
+  "max_real_eig": 0.00263979121128078,
+  "slowest_tau_min": 378.81783821638595,
+  "min_damping": -0.005727903829924181
+ },
+ {
+  "Kp": 20,
+  "taui": 12,
+  "tw": 0.5,
+  "pv_filter": 0.1,
+  "n_unsat": 1415,
+  "max_real_eig": -0.011300290123043726,
+  "slowest_tau_min": 88.49330319057779,
+  "min_damping": 0.028006582963741346
+ }
+]
