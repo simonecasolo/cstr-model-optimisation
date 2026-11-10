@@ -71,20 +71,22 @@ for nm, fn, fmt in (("Sbi timing (nb12)", "12_N3_sbi_timing.csv", None), ("Break
 for fn, nm in (("37_N3_lc2st_positive_controls.csv", "L-C2ST positive controls (nb37)"),):
     if (R / fn).exists():
         d_ = pd.read_csv(R / fn); rows.append((nm, "; ".join(f"{a.variant}|{a.posterior}: p<0.05 in {a.frac_p_below_0_05:.2f}" for a in d_.itertuples())))
+if (R / "39_N3_decision.json").exists():
+    j39 = json.loads((R / "39_N3_decision.json").read_text()); rows.append(("Saturated-window drift detector, plug-in beta disagreement (nb39)", f"tau {j39['tau']:.2f}; D1 saturated Sc7 detection {j39['detection_Sc7_saturated']:.3f}, Sc5 false alarms {j39['false_alarm_Sc5_saturated']:.3f}; pre-set bar met: {j39['bar_met']}"))
 dash = pd.DataFrame(rows, columns=["claim", "value (loaded from results/)"])
 for _, r_ in dash.iterrows():
     print(f"* {r_['claim']}\n    {r_.iloc[1]}\n")
 dash.to_csv(R / "14_N3_dashboard.csv", index=False)'''
     open_items = """## 4. What is not settled (read before the conclusions)
 
-* **No NUTS baseline** (decision C, plan SI-1): the posterior is checked by SBC, TARP, the Cramér–Rao bound, the EKF/UKF comparison and L-C2ST. The notebooks 05, 20, 21 and 23 still carry the pre-fix NUTS numbers; only notebook 21 carries the banner that they are not valid (notebooks 05, 20 and 23 need the same banner, pending your decision).
-* **Drift-aware posterior (nb09):** pre-set verdict FIXED with a macro-F1 margin of 0.0001 and an ensemble TARP p of 0.017; the deployment gate (nb38) repairs the unsaturated Sc7 windows only (saturated windows remain wrong unless the guard is dropped, at a cost in the well-specified scenarios).
-* **The L-C2ST (nb37)** — see its commentary: the pre-set default is not interpretable on its own; the corrected positive controls decide how far it can be read.
+* **No NUTS baseline** (decision C, plan SI-1): the posterior is checked by SBC, TARP, the Cramér–Rao bound, the EKF/UKF comparison and L-C2ST. The notebooks 05, 20, 21 and 23 keep their pre-fix NUTS numbers under a banner that they are not valid; **notebook 05a** (pre-fix NUTS classification) also uses `run_mcmc_baseline` and has no banner yet.
+* **Drift-aware posterior (nb09):** pre-set verdict FIXED with a macro-F1 margin of 0.0001 and an ensemble TARP p of 0.017; the deployment gate (nb38) repairs the unsaturated Sc7 windows only. **Saturated windows (nb39):** the plug-in β disagreement does not detect the drift there either (pre-set bar not met: Sc7 detection 0.105 on D1, false alarms 0.054), so the saturation caveat stands: neither z_T nor d works with a saturated valve; routing every saturated window to the drift-aware posterior (the no-guard variant of nb38) costs macro-F1 and width.
+* **The L-C2ST (nb37):** the standardised variant (power demonstrated) rejects 0 of 25 windows; the sbi default on raw inputs is not reproducible (not used); the compressed-observation variant flags 8 of 25 windows and is an open item (plan SI-2).
 * **System II / Luyben** carry the same malformed PI form as System I had; not touched.
 * **CNN vs hand-crafted (nb04b/24)** is still pending; the old "within 1%" claim is retired.
 * **The k0 = 60× Fogler** (about 98% conversion) is kept and must be disclosed.
 * **Controller-form correction, k0 disclosure and the warm-start protocol** are decided but their manuscript text is pending (ledger).
-* **SI figures (nb17):** not regenerated (nb17 rewrites `data/observations.npz` and `data/scenario_configs.csv`, which would overwrite the regenerated D0).
+* **SI figures:** regenerated from stored data and results only by the new notebook 17 (`17_supplementary_figures_N3.ipynb`) into `figures/si_N3/` (data/ verified unchanged by checksums); the SI still cites the old files in `figures/` until the swap is decided. The old notebook 17 rewrites `data/observations.npz` and must not be run.
 """
     concl = """## 5. Conclusions — to be written after the last run
 (The core message, the sources of silent failure with their numbers, the practitioner checklist and the open items, written against the dashboard above.)"""

@@ -1,0 +1,7 @@
+{
+ "tau": 1.0547184944152832,
+ "detection_Sc7_saturated": 0.10526315789473684,
+ "false_alarm_Sc5_saturated": 0.05405405405405406,
+ "false_alarm_Sc1_4_saturated": 0.0,
+ "bar_met": false
+}

@@ -45,6 +45,9 @@ N_PER_SEED, SEEDS, BUDGETS = 20_000, [0, 1, 2], [5_000, 20_000]
 N_SBC, SC_REPS = 1000, 50
 THETA_SEED, TEST_SEED = 3300, 3399
 CHUNK = 5_000
+# NOTE (2026-11-10, comment only): the 'Sc2' point here, (alpha, beta) = (1.0, 0.7), is the OLD scenario-catalogue value. The catalogue moved Sc2 to beta = 0.85
+# on 2026-11-08 (today's Sc2 is (1.0, 0.85); today's Sc5 is (1.0, 0.5)); this table was NOT updated, so any 'Sc2' result derived from it (e.g. results/03s_N3_fim.csv, the nb29
+# E2 tables) refers to beta = 0.7. notebook 08 (N3) reports the Fisher information at today's points and pairs the old 'Sc2' with its severity point beta = 0.7.
 E2_POINTS = {"Sc1": (1.0, 1.0), "Sc2": (1.0, 0.7), "Sc3": (0.7, 1.0), "Sc4": (0.85, 0.85)}
 
 

@@ -1,0 +1,7 @@
+scenario,n_saturated,flag_rate_d,d_median,role
+Sc1,15,0.0,0.0022130021825432777,false alarm (reported)
+Sc2,21,0.0,0.019532501697540283,false alarm (reported)
+Sc3,4,0.0,0.06380120664834976,false alarm (reported)
+Sc4,16,0.0,0.06059091538190842,false alarm (reported)
+Sc5,37,0.05405405405405406,-0.12908804416656494,FALSE ALARM (gated)
+Sc7,19,0.10526315789473684,0.675722599029541,DETECTION (drift present)

@@ -97,6 +97,8 @@ def stage_e1():
     Kp, tau_i = float(NOMINAL_CTRL[0]), float(NOMINAL_CTRL[1])
     w_qc = np.array([0.0, Kp, 0.0, Kp / tau_i])          # dQc/d[C,T,Tc,I] when unsaturated
     q = np.asarray(DEFAULT_PROCESS_SIGMA, float) ** 2
+    # NOTE (2026-11-10, comment only): 'Sc2' = (1.0, 0.7) below is the OLD catalogue value (today's Sc2 is (1.0, 0.85)); 'Sc5' = (1.0, 0.4) is also old (today's Sc5 is (1.0, 0.5)).
+    # Results derived from these points (nb29 E1/E2 tables) refer to those old betas. See notebook 08 (N3) and the runbook note of 2026-11-10.
     pts = {"Sc1": (1.0, 1.0), "Sc2": (1.0, 0.7), "Sc3": (0.7, 1.0), "Sc4": (0.85, 0.85),
            "Sc5": (1.0, 0.4), "Sc7": (1.0, 0.85), "c(0.4,0.4)": (0.4, 0.4),
            "c(0.4,1.2)": (0.4, 1.2), "c(1.2,0.4)": (1.2, 0.4), "c(1.2,1.2)": (1.2, 1.2)}
@@ -192,6 +194,8 @@ def stage_e2(n_rep: int = 1500, h: float = 0.01):
     import ws_protocols as ws
     import ws_eval as we
     we.mark(TAG, "e2_start")
+    # NOTE (2026-11-10, comment only): 'Sc2' = (1.0, 0.7) below is the OLD catalogue value (today's Sc2 is (1.0, 0.85)); 'Sc5' = (1.0, 0.4) is also old (today's Sc5 is (1.0, 0.5)).
+    # Results derived from these points (nb29 E1/E2 tables) refer to those old betas. See notebook 08 (N3) and the runbook note of 2026-11-10.
     pts = {"Sc1": (1.0, 1.0), "Sc2": (1.0, 0.7), "Sc3": (0.7, 1.0), "Sc4": (0.85, 0.85)}
     rows = []
     for P in PROTOCOLS:

@@ -20,3 +20,4 @@ Break-even (nb12),"filter          sbi_mode  t_filter_ms  t_sbi_ms  break_even_w
    UKF       batched SBI      483.716    13.202             765.517
    UKF single-window SBI      483.716    51.367             833.093"
 L-C2ST positive controls (nb37),comp|beta shifted +0.10: p<0.05 in 1.00; comp|production posterior: p<0.05 in 0.32; default|beta shifted +0.10: p<0.05 in 0.92; default|production posterior: p<0.05 in 0.00; std|beta shifted +0.10: p<0.05 in 1.00; std|production posterior: p<0.05 in 0.00; std|width x0.5: p<0.05 in 1.00
+"Saturated-window drift detector, plug-in beta disagreement (nb39)","tau 1.05; D1 saturated Sc7 detection 0.105, Sc5 false alarms 0.054; pre-set bar met: False"
